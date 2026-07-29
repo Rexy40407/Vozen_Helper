@@ -210,6 +210,31 @@
       .ops__detail { min-height: 20px; margin: 6px 0 0; color: var(--text-1); font-size: 13px; line-height: 1.45; }
       .ops__track { height: 6px; margin-top: 15px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, .08); }
       .ops__fill { display: block; width: 100%; height: 100%; border-radius: inherit; transform: scaleX(0); transform-origin: left center; background: var(--ops-tone, var(--text-2)); transition: transform .35s cubic-bezier(.22, 1, .36, 1), background-color .2s ease; }
+      .ops__details { margin-top: 15px; border-top: 1px solid rgba(255, 255, 255, .08); }
+      .ops__details summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0 0; cursor: pointer; color: var(--text-1); font-size: 12.5px; font-weight: 650; list-style: none; }
+      .ops__details summary::-webkit-details-marker { display: none; }
+      .ops__details summary:focus-visible { outline: 2px solid var(--aqua); outline-offset: 4px; border-radius: 4px; }
+      .ops__details-chevron { width: 8px; height: 8px; flex: none; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .18s ease; }
+      .ops__details[open] .ops__details-chevron { transform: rotate(225deg) translate(-2px, -1px); }
+      .ops__details-body { padding-top: 13px; }
+      .ops__facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 14px; margin: 0; }
+      .ops__fact { min-width: 0; }
+      .ops__fact dt { color: var(--text-2); font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; }
+      .ops__fact dd { margin: 4px 0 0; overflow: hidden; color: var(--text-0); font-size: 12px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+      .ops__history { margin-top: 15px; padding-top: 13px; border-top: 1px solid rgba(255, 255, 255, .06); }
+      .ops__history-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+      .ops__history-title { color: var(--text-1); font-size: 12px; font-weight: 700; }
+      .ops__history-note { color: var(--text-2); font-family: var(--f-mono); font-size: 9.5px; white-space: nowrap; }
+      .ops__history-list { display: grid; gap: 1px; margin: 9px 0 0; padding: 0; list-style: none; }
+      .ops__history-row { display: grid; grid-template-columns: 74px minmax(0, 1fr) auto; align-items: center; column-gap: 9px; min-height: 25px; padding: 3px 0; }
+      .ops__history-row::before { content: ''; grid-column: 1; grid-row: 1; width: 5px; height: 5px; margin-left: 1px; border-radius: 50%; background: var(--history-tone, var(--text-2)); }
+      .ops__history-day { grid-column: 1; grid-row: 1; margin-left: 12px; color: var(--text-2); font-family: var(--f-mono); font-size: 10px; }
+      .ops__history-size { min-width: 0; overflow: hidden; color: var(--text-1); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
+      .ops__history-use { color: var(--history-tone, var(--text-2)); font-family: var(--f-mono); font-size: 10px; font-weight: 700; }
+      .ops__history-row[data-state="healthy"] { --history-tone: var(--aqua); }
+      .ops__history-row[data-state="warn"] { --history-tone: var(--amber); }
+      .ops__history-row[data-state="critical"] { --history-tone: var(--red); }
+      .ops__history-row[data-state="unknown"] { --history-tone: var(--text-2); }
       .ops__live { display: flex; flex-direction: column; justify-content: center; }
       .ops__live-value { display: inline-flex; align-items: center; gap: 10px; }
       .ops__live-value .ops__value { font-size: clamp(27px, 2.5vw, 35px); }
@@ -221,6 +246,7 @@
       .ops__refresh svg { width: 19px; height: 19px; }
       .ops__updated { display: block; margin-top: 10px; color: var(--text-2); font-family: var(--f-mono); font-size: 10.5px; }
       @media (max-width: 760px) { .ops { grid-template-columns: 1fr; } .ops__metric + .ops__metric { border-top: 1px solid var(--line); border-left: 0; } .ops__refresh { width: auto; height: auto; margin: 0; padding: 12px 18px; justify-self: stretch; border-width: 1px 0 0; border-radius: 0; display: inline-flex; gap: 8px; font-family: var(--f-body); font-weight: 600; font-size: 13px; } .ops__refresh::after { content: "Atualizar"; } }
+      @media (max-width: 430px) { .ops__facts { grid-template-columns: 1fr 1fr; } .ops__history-row { grid-template-columns: 68px minmax(0, 1fr) auto; column-gap: 7px; } }
       @media (prefers-reduced-motion: reduce) { .ops__fill, .ops__refresh { transition: none; } }
 
       .box { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px; margin-bottom: 20px; backdrop-filter: blur(14px); }
@@ -371,6 +397,20 @@
           <p class="ops__detail" id="databaseDetail">A obter a leitura do volume…</p>
           <div class="ops__track" aria-hidden="true"><span class="ops__fill" id="databaseFill"></span></div>
           <span class="ops__updated" id="metricsUpdated">Atualização automática a cada 30 segundos</span>
+          <details class="ops__details" id="databaseDetails">
+            <summary><span>Ver detalhes e histórico</span><span class="ops__details-chevron" aria-hidden="true"></span></summary>
+            <div class="ops__details-body">
+              <dl class="ops__facts">
+                <div class="ops__fact"><dt>Tamanho SQLite</dt><dd id="databaseExactSize">—</dd></div>
+                <div class="ops__fact"><dt>Volume usado</dt><dd id="databaseUsed">—</dd></div>
+                <div class="ops__fact"><dt>Espaço livre</dt><dd id="databaseFree">—</dd></div>
+              </dl>
+              <div class="ops__history">
+                <div class="ops__history-head"><span class="ops__history-title">Últimos 7 dias</span><span class="ops__history-note" id="databaseHistoryNote">A recolher leituras</span></div>
+                <ol class="ops__history-list" id="databaseHistory" aria-live="polite"></ol>
+              </div>
+            </div>
+          </details>
         </article>
         <article class="ops__metric ops__live" data-state="healthy">
           <div class="ops__top"><span class="ops__label">Em simultâneo</span></div>
@@ -804,6 +844,59 @@
         return { key: 'healthy', label: percent < 20 ? 'Com folga' : 'Saudável', percent };
       }
 
+      function lastSevenUtcDays() {
+        const days = [];
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+        for (let offset = 6; offset >= 0; offset -= 1) {
+          const day = new Date(today);
+          day.setUTCDate(today.getUTCDate() - offset);
+          days.push(day.toISOString().slice(0, 10));
+        }
+        return days;
+      }
+
+      function formatHistoryDay(day) {
+        return new Intl.DateTimeFormat('pt-PT', { weekday: 'short', day: '2-digit', month: 'short', timeZone: 'UTC' })
+          .format(new Date(day + 'T00:00:00Z'))
+          .replace('.', '');
+      }
+
+      function renderDatabaseHistory(samples) {
+        const readings = new Map((Array.isArray(samples) ? samples : []).map((sample) => [sample.day, sample]));
+        const history = $('databaseHistory');
+        history.replaceChildren();
+        let recorded = 0;
+        for (const day of lastSevenUtcDays().reverse()) {
+          const sample = readings.get(day);
+          const row = document.createElement('li');
+          row.className = 'ops__history-row';
+          const dayLabel = document.createElement('span');
+          dayLabel.className = 'ops__history-day';
+          dayLabel.textContent = formatHistoryDay(day);
+          const size = document.createElement('span');
+          size.className = 'ops__history-size';
+          const usage = document.createElement('span');
+          usage.className = 'ops__history-use';
+          if (sample) {
+            recorded += 1;
+            const state = storageState(Number(sample.volumeTotalBytes), Number(sample.volumeUsedBytes));
+            row.dataset.state = state.key;
+            size.textContent = formatBytes(sample.databaseBytes) + ' SQLite';
+            usage.textContent = state.percent === null ? 'sem volume' : state.percent + '%';
+          } else {
+            row.dataset.state = 'unknown';
+            size.textContent = 'Sem leitura';
+            usage.textContent = '—';
+          }
+          row.append(dayLabel, size, usage);
+          history.append(row);
+        }
+        $('databaseHistoryNote').textContent = recorded === 7
+          ? '7 registos reais'
+          : recorded + ' de 7 registos';
+      }
+
       function renderSystemMetrics(metrics) {
         const databaseBytes = Number(metrics.databaseBytes);
         const total = Number(metrics.volumeTotalBytes);
@@ -813,6 +906,9 @@
         $('databaseMetric').dataset.state = state.key;
         $('databaseState').textContent = state.label;
         $('databaseSize').textContent = formatBytes(databaseBytes);
+        $('databaseExactSize').textContent = formatBytes(databaseBytes);
+        $('databaseUsed').textContent = formatBytes(used);
+        $('databaseFree').textContent = formatBytes(available);
         $('databaseFill').style.transform = state.percent === null ? 'scaleX(0)' : 'scaleX(' + (state.percent / 100) + ')';
         $('databaseDetail').textContent = state.percent === null
           ? 'O volume de dados não está disponível nesta leitura.'
@@ -822,6 +918,7 @@
         $('activeSessionsDetail').textContent = active === 1
           ? '1 chamada de voz ativa agora'
           : active + ' chamadas de voz ativas agora';
+        renderDatabaseHistory(metrics.databaseHistory);
         $('metricsUpdated').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
       }
 
@@ -830,7 +927,11 @@
         $('databaseState').textContent = 'Indisponível';
         $('databaseSize').textContent = '—';
         $('databaseDetail').textContent = 'Não foi possível obter a leitura agora.';
+        $('databaseExactSize').textContent = '—';
+        $('databaseUsed').textContent = '—';
+        $('databaseFree').textContent = '—';
         $('databaseFill').style.transform = 'scaleX(0)';
+        renderDatabaseHistory([]);
         $('metricsUpdated').textContent = 'Tenta atualizar novamente.';
       }
 
