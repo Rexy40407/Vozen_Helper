@@ -217,7 +217,7 @@
       .ops__details-chevron { width: 8px; height: 8px; flex: none; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .18s ease; }
       .ops__details[open] .ops__details-chevron { transform: rotate(225deg) translate(-2px, -1px); }
       .ops__details-body { padding-top: 13px; }
-      .ops__facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 14px; margin: 0; }
+      .ops__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; margin: 0; }
       .ops__fact { min-width: 0; }
       .ops__fact dt { color: var(--text-2); font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; }
       .ops__fact dd { margin: 4px 0 0; overflow: hidden; color: var(--text-0); font-size: 12px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
@@ -246,7 +246,7 @@
       .ops__refresh svg { width: 19px; height: 19px; }
       .ops__updated { display: block; margin-top: 10px; color: var(--text-2); font-family: var(--f-mono); font-size: 10.5px; }
       @media (max-width: 760px) { .ops { grid-template-columns: 1fr; } .ops__metric + .ops__metric { border-top: 1px solid var(--line); border-left: 0; } .ops__refresh { width: auto; height: auto; margin: 0; padding: 12px 18px; justify-self: stretch; border-width: 1px 0 0; border-radius: 0; display: inline-flex; gap: 8px; font-family: var(--f-body); font-weight: 600; font-size: 13px; } .ops__refresh::after { content: "Atualizar"; } }
-      @media (max-width: 430px) { .ops__facts { grid-template-columns: 1fr 1fr; } .ops__history-row { grid-template-columns: 68px minmax(0, 1fr) auto; column-gap: 7px; } }
+      @media (max-width: 430px) { .ops__history-row { grid-template-columns: 68px minmax(0, 1fr) auto; column-gap: 7px; } }
       @media (prefers-reduced-motion: reduce) { .ops__fill, .ops__refresh { transition: none; } }
 
       .box { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px; margin-bottom: 20px; backdrop-filter: blur(14px); }
@@ -404,6 +404,7 @@
                 <div class="ops__fact"><dt>Tamanho SQLite</dt><dd id="databaseExactSize">—</dd></div>
                 <div class="ops__fact"><dt>Volume usado</dt><dd id="databaseUsed">—</dd></div>
                 <div class="ops__fact"><dt>Espaço livre</dt><dd id="databaseFree">—</dd></div>
+                <div class="ops__fact"><dt>Média 7 dias</dt><dd id="databaseAverage">—</dd></div>
               </dl>
               <div class="ops__history">
                 <div class="ops__history-head"><span class="ops__history-title">Últimos 7 dias</span><span class="ops__history-note" id="databaseHistoryNote">A recolher leituras</span></div>
@@ -867,6 +868,9 @@
         const history = $('databaseHistory');
         history.replaceChildren();
         let recorded = 0;
+        let totalDatabaseBytes = 0;
+        let totalUsagePercent = 0;
+        let usageReadings = 0;
         for (const day of lastSevenUtcDays().reverse()) {
           const sample = readings.get(day);
           const row = document.createElement('li');
@@ -881,6 +885,11 @@
           if (sample) {
             recorded += 1;
             const state = storageState(Number(sample.volumeTotalBytes), Number(sample.volumeUsedBytes));
+            totalDatabaseBytes += Math.max(0, Number(sample.databaseBytes) || 0);
+            if (state.percent !== null) {
+              totalUsagePercent += state.percent;
+              usageReadings += 1;
+            }
             row.dataset.state = state.key;
             size.textContent = formatBytes(sample.databaseBytes) + ' SQLite';
             usage.textContent = state.percent === null ? 'sem volume' : state.percent + '%';
@@ -895,6 +904,9 @@
         $('databaseHistoryNote').textContent = recorded === 7
           ? '7 registos reais'
           : recorded + ' de 7 registos';
+        $('databaseAverage').textContent = recorded === 0
+          ? 'Sem dados'
+          : formatBytes(totalDatabaseBytes / recorded) + (usageReadings ? ' · ' + Math.round(totalUsagePercent / usageReadings) + '%' : '');
       }
 
       function renderSystemMetrics(metrics) {
@@ -930,6 +942,7 @@
         $('databaseExactSize').textContent = '—';
         $('databaseUsed').textContent = '—';
         $('databaseFree').textContent = '—';
+        $('databaseAverage').textContent = '—';
         $('databaseFill').style.transform = 'scaleX(0)';
         renderDatabaseHistory([]);
         $('metricsUpdated').textContent = 'Tenta atualizar novamente.';
