@@ -194,6 +194,35 @@
       .tab { padding: 9px 18px; border-radius: 9px; border: none; background: none; cursor: pointer; font-family: var(--f-body); font-weight: 600; font-size: 14px; color: var(--text-1); }
       .tab.is-active { background: var(--grad); color: #06070e; }
 
+      /* Leitura operacional: uma faixa única com duas células, em vez de cartões decorativos.
+         A cor é sempre derivada da ocupação REAL do volume onde a SQLite vive. */
+      .ops { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(230px, .85fr) auto; align-items: stretch; margin-bottom: 20px; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; backdrop-filter: blur(14px); }
+      .ops__metric { min-width: 0; padding: 20px 22px; }
+      .ops__metric + .ops__metric { border-left: 1px solid var(--line); }
+      .ops__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
+      .ops__label { color: var(--text-2); font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+      .ops__state { display: inline-flex; align-items: center; min-height: 24px; padding: 4px 9px; border: 1px solid color-mix(in srgb, var(--ops-tone, var(--text-2)) 38%, transparent); border-radius: 999px; color: var(--ops-tone, var(--text-1)); background: color-mix(in srgb, var(--ops-tone, var(--text-2)) 11%, transparent); font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; white-space: nowrap; }
+      .ops__metric[data-state="healthy"] { --ops-tone: var(--aqua); }
+      .ops__metric[data-state="warn"] { --ops-tone: var(--amber); }
+      .ops__metric[data-state="critical"] { --ops-tone: var(--red); }
+      .ops__metric[data-state="unknown"] { --ops-tone: var(--text-2); }
+      .ops__value { display: block; color: var(--text-0); font-family: var(--f-display); font-size: clamp(22px, 2.2vw, 30px); font-weight: 800; letter-spacing: -.035em; line-height: 1.15; }
+      .ops__detail { min-height: 20px; margin: 6px 0 0; color: var(--text-1); font-size: 13px; line-height: 1.45; }
+      .ops__track { height: 6px; margin-top: 15px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, .08); }
+      .ops__fill { display: block; width: 100%; height: 100%; border-radius: inherit; transform: scaleX(0); transform-origin: left center; background: var(--ops-tone, var(--text-2)); transition: transform .35s cubic-bezier(.22, 1, .36, 1), background-color .2s ease; }
+      .ops__live { display: flex; flex-direction: column; justify-content: center; }
+      .ops__live-value { display: inline-flex; align-items: center; gap: 10px; }
+      .ops__live-value .ops__value { font-size: clamp(27px, 2.5vw, 35px); }
+      .ops__pulse { width: 9px; height: 9px; flex: none; border-radius: 50%; background: var(--aqua); box-shadow: 0 0 0 5px rgba(46, 230, 200, .12); }
+      .ops__refresh { align-self: center; justify-self: center; width: 42px; height: 42px; margin: 0 18px; border: 1px solid var(--line); border-radius: 11px; cursor: pointer; color: var(--text-1); background: transparent; display: grid; place-items: center; transition: color .16s ease, border-color .16s ease, transform .16s ease; }
+      .ops__refresh:hover { color: var(--aqua); border-color: rgba(46, 230, 200, .45); transform: rotate(18deg); }
+      .ops__refresh:focus-visible { outline: 2px solid var(--aqua); outline-offset: 3px; }
+      .ops__refresh[disabled] { cursor: wait; opacity: .55; }
+      .ops__refresh svg { width: 19px; height: 19px; }
+      .ops__updated { display: block; margin-top: 10px; color: var(--text-2); font-family: var(--f-mono); font-size: 10.5px; }
+      @media (max-width: 760px) { .ops { grid-template-columns: 1fr; } .ops__metric + .ops__metric { border-top: 1px solid var(--line); border-left: 0; } .ops__refresh { width: auto; height: auto; margin: 0; padding: 12px 18px; justify-self: stretch; border-width: 1px 0 0; border-radius: 0; display: inline-flex; gap: 8px; font-family: var(--f-body); font-weight: 600; font-size: 13px; } .ops__refresh::after { content: "Atualizar"; } }
+      @media (prefers-reduced-motion: reduce) { .ops__fill, .ops__refresh { transition: none; } }
+
       .box { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px; margin-bottom: 20px; backdrop-filter: blur(14px); }
       .box h2 { font-family: var(--f-display); font-size: 16px; font-weight: 700; color: var(--text-0); margin: 0 0 16px; letter-spacing: -0.01em; }
       .box-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
@@ -332,6 +361,27 @@
         <button class="tab" id="tabServers" type="button">Servidores</button>
       </div>
 
+      <section class="ops" aria-label="Estado operacional do Vozen">
+        <article class="ops__metric" id="databaseMetric" data-state="unknown">
+          <div class="ops__top">
+            <span class="ops__label">Base de dados</span>
+            <span class="ops__state" id="databaseState">A carregar</span>
+          </div>
+          <strong class="ops__value" id="databaseSize" aria-live="polite">—</strong>
+          <p class="ops__detail" id="databaseDetail">A obter a leitura do volume…</p>
+          <div class="ops__track" aria-hidden="true"><span class="ops__fill" id="databaseFill"></span></div>
+          <span class="ops__updated" id="metricsUpdated">Atualização automática a cada 30 segundos</span>
+        </article>
+        <article class="ops__metric ops__live" data-state="healthy">
+          <div class="ops__top"><span class="ops__label">Em simultâneo</span></div>
+          <div class="ops__live-value"><span class="ops__pulse" aria-hidden="true"></span><strong class="ops__value" id="activeSessions" aria-live="polite">—</strong></div>
+          <p class="ops__detail" id="activeSessionsDetail">Chamadas de voz ativas agora</p>
+        </article>
+        <button class="ops__refresh" id="metricsRefresh" type="button" aria-label="Atualizar indicadores agora" title="Atualizar indicadores agora">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.4-4.8L3 9"/><path d="M3 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 14.4 4.8L21 15"/><path d="M21 20v-5h-5"/></svg>
+        </button>
+      </section>
+
       <!-- Tab: Passes -->
       <div id="paneGrants">
         <div class="box">
@@ -469,6 +519,7 @@
       let sessionExpiresAt = 0;
       let sessionIdleTimer = null;
       let lastSessionTouch = 0;
+      let metricsTimer = null;
 
       // Captura o token do fragmento (#access_token=…) após o redirect do OAuth e limpa o URL.
       (function () {
@@ -703,6 +754,8 @@
         sessionExpiresAt = 0;
         discordToken = '';
         serversLoaded = false;
+        clearInterval(metricsTimer);
+        metricsTimer = null;
         document.body.classList.remove('has-panel');
         $('panel').classList.remove('show');
         $('auth').style.display = '';
@@ -725,7 +778,79 @@
         $('panel').classList.add('show');
         armSessionIdle();
         loadPasses();
+        loadSystemMetrics();
+        clearInterval(metricsTimer);
+        metricsTimer = setInterval(loadSystemMetrics, 30_000);
       }
+
+      function formatBytes(value) {
+        const bytes = Number(value);
+        if (!Number.isFinite(bytes) || bytes < 0) return '—';
+        if (bytes < 1024) return Math.round(bytes) + ' B';
+        const units = ['KB', 'MB', 'GB', 'TB'];
+        let size = bytes / 1024;
+        let unit = 0;
+        while (size >= 1024 && unit < units.length - 1) { size /= 1024; unit += 1; }
+        return (size >= 10 ? size.toFixed(0) : size.toFixed(1)) + ' ' + units[unit];
+      }
+
+      function storageState(total, used) {
+        if (!Number.isFinite(total) || total <= 0 || !Number.isFinite(used) || used < 0) {
+          return { key: 'unknown', label: 'Sem leitura', percent: null };
+        }
+        const percent = Math.max(0, Math.min(100, Math.round((used / total) * 100)));
+        if (percent >= 85) return { key: 'critical', label: 'Upgrade recomendado', percent };
+        if (percent >= 70) return { key: 'warn', label: 'A acompanhar', percent };
+        return { key: 'healthy', label: percent < 20 ? 'Com folga' : 'Saudável', percent };
+      }
+
+      function renderSystemMetrics(metrics) {
+        const databaseBytes = Number(metrics.databaseBytes);
+        const total = Number(metrics.volumeTotalBytes);
+        const used = Number(metrics.volumeUsedBytes);
+        const available = Number(metrics.volumeAvailableBytes);
+        const state = storageState(total, used);
+        $('databaseMetric').dataset.state = state.key;
+        $('databaseState').textContent = state.label;
+        $('databaseSize').textContent = formatBytes(databaseBytes);
+        $('databaseFill').style.transform = state.percent === null ? 'scaleX(0)' : 'scaleX(' + (state.percent / 100) + ')';
+        $('databaseDetail').textContent = state.percent === null
+          ? 'O volume de dados não está disponível nesta leitura.'
+          : 'Volume de dados: ' + state.percent + '% utilizado · ' + formatBytes(available) + ' livres';
+        const active = Math.max(0, Number(metrics.activeVoiceSessions) || 0);
+        $('activeSessions').textContent = String(active);
+        $('activeSessionsDetail').textContent = active === 1
+          ? '1 chamada de voz ativa agora'
+          : active + ' chamadas de voz ativas agora';
+        $('metricsUpdated').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+      }
+
+      function renderMetricsUnavailable() {
+        $('databaseMetric').dataset.state = 'unknown';
+        $('databaseState').textContent = 'Indisponível';
+        $('databaseSize').textContent = '—';
+        $('databaseDetail').textContent = 'Não foi possível obter a leitura agora.';
+        $('databaseFill').style.transform = 'scaleX(0)';
+        $('metricsUpdated').textContent = 'Tenta atualizar novamente.';
+      }
+
+      async function loadSystemMetrics() {
+        const refresh = $('metricsRefresh');
+        if (!session || refresh.disabled) return;
+        refresh.disabled = true;
+        try {
+          const r = await api('/api/admin/metrics');
+          if (r.status === 403) return logoutStale();
+          if (!r.ok) throw new Error('metrics_unavailable');
+          renderSystemMetrics(await r.json());
+        } catch (_e) {
+          renderMetricsUnavailable();
+        } finally {
+          refresh.disabled = false;
+        }
+      }
+
+      $('metricsRefresh').addEventListener('click', loadSystemMetrics);
 
       // Tabs
       $('tabGrants').addEventListener('click', () => switchTab('grants'));
@@ -995,6 +1120,8 @@
         session = '';
         sessionExpiresAt = 0;
         serversLoaded = false;
+        clearInterval(metricsTimer);
+        metricsTimer = null;
         document.body.classList.remove('has-panel');
         $('panel').classList.remove('show');
         $('auth').style.display = '';
