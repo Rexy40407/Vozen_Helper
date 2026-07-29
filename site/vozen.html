@@ -239,15 +239,18 @@
       .ops__live-value { display: inline-flex; align-items: center; gap: 10px; }
       .ops__live-value .ops__value { font-size: clamp(27px, 2.5vw, 35px); }
       .ops__pulse { width: 9px; height: 9px; flex: none; border-radius: 50%; background: var(--aqua); box-shadow: 0 0 0 5px rgba(46, 230, 200, .12); }
-      .ops__refresh { align-self: center; justify-self: center; width: 42px; height: 42px; margin: 0 18px; border: 1px solid var(--line); border-radius: 11px; cursor: pointer; color: var(--text-1); background: transparent; display: grid; place-items: center; transition: color .16s ease, border-color .16s ease, transform .16s ease; }
-      .ops__refresh:hover { color: var(--aqua); border-color: rgba(46, 230, 200, .45); transform: rotate(18deg); }
+      .ops__refresh { align-self: center; justify-self: center; width: 42px; height: 42px; margin: 0 18px; border: 1px solid var(--line); border-radius: 11px; cursor: pointer; color: var(--text-1); background: transparent; display: grid; place-items: center; transition: color .16s ease, border-color .16s ease; }
+      .ops__refresh:hover { color: var(--aqua); border-color: rgba(46, 230, 200, .45); }
       .ops__refresh:focus-visible { outline: 2px solid var(--aqua); outline-offset: 3px; }
       .ops__refresh[disabled] { cursor: wait; opacity: .55; }
-      .ops__refresh svg { width: 19px; height: 19px; }
+      .ops__refresh svg { width: 19px; height: 19px; transform-origin: center; transition: transform .16s ease; }
+      .ops__refresh:not([disabled]):hover svg { transform: rotate(18deg); }
+      .ops__refresh.is-loading svg { animation: ops-refresh-spin .7s linear infinite; will-change: transform; }
+      @keyframes ops-refresh-spin { to { transform: rotate(360deg); } }
       .ops__updated { display: block; margin-top: 10px; color: var(--text-2); font-family: var(--f-mono); font-size: 10.5px; }
       @media (max-width: 760px) { .ops { grid-template-columns: 1fr; } .ops__metric + .ops__metric { border-top: 1px solid var(--line); border-left: 0; } .ops__refresh { width: auto; height: auto; margin: 0; padding: 12px 18px; justify-self: stretch; border-width: 1px 0 0; border-radius: 0; display: inline-flex; gap: 8px; font-family: var(--f-body); font-weight: 600; font-size: 13px; } .ops__refresh::after { content: "Atualizar"; } }
       @media (max-width: 430px) { .ops__history-row { grid-template-columns: 68px minmax(0, 1fr) auto; column-gap: 7px; } }
-      @media (prefers-reduced-motion: reduce) { .ops__fill, .ops__refresh { transition: none; } }
+      @media (prefers-reduced-motion: reduce) { .ops__fill, .ops__refresh, .ops__refresh svg { transition: none; } .ops__refresh.is-loading svg { animation: none; } }
 
       .box { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px; margin-bottom: 20px; backdrop-filter: blur(14px); }
       .box h2 { font-family: var(--f-display); font-size: 16px; font-weight: 700; color: var(--text-0); margin: 0 0 16px; letter-spacing: -0.01em; }
@@ -952,6 +955,7 @@
         const refresh = $('metricsRefresh');
         if (!session || refresh.disabled) return;
         refresh.disabled = true;
+        refresh.classList.add('is-loading');
         try {
           const r = await api('/api/admin/metrics');
           if (r.status === 403) return logoutStale();
@@ -961,6 +965,7 @@
           renderMetricsUnavailable();
         } finally {
           refresh.disabled = false;
+          refresh.classList.remove('is-loading');
         }
       }
 
