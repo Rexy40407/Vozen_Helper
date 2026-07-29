@@ -197,8 +197,10 @@
       /* Leitura operacional: uma faixa única com duas células, em vez de cartões decorativos.
          A cor é sempre derivada da ocupação REAL do volume onde a SQLite vive. */
       .ops { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(230px, .85fr) auto; align-items: stretch; margin-bottom: 20px; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; backdrop-filter: blur(14px); }
+      .ops__storage { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
       .ops__metric { min-width: 0; padding: 20px 22px; }
       .ops__metric + .ops__metric { border-left: 1px solid var(--line); }
+      .ops__storage > .ops__metric + .ops__metric { border-left: 1px solid var(--line); }
       .ops__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
       .ops__label { color: var(--text-2); font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
       .ops__state { display: inline-flex; align-items: center; min-height: 24px; padding: 4px 9px; border: 1px solid color-mix(in srgb, var(--ops-tone, var(--text-2)) 38%, transparent); border-radius: 999px; color: var(--ops-tone, var(--text-1)); background: color-mix(in srgb, var(--ops-tone, var(--text-2)) 11%, transparent); font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; white-space: nowrap; }
@@ -248,7 +250,7 @@
       .ops__refresh.is-loading svg { animation: ops-refresh-spin .7s linear infinite; will-change: transform; }
       @keyframes ops-refresh-spin { to { transform: rotate(360deg); } }
       .ops__updated { display: block; margin-top: 10px; color: var(--text-2); font-family: var(--f-mono); font-size: 10.5px; }
-      @media (max-width: 760px) { .ops { grid-template-columns: 1fr; } .ops__metric + .ops__metric { border-top: 1px solid var(--line); border-left: 0; } .ops__refresh { width: auto; height: auto; margin: 0; padding: 12px 18px; justify-self: stretch; border-width: 1px 0 0; border-radius: 0; display: inline-flex; gap: 8px; font-family: var(--f-body); font-weight: 600; font-size: 13px; } .ops__refresh::after { content: "Atualizar"; } }
+      @media (max-width: 760px) { .ops { grid-template-columns: 1fr; } .ops__storage { grid-template-columns: 1fr; } .ops__metric + .ops__metric, .ops__storage > .ops__metric + .ops__metric { border-top: 1px solid var(--line); border-left: 0; } .ops__refresh { width: auto; height: auto; margin: 0; padding: 12px 18px; justify-self: stretch; border-width: 1px 0 0; border-radius: 0; display: inline-flex; gap: 8px; font-family: var(--f-body); font-weight: 600; font-size: 13px; } .ops__refresh::after { content: "Atualizar"; } }
       @media (max-width: 430px) { .ops__history-row { grid-template-columns: 68px minmax(0, 1fr) auto; column-gap: 7px; } }
       @media (prefers-reduced-motion: reduce) { .ops__fill, .ops__refresh, .ops__refresh svg { transition: none; } .ops__refresh.is-loading svg { animation: none; } }
 
@@ -391,6 +393,7 @@
       </div>
 
       <section class="ops" aria-label="Estado operacional do Vozen">
+        <div class="ops__storage">
         <article class="ops__metric" id="databaseMetric" data-state="unknown">
           <div class="ops__top">
             <span class="ops__label">Base de dados</span>
@@ -416,6 +419,21 @@
             </div>
           </details>
         </article>
+        <article class="ops__metric" id="supabaseMetric" data-state="unknown">
+          <div class="ops__top">
+            <span class="ops__label">Supabase</span>
+            <span class="ops__state" id="supabaseState">Sem leitura</span>
+          </div>
+          <strong class="ops__value" id="supabaseSize" aria-live="polite">—</strong>
+          <p class="ops__detail" id="supabaseDetail">A aguardar a ligação ao PostgreSQL…</p>
+          <div class="ops__track" aria-hidden="true"><span class="ops__fill" id="supabaseFill"></span></div>
+          <dl class="ops__facts" style="margin-top: 15px">
+            <div class="ops__fact"><dt>Base PostgreSQL</dt><dd id="supabaseExactSize">—</dd></div>
+            <div class="ops__fact"><dt>Quota</dt><dd id="supabaseQuota">—</dd></div>
+            <div class="ops__fact"><dt>Espaço livre</dt><dd id="supabaseFree">—</dd></div>
+          </dl>
+        </article>
+        </div>
         <article class="ops__metric ops__live" data-state="healthy">
           <div class="ops__top"><span class="ops__label">Em simultâneo</span></div>
           <div class="ops__live-value"><span class="ops__pulse" aria-hidden="true"></span><strong class="ops__value" id="activeSessions" aria-live="polite">—</strong></div>
@@ -928,6 +946,24 @@
         $('databaseDetail').textContent = state.percent === null
           ? 'O volume de dados não está disponível nesta leitura.'
           : 'Volume de dados: ' + state.percent + '% utilizado · ' + formatBytes(available) + ' livres';
+        const supabase = metrics && metrics.supabase && typeof metrics.supabase === 'object' ? metrics.supabase : null;
+        const supabaseBytes = supabase ? Number(supabase.databaseBytes) : NaN;
+        const supabaseCapacity = supabase ? Number(supabase.capacityBytes) : NaN;
+        const supabaseState = storageState(supabaseCapacity, supabaseBytes);
+        $('supabaseMetric').dataset.state = supabaseState.key;
+        $('supabaseState').textContent = supabaseState.percent === null ? 'Sem leitura' : supabaseState.label;
+        $('supabaseSize').textContent = formatBytes(supabaseBytes);
+        $('supabaseExactSize').textContent = formatBytes(supabaseBytes);
+        $('supabaseQuota').textContent = formatBytes(supabaseCapacity);
+        $('supabaseFree').textContent = supabaseState.percent === null
+          ? '—'
+          : formatBytes(Math.max(0, supabaseCapacity - supabaseBytes));
+        $('supabaseFill').style.transform = supabaseState.percent === null
+          ? 'scaleX(0)'
+          : 'scaleX(' + (supabaseState.percent / 100) + ')';
+        $('supabaseDetail').textContent = supabaseState.percent === null
+          ? 'Sem leitura: o mirror Supabase ainda não está ligado.'
+          : 'Quota: ' + supabaseState.percent + '% utilizada · ' + formatBytes(Math.max(0, supabaseCapacity - supabaseBytes)) + ' livres';
         const active = Math.max(0, Number(metrics.activeVoiceSessions) || 0);
         $('activeSessions').textContent = String(active);
         $('activeSessionsDetail').textContent = active === 1
@@ -947,6 +983,14 @@
         $('databaseFree').textContent = '—';
         $('databaseAverage').textContent = '—';
         $('databaseFill').style.transform = 'scaleX(0)';
+        $('supabaseMetric').dataset.state = 'unknown';
+        $('supabaseState').textContent = 'Indisponível';
+        $('supabaseSize').textContent = '—';
+        $('supabaseDetail').textContent = 'Não foi possível obter a leitura agora.';
+        $('supabaseExactSize').textContent = '—';
+        $('supabaseQuota').textContent = '—';
+        $('supabaseFree').textContent = '—';
+        $('supabaseFill').style.transform = 'scaleX(0)';
         renderDatabaseHistory([]);
         $('metricsUpdated').textContent = 'Tenta atualizar novamente.';
       }
