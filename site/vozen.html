@@ -196,8 +196,9 @@
 
       /* Leitura operacional: uma faixa única com duas células, em vez de cartões decorativos.
          A cor é sempre derivada da ocupação REAL do volume onde a SQLite vive. */
-      .ops { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(230px, .85fr) auto; align-items: stretch; margin-bottom: 20px; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; backdrop-filter: blur(14px); }
+      .ops { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(250px, .85fr) auto; align-items: stretch; margin-bottom: 20px; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; backdrop-filter: blur(14px); }
       .ops__storage { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
+      .ops__sidebar { display: grid; align-self: stretch; align-content: start; min-width: 0; border-left: 1px solid var(--line); }
       .ops__metric { min-width: 0; padding: 20px 22px; }
       .ops__metric + .ops__metric { border-left: 1px solid var(--line); }
       .ops__storage > .ops__metric + .ops__metric { border-left: 1px solid var(--line); }
@@ -237,7 +238,7 @@
       .ops__history-row[data-state="warn"] { --history-tone: var(--amber); }
       .ops__history-row[data-state="critical"] { --history-tone: var(--red); }
       .ops__history-row[data-state="unknown"] { --history-tone: var(--text-2); }
-      .ops__live { display: flex; flex-direction: column; justify-content: center; }
+      .ops__live { display: flex; flex-direction: column; justify-content: flex-start; }
       .ops__live-value { display: inline-flex; align-items: center; gap: 10px; }
       .ops__live-value .ops__value { font-size: clamp(27px, 2.5vw, 35px); }
       .ops__pulse { width: 9px; height: 9px; flex: none; border-radius: 50%; background: var(--aqua); box-shadow: 0 0 0 5px rgba(46, 230, 200, .12); }
@@ -427,18 +428,36 @@
           <strong class="ops__value" id="supabaseSize" aria-live="polite">—</strong>
           <p class="ops__detail" id="supabaseDetail">A aguardar a ligação ao PostgreSQL…</p>
           <div class="ops__track" aria-hidden="true"><span class="ops__fill" id="supabaseFill"></span></div>
-          <dl class="ops__facts" style="margin-top: 15px">
-            <div class="ops__fact"><dt>Base PostgreSQL</dt><dd id="supabaseExactSize">—</dd></div>
-            <div class="ops__fact"><dt>Quota</dt><dd id="supabaseQuota">—</dd></div>
-            <div class="ops__fact"><dt>Espaço livre</dt><dd id="supabaseFree">—</dd></div>
-          </dl>
+          <details class="ops__details" id="supabaseDetails">
+            <summary><span>Ver detalhes e histórico</span><span class="ops__details-chevron" aria-hidden="true"></span></summary>
+            <div class="ops__details-body">
+              <dl class="ops__facts">
+                <div class="ops__fact"><dt>Base PostgreSQL</dt><dd id="supabaseExactSize">—</dd></div>
+                <div class="ops__fact"><dt>Quota usada</dt><dd id="supabaseQuota">—</dd></div>
+                <div class="ops__fact"><dt>Espaço livre</dt><dd id="supabaseFree">—</dd></div>
+                <div class="ops__fact"><dt>Média 7 dias</dt><dd id="supabaseAverage">—</dd></div>
+              </dl>
+              <div class="ops__history">
+                <div class="ops__history-head"><span class="ops__history-title">Últimos 7 dias</span><span class="ops__history-note" id="supabaseHistoryNote">A recolher leituras</span></div>
+                <ol class="ops__history-list" id="supabaseHistory" aria-live="polite"></ol>
+              </div>
+            </div>
+          </details>
         </article>
         </div>
-        <article class="ops__metric ops__live" data-state="healthy">
-          <div class="ops__top"><span class="ops__label">Em simultâneo</span></div>
-          <div class="ops__live-value"><span class="ops__pulse" aria-hidden="true"></span><strong class="ops__value" id="activeSessions" aria-live="polite">—</strong></div>
-          <p class="ops__detail" id="activeSessionsDetail">Chamadas de voz ativas agora</p>
-        </article>
+        <div class="ops__sidebar">
+          <article class="ops__metric ops__live" data-state="healthy">
+            <div class="ops__top"><span class="ops__label">Em simultâneo</span></div>
+            <div class="ops__live-value"><span class="ops__pulse" aria-hidden="true"></span><strong class="ops__value" id="activeSessions" aria-live="polite">—</strong></div>
+            <p class="ops__detail" id="activeSessionsDetail">Chamadas de voz ativas agora</p>
+            <details class="ops__details" id="activeServersDetails">
+              <summary><span>Ver servidores online</span><span class="ops__details-chevron" aria-hidden="true"></span></summary>
+              <div class="ops__details-body">
+                <ol class="ops__history-list" id="activeServers" aria-live="polite"></ol>
+              </div>
+            </details>
+          </article>
+        </div>
         <button class="ops__refresh" id="metricsRefresh" type="button" aria-label="Atualizar indicadores agora" title="Atualizar indicadores agora">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.4-4.8L3 9"/><path d="M3 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 14.4 4.8L21 15"/><path d="M21 20v-5h-5"/></svg>
         </button>
@@ -930,6 +949,79 @@
           : formatBytes(totalDatabaseBytes / recorded) + (usageReadings ? ' · ' + Math.round(totalUsagePercent / usageReadings) + '%' : '');
       }
 
+      function renderSupabaseHistory(samples) {
+        const readings = new Map((Array.isArray(samples) ? samples : []).map((sample) => [sample.day, sample]));
+        const history = $('supabaseHistory');
+        history.replaceChildren();
+        let recorded = 0;
+        let totalDatabaseBytes = 0;
+        let totalUsagePercent = 0;
+        let usageReadings = 0;
+        for (const day of lastSevenUtcDays().reverse()) {
+          const sample = readings.get(day);
+          const row = document.createElement('li');
+          row.className = 'ops__history-row';
+          const dayLabel = document.createElement('span');
+          dayLabel.className = 'ops__history-day';
+          dayLabel.textContent = formatHistoryDay(day);
+          const size = document.createElement('span');
+          size.className = 'ops__history-size';
+          const usage = document.createElement('span');
+          usage.className = 'ops__history-use';
+          if (sample) {
+            recorded += 1;
+            const state = storageState(Number(sample.capacityBytes), Number(sample.databaseBytes));
+            totalDatabaseBytes += Math.max(0, Number(sample.databaseBytes) || 0);
+            if (state.percent !== null) {
+              totalUsagePercent += state.percent;
+              usageReadings += 1;
+            }
+            row.dataset.state = state.key;
+            size.textContent = formatBytes(sample.databaseBytes) + ' PostgreSQL';
+            usage.textContent = state.percent === null ? 'sem quota' : state.percent + '%';
+          } else {
+            row.dataset.state = 'unknown';
+            size.textContent = 'Sem leitura';
+            usage.textContent = '—';
+          }
+          row.append(dayLabel, size, usage);
+          history.append(row);
+        }
+        $('supabaseHistoryNote').textContent = recorded === 7
+          ? '7 registos reais'
+          : recorded + ' de 7 registos';
+        $('supabaseAverage').textContent = recorded === 0
+          ? 'Sem dados'
+          : formatBytes(totalDatabaseBytes / recorded) + (usageReadings ? ' · ' + Math.round(totalUsagePercent / usageReadings) + '%' : '');
+      }
+
+      function renderActiveServers(servers) {
+        const list = $('activeServers');
+        list.replaceChildren();
+        const entries = Array.isArray(servers) ? servers.filter((server) => server && typeof server.name === 'string') : [];
+        if (entries.length === 0) {
+          const row = document.createElement('li');
+          row.className = 'ops__history-row';
+          row.dataset.state = 'unknown';
+          row.textContent = 'Nenhum servidor em chamada agora';
+          list.append(row);
+          return;
+        }
+        for (const server of entries) {
+          const row = document.createElement('li');
+          row.className = 'ops__history-row';
+          row.dataset.state = 'healthy';
+          const name = document.createElement('span');
+          name.className = 'ops__history-size';
+          name.textContent = server.name;
+          const status = document.createElement('span');
+          status.className = 'ops__history-use';
+          status.textContent = 'em voz';
+          row.append(name, status);
+          list.append(row);
+        }
+      }
+
       function renderSystemMetrics(metrics) {
         const databaseBytes = Number(metrics.databaseBytes);
         const total = Number(metrics.volumeTotalBytes);
@@ -970,6 +1062,8 @@
           ? '1 chamada de voz ativa agora'
           : active + ' chamadas de voz ativas agora';
         renderDatabaseHistory(metrics.databaseHistory);
+        renderSupabaseHistory(supabase && supabase.history);
+        renderActiveServers(metrics.activeVoiceServers);
         $('metricsUpdated').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
       }
 
@@ -990,8 +1084,11 @@
         $('supabaseExactSize').textContent = '—';
         $('supabaseQuota').textContent = '—';
         $('supabaseFree').textContent = '—';
+        $('supabaseAverage').textContent = '—';
         $('supabaseFill').style.transform = 'scaleX(0)';
         renderDatabaseHistory([]);
+        renderSupabaseHistory([]);
+        renderActiveServers([]);
         $('metricsUpdated').textContent = 'Tenta atualizar novamente.';
       }
 
