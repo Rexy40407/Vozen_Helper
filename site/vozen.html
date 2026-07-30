@@ -214,11 +214,7 @@
       .ops__track { height: 6px; margin-top: 15px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, .08); }
       .ops__fill { display: block; width: 100%; height: 100%; border-radius: inherit; transform: scaleX(0); transform-origin: left center; background: var(--ops-tone, var(--text-2)); transition: transform .35s cubic-bezier(.22, 1, .36, 1), background-color .2s ease; }
       .ops__details { margin-top: 15px; border-top: 1px solid rgba(255, 255, 255, .08); }
-      .ops__details summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0 0; cursor: pointer; color: var(--text-1); font-size: 12.5px; font-weight: 650; list-style: none; }
-      .ops__details summary::-webkit-details-marker { display: none; }
-      .ops__details summary:focus-visible { outline: 2px solid var(--aqua); outline-offset: 4px; border-radius: 4px; }
       .ops__details-chevron { width: 8px; height: 8px; flex: none; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .18s ease; }
-      .ops__details[open] .ops__details-chevron { transform: rotate(225deg) translate(-2px, -1px); }
       .ops__details-body { padding-top: 13px; }
       .ops__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; margin: 0; }
       .ops__fact { min-width: 0; }
@@ -242,16 +238,18 @@
       .ops__live-value { display: inline-flex; align-items: center; gap: 10px; }
       .ops__live-value .ops__value { font-size: clamp(27px, 2.5vw, 35px); }
       .ops__pulse { width: 9px; height: 9px; flex: none; border-radius: 50%; background: var(--aqua); box-shadow: 0 0 0 5px rgba(46, 230, 200, .12); }
-      .ops__refresh { align-self: center; justify-self: center; width: 42px; height: 42px; margin: 0 18px; border: 1px solid var(--line); border-radius: 11px; cursor: pointer; color: var(--text-1); background: transparent; display: grid; place-items: center; transition: color .16s ease, border-color .16s ease; }
-      .ops__refresh:hover { color: var(--aqua); border-color: rgba(46, 230, 200, .45); }
-      .ops__refresh:focus-visible { outline: 2px solid var(--aqua); outline-offset: 3px; }
+      .ops__actions { align-self: start; justify-self: center; display: grid; gap: 8px; margin: 18px; }
+      .ops__details-toggle, .ops__refresh { width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 11px; cursor: pointer; color: var(--text-1); background: transparent; display: grid; place-items: center; transition: color .16s ease, border-color .16s ease; }
+      .ops__details-toggle:hover, .ops__refresh:hover { color: var(--aqua); border-color: rgba(46, 230, 200, .45); }
+      .ops__details-toggle:focus-visible, .ops__refresh:focus-visible { outline: 2px solid var(--aqua); outline-offset: 3px; }
+      .ops__details-toggle[aria-expanded="true"] .ops__details-chevron { transform: rotate(225deg) translate(-2px, -1px); }
       .ops__refresh[disabled] { cursor: wait; opacity: .55; }
       .ops__refresh svg { width: 19px; height: 19px; transform-origin: center; transition: transform .16s ease; }
       .ops__refresh:not([disabled]):hover svg { transform: rotate(18deg); }
       .ops__refresh.is-loading svg { animation: ops-refresh-spin .7s linear infinite; will-change: transform; }
       @keyframes ops-refresh-spin { to { transform: rotate(360deg); } }
       .ops__updated { display: block; margin-top: 10px; color: var(--text-2); font-family: var(--f-mono); font-size: 10.5px; }
-      @media (max-width: 760px) { .ops { grid-template-columns: 1fr; } .ops__storage { grid-template-columns: 1fr; } .ops__metric + .ops__metric, .ops__storage > .ops__metric + .ops__metric { border-top: 1px solid var(--line); border-left: 0; } .ops__refresh { width: auto; height: auto; margin: 0; padding: 12px 18px; justify-self: stretch; border-width: 1px 0 0; border-radius: 0; display: inline-flex; gap: 8px; font-family: var(--f-body); font-weight: 600; font-size: 13px; } .ops__refresh::after { content: "Atualizar"; } }
+      @media (max-width: 760px) { .ops { grid-template-columns: 1fr; } .ops__storage { grid-template-columns: 1fr; } .ops__metric + .ops__metric, .ops__storage > .ops__metric + .ops__metric { border-top: 1px solid var(--line); border-left: 0; } .ops__actions { grid-template-columns: 1fr 1fr; width: 100%; margin: 0; gap: 0; border-top: 1px solid var(--line); } .ops__details-toggle, .ops__refresh { width: auto; height: auto; margin: 0; padding: 12px 18px; justify-self: stretch; border: 0; border-radius: 0; display: inline-flex; justify-content: center; gap: 8px; font-family: var(--f-body); font-weight: 600; font-size: 13px; } .ops__details-toggle { border-right: 1px solid var(--line); } .ops__details-toggle::before { content: "Detalhes"; } .ops__refresh::after { content: "Atualizar"; } }
       @media (max-width: 430px) { .ops__history-row { grid-template-columns: 68px minmax(0, 1fr) auto; column-gap: 7px; } }
       @media (prefers-reduced-motion: reduce) { .ops__fill, .ops__refresh, .ops__refresh svg { transition: none; } .ops__refresh.is-loading svg { animation: none; } }
 
@@ -404,8 +402,7 @@
           <p class="ops__detail" id="databaseDetail">A obter a leitura do volume…</p>
           <div class="ops__track" aria-hidden="true"><span class="ops__fill" id="databaseFill"></span></div>
           <span class="ops__updated" id="metricsUpdated">Atualização automática a cada 30 segundos</span>
-          <details class="ops__details" id="databaseDetails">
-            <summary><span>Ver detalhes e histórico</span><span class="ops__details-chevron" aria-hidden="true"></span></summary>
+          <div class="ops__details" data-metrics-detail hidden>
             <div class="ops__details-body">
               <dl class="ops__facts">
                 <div class="ops__fact"><dt>Tamanho SQLite</dt><dd id="databaseExactSize">—</dd></div>
@@ -418,7 +415,7 @@
                 <ol class="ops__history-list" id="databaseHistory" aria-live="polite"></ol>
               </div>
             </div>
-          </details>
+          </div>
         </article>
         <article class="ops__metric" id="supabaseMetric" data-state="unknown">
           <div class="ops__top">
@@ -428,8 +425,7 @@
           <strong class="ops__value" id="supabaseSize" aria-live="polite">—</strong>
           <p class="ops__detail" id="supabaseDetail">A aguardar a ligação ao PostgreSQL…</p>
           <div class="ops__track" aria-hidden="true"><span class="ops__fill" id="supabaseFill"></span></div>
-          <details class="ops__details" id="supabaseDetails">
-            <summary><span>Ver detalhes e histórico</span><span class="ops__details-chevron" aria-hidden="true"></span></summary>
+          <div class="ops__details" data-metrics-detail hidden>
             <div class="ops__details-body">
               <dl class="ops__facts">
                 <div class="ops__fact"><dt>Base PostgreSQL</dt><dd id="supabaseExactSize">—</dd></div>
@@ -442,7 +438,7 @@
                 <ol class="ops__history-list" id="supabaseHistory" aria-live="polite"></ol>
               </div>
             </div>
-          </details>
+          </div>
         </article>
         </div>
         <div class="ops__sidebar">
@@ -450,17 +446,22 @@
             <div class="ops__top"><span class="ops__label">Em simultâneo</span></div>
             <div class="ops__live-value"><span class="ops__pulse" aria-hidden="true"></span><strong class="ops__value" id="activeSessions" aria-live="polite">—</strong></div>
             <p class="ops__detail" id="activeSessionsDetail">Chamadas de voz ativas agora</p>
-            <details class="ops__details" id="activeServersDetails">
-              <summary><span>Ver servidores online</span><span class="ops__details-chevron" aria-hidden="true"></span></summary>
+            <div class="ops__details" data-metrics-detail hidden>
               <div class="ops__details-body">
+                <span class="ops__label">Servidores online</span>
                 <ol class="ops__history-list" id="activeServers" aria-live="polite"></ol>
               </div>
-            </details>
+            </div>
           </article>
         </div>
-        <button class="ops__refresh" id="metricsRefresh" type="button" aria-label="Atualizar indicadores agora" title="Atualizar indicadores agora">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.4-4.8L3 9"/><path d="M3 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 14.4 4.8L21 15"/><path d="M21 20v-5h-5"/></svg>
-        </button>
+        <div class="ops__actions">
+          <button class="ops__details-toggle" id="metricsDetailsToggle" type="button" aria-expanded="false" aria-label="Mostrar detalhes dos indicadores" title="Mostrar detalhes dos indicadores">
+            <span class="ops__details-chevron" aria-hidden="true"></span>
+          </button>
+          <button class="ops__refresh" id="metricsRefresh" type="button" aria-label="Atualizar indicadores agora" title="Atualizar indicadores agora">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.4-4.8L3 9"/><path d="M3 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 14.4 4.8L21 15"/><path d="M21 20v-5h-5"/></svg>
+          </button>
+        </div>
       </section>
 
       <!-- Tab: Passes -->
@@ -1111,6 +1112,16 @@
       }
 
       $('metricsRefresh').addEventListener('click', loadSystemMetrics);
+      $('metricsDetailsToggle').addEventListener('click', () => {
+        const toggle = $('metricsDetailsToggle');
+        const open = toggle.getAttribute('aria-expanded') !== 'true';
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? 'Esconder detalhes dos indicadores' : 'Mostrar detalhes dos indicadores');
+        toggle.setAttribute('title', open ? 'Esconder detalhes dos indicadores' : 'Mostrar detalhes dos indicadores');
+        document.querySelectorAll('[data-metrics-detail]').forEach((detail) => {
+          detail.hidden = !open;
+        });
+      });
 
       // Tabs
       $('tabGrants').addEventListener('click', () => switchTab('grants'));
