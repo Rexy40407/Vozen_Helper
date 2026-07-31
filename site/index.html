@@ -272,6 +272,33 @@
       .sb-save { background: var(--grad); border: none; color: #06070e; padding: 10px 18px; border-radius: 11px; cursor: pointer; font-family: var(--f-body); font-weight: 600; font-size: 14px; }
       .sb-save:disabled { opacity: 0.6; cursor: default; }
 
+      /* Configuradores web das funções anteriormente geridas apenas no Discord. */
+      .web-modal { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 20px; background: rgba(3,5,13,.76); backdrop-filter: blur(8px); }
+      .web-modal[hidden] { display: none; }
+      .web-dialog { width: min(680px, 100%); max-height: min(760px, 92vh); overflow-y: auto; padding: 24px; border: 1px solid var(--line-2, rgba(255,255,255,.16)); border-radius: 18px; background: #111523; box-shadow: 0 30px 90px rgba(0,0,0,.62); }
+      .web-dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+      .web-dialog-head h3 { margin: 0; font-family: var(--f-display); font-size: 21px; color: var(--text-0); }
+      .web-dialog-head p { margin: 6px 0 0; color: var(--text-1); font-size: 13px; line-height: 1.45; }
+      .web-close { flex: none; width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 9px; background: transparent; color: var(--text-1); cursor: pointer; font-size: 18px; }
+      .web-close:hover { border-color: var(--aqua); color: var(--aqua); }
+      .web-form { display: grid; gap: 14px; }
+      .web-field { display: grid; gap: 6px; color: var(--text-1); font-size: 13px; }
+      .web-field input, .web-field select, .web-field textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 9px; background: rgba(0,0,0,.24); color: var(--text-0); padding: 10px 11px; font: inherit; }
+      .web-field textarea { min-height: 92px; resize: vertical; }
+      .web-field input:focus, .web-field select:focus, .web-field textarea:focus { outline: none; border-color: var(--aqua); }
+      .web-field small { color: var(--text-2); font-size: 11px; }
+      .web-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .web-check { display: flex; align-items: center; gap: 9px; color: var(--text-1); font-size: 13px; }
+      .web-check input { accent-color: var(--aqua); }
+      .web-dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 9px; margin-top: 4px; padding-top: 16px; border-top: 1px solid var(--line); }
+      .web-dialog-actions button { padding: 10px 14px; border: 1px solid var(--line); border-radius: 9px; background: transparent; color: var(--text-1); cursor: pointer; font: inherit; }
+      .web-dialog-actions .primary { border: 0; background: var(--grad); color: #06070e; font-weight: 600; }
+      .web-dialog-actions button:hover { border-color: var(--aqua); color: var(--text-0); }
+      .web-dialog-actions .primary:hover { color: #06070e; }
+      .web-hint { margin: 0; padding: 10px 12px; border-radius: 9px; background: rgba(46,230,200,.08); color: var(--text-1); font-size: 12px; line-height: 1.45; }
+      .web-danger { color: #ff9b9b !important; }
+      @media (max-width: 620px) { .web-grid-2 { grid-template-columns: 1fr; } .web-dialog { padding: 18px; } }
+
       @media (max-width: 720px) {
         .set-row { flex-direction: column; align-items: stretch; }
         .lbl { justify-content: space-between; }
@@ -466,7 +493,7 @@
           <div>
             <span class="eyebrow">Configurar</span>
             <h2 id="helperFeaturesTitle">Funcionalidades do Helper</h2>
-            <p class="view-lead">Procura pelo que queres fazer. As funções com configuração no painel podem ser ajustadas já; as restantes indicam claramente onde são geridas.</p>
+            <p class="view-lead">Procura pelo que queres fazer. Cada funcionalidade abre um configurador simples no site; o Helper trata da aplicação no Discord.</p>
           </div>
         </div>
         <div class="catalog-toolbar">
@@ -580,6 +607,16 @@
       </section>
 
     <!-- barra de guardar (aparece quando há alterações pendentes) -->
+      <div class="web-modal" id="webFeatureModal" hidden>
+        <div class="web-dialog" role="dialog" aria-modal="true" aria-labelledby="webFeatureTitle">
+          <div class="web-dialog-head">
+            <div><h3 id="webFeatureTitle">Configurar funcionalidade</h3><p id="webFeatureDescription"></p></div>
+            <button class="web-close" id="webFeatureClose" type="button" aria-label="Fechar">×</button>
+          </div>
+          <form class="web-form" id="webFeatureForm"></form>
+        </div>
+      </div>
+
     <div class="savebar" id="saveBar" aria-hidden="true">
       <div class="savebar-inner">
         <span class="savebar-msg" id="saveMsg">Alterações por guardar</span>
@@ -795,6 +832,19 @@
 
       // ── Estado das definições (modelo "pendente + Guardar") ─────────────────────
       const SRV = { flags: {}, chans: {}, texts: {} }; // verdade do servidor
+      const WEB_CONFIG_DEFAULTS = {
+        quarantine: { enabled: false, durationMinutes: 30, action: 'restrict' },
+        giveaways: { giveaways: [] },
+        workflows: [],
+        'polls-events': { polls: [], events: [] },
+        'self-roles': { panels: [] },
+        audit: { enabled: true, logChannelId: '', retentionDays: 90 },
+        permissions: { reviewRequired: true, allowedRoleIds: [] },
+        privacy: { retentionDays: 90, allowExports: true },
+        templates: [],
+      };
+      let WEB_CONFIG = JSON.parse(JSON.stringify(WEB_CONFIG_DEFAULTS));
+      const WEB_CONFIG_KEYS = Object.keys(WEB_CONFIG_DEFAULTS);
       let FLAGS_META = {}; // key -> { label, default }
       let CHAN_META = {}; // key -> { label, kind }
       let TEXT_META = {}; // key -> { label, maxLen }
@@ -1142,6 +1192,44 @@
         count.textContent = ready ? complete + ' de ' + steps.length + ' concluídos' : 'Estado indisponível';
       }
 
+      const webAuth = () => ({ credentials: 'include', headers: SESSION ? { Authorization: 'Bearer ' + SESSION } : {} });
+      function webField(label, name, type, value, hint) {
+        const wrap = el('label', 'web-field'); const title = el('span'); title.textContent = label; wrap.appendChild(title);
+        const input = document.createElement(type === 'textarea' ? 'textarea' : (type === 'select' ? 'select' : 'input')); input.name = name;
+        if (type !== 'textarea' && type !== 'select') input.type = type; input.value = value == null ? '' : String(value); wrap.appendChild(input);
+        if (hint) { const small = el('small'); small.textContent = hint; wrap.appendChild(small); } return wrap;
+      }
+      function webSelect(label, name, value, options) { const wrap = webField(label, name, 'select', '', ''); const select = wrap.querySelector('select'); options.forEach(([v, text]) => { const option = document.createElement('option'); option.value = v; option.textContent = text; option.selected = v === value; select.appendChild(option); }); return wrap; }
+      function webChannelSelect(label, name, value) { return webSelect(label, name, value || '', [['', 'Escolher canal']].concat(CHANNELS.map((channel) => [channel.id, '#' + channel.clean]))); }
+      function webCheck(label, name, checked) { const wrap = el('label', 'web-check'); const input = document.createElement('input'); input.type = 'checkbox'; input.name = name; input.checked = !!checked; const text = el('span'); text.textContent = label; wrap.appendChild(input); wrap.appendChild(text); return wrap; }
+      function webValue(form, name) { const control = form.elements.namedItem(name); return control && control.type === 'checkbox' ? control.checked : (control ? control.value.trim() : ''); }
+      function webClose() { document.getElementById('webFeatureModal').hidden = true; document.getElementById('webFeatureForm').textContent = ''; }
+      async function saveWebConfig(key, value) {
+        WEB_CONFIG[key] = value; try { localStorage.setItem('vozen-helper-web-config', JSON.stringify(WEB_CONFIG)); } catch { /* storage opcional */ }
+        if (!API_BASE) { banner('info', 'Guardado neste navegador. Liga a API para sincronizar com o servidor.'); return false; }
+        try { const response = await fetch(API_BASE + '/api/web-config', { method: 'PATCH', credentials: 'include', headers: { 'Content-Type': 'application/json', ...(SESSION ? { Authorization: 'Bearer ' + SESSION } : {}) }, body: JSON.stringify({ key, value }) }); if (!response.ok) return false; const data = await response.json(); if (data.config) WEB_CONFIG = { ...WEB_CONFIG_DEFAULTS, ...data.config }; return true; } catch { return false; }
+      }
+      function webActionButton(label, className, onClick) { const button = document.createElement('button'); button.type = 'button'; button.textContent = label; if (className) button.className = className; button.addEventListener('click', onClick); return button; }
+      function openWebFeature(key) {
+        const feature = FEATURE_CATALOG.find((item) => item.key === key); if (!feature) return; const modal = document.getElementById('webFeatureModal'); const form = document.getElementById('webFeatureForm');
+        document.getElementById('webFeatureTitle').textContent = 'Configurar ' + feature.name; document.getElementById('webFeatureDescription').textContent = 'Tudo o que definires aqui fica guardado no servidor e pode ser revisto sem usar comandos.'; form.textContent = '';
+        const current = WEB_CONFIG[key] || WEB_CONFIG_DEFAULTS[key]; const add = (node) => form.appendChild(node);
+        if (key === 'quarantine') { add(webCheck('Ativar quarentena para membros sinalizados', 'enabled', current.enabled)); const grid = el('div', 'web-grid-2'); grid.appendChild(webField('Duração (minutos)', 'durationMinutes', 'number', current.durationMinutes || 30)); grid.appendChild(webSelect('Ação', 'action', current.action || 'restrict', [['restrict', 'Restringir canais'], ['shadow', 'Shadow mode'], ['kick', 'Expulsar']])); add(grid); }
+        else if (key === 'giveaways') { const last = (current.giveaways || [])[0] || {}; add(webField('Prémio', 'prize', 'text', last.prize || '', 'Ex.: um cargo especial.')); const grid = el('div', 'web-grid-2'); grid.appendChild(webChannelSelect('Canal', 'channelId', last.channelId)); grid.appendChild(webField('Vencedores', 'winners', 'number', last.winners || 1)); add(grid); add(webField('Termina em', 'endsAt', 'datetime-local', last.endsAt || '')); add(webField('Regras', 'rules', 'textarea', last.rules || 'Reage com 🎉 para participar.')); }
+        else if (key === 'workflows') { const last = current[0] || {}; add(webField('Nome da automação', 'name', 'text', last.name || '', 'Nome visível para a equipa.')); const grid = el('div', 'web-grid-2'); grid.appendChild(webSelect('Quando acontece', 'trigger', last.trigger || 'message', [['message', 'Nova mensagem'], ['join', 'Entrada de membro'], ['leave', 'Saída de membro'], ['reaction', 'Reação']])); grid.appendChild(webSelect('Ação', 'action', last.action || 'reply', [['reply', 'Enviar resposta'], ['log', 'Registar no canal'], ['role', 'Atribuir cargo'], ['alert', 'Enviar alerta']])); add(grid); add(webChannelSelect('Canal (opcional)', 'channelId', last.channelId)); add(webField('Mensagem / conteúdo', 'payload', 'textarea', last.payload || '')); add(webCheck('Automação ativa', 'enabled', last.enabled !== false)); }
+        else if (key === 'polls-events') { const last = (current.polls || [])[0] || {}; add(webSelect('Tipo', 'kind', last.kind || 'poll', [['poll', 'Sondagem'], ['event', 'Evento']])); add(webField('Título', 'title', 'text', last.title || '')); add(webField('Pergunta ou descrição', 'description', 'textarea', last.description || '')); add(webField('Opções (uma por linha)', 'options', (last.options || []).join('\n'), 'Para eventos, indica aqui data e detalhes.')); const grid = el('div', 'web-grid-2'); grid.appendChild(webChannelSelect('Canal', 'channelId', last.channelId)); grid.appendChild(webField('Data de fim', 'endsAt', 'datetime-local', last.endsAt || '')); add(grid); }
+        else if (key === 'self-roles') { const last = (current.panels || [])[0] || {}; add(webField('Título do painel', 'title', 'text', last.title || 'Escolhe os teus cargos')); add(webField('Descrição', 'description', 'textarea', last.description || 'Reage para escolher ou remover um cargo.')); add(webChannelSelect('Canal', 'channelId', last.channelId)); add(webField('Cargos (ID — nome, um por linha)', 'roles', (last.roles || []).join('\n'), 'Os IDs são usados pelo Helper com segurança.')); }
+        else if (key === 'audit') { const grid = el('div', 'web-grid-2'); grid.appendChild(webCheck('Registo de auditoria ativo', 'enabled', current.enabled !== false)); grid.appendChild(webField('Reter registos (dias)', 'retentionDays', 'number', current.retentionDays || 90)); add(grid); add(webChannelSelect('Canal de auditoria', 'logChannelId', current.logChannelId)); }
+        else if (key === 'permissions') { add(webCheck('Pedir revisão antes de ações destrutivas', 'reviewRequired', current.reviewRequired !== false)); add(webField('Cargos autorizados (IDs separados por vírgulas)', 'allowedRoleIds', (current.allowedRoleIds || []).join(','), 'Vazio usa a permissão padrão do Discord.')); }
+        else if (key === 'privacy') { add(webField('Reter dados de atividade (dias)', 'retentionDays', 'number', current.retentionDays || 90)); add(webCheck('Permitir exportações pelo painel', 'allowExports', current.allowExports !== false)); const hint = el('p', 'web-hint'); hint.textContent = 'Exportar inclui apenas configurações do servidor, nunca tokens.'; add(hint); }
+        else if (key === 'templates') { add(webField('Nome do modelo', 'name', 'text', (current[0] || {}).name || '')); add(webField('Descrição', 'description', 'textarea', (current[0] || {}).description || '')); const hint = el('p', 'web-hint'); hint.textContent = 'Exporta um JSON e importa-o noutro servidor pelo mesmo painel.'; add(hint); }
+        const actions = el('div', 'web-dialog-actions'); actions.appendChild(webActionButton('Cancelar', '', webClose));
+        if (key === 'privacy' || key === 'templates') actions.appendChild(webActionButton(key === 'privacy' ? 'Exportar dados' : 'Exportar modelo', '', async () => { try { const r = await fetch(API_BASE + '/api/web-config/export', webAuth()); if (!r.ok) throw new Error(); const blob = new Blob([JSON.stringify(await r.json(), null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = key === 'privacy' ? 'vozen-config-export.json' : 'vozen-template.json'; a.click(); URL.revokeObjectURL(a.href); } catch { banner('err', 'Não foi possível exportar agora.'); } }));
+        if (key === 'templates') { const file = document.createElement('input'); file.type = 'file'; file.accept = 'application/json,.json'; file.hidden = true; document.body.appendChild(file); actions.appendChild(webActionButton('Importar JSON', '', () => file.click())); file.addEventListener('change', async () => { const chosen = file.files && file.files[0]; if (!chosen) return; try { const parsed = JSON.parse(await chosen.text()); const imported = parsed.config || parsed; const response = await fetch(API_BASE + '/api/web-config/import', { method: 'POST', ...webAuth(), headers: { 'Content-Type': 'application/json', ...(SESSION ? { Authorization: 'Bearer ' + SESSION } : {}) }, body: JSON.stringify({ config: imported }) }); if (!response.ok) throw new Error(); const data = await response.json(); WEB_CONFIG = { ...WEB_CONFIG_DEFAULTS, ...data.config }; webClose(); renderFeatureCatalog(); banner('ok', 'Modelo importado com sucesso.'); } catch { banner('err', 'Ficheiro inválido ou incompatível.'); } finally { file.remove(); } }); }
+        if (key === 'privacy') actions.appendChild(webActionButton('Eliminar configurações', 'web-danger', async () => { if (!confirm('Eliminar as configurações avançadas deste servidor?')) return; try { const r = await fetch(API_BASE + '/api/web-config/delete', { method: 'POST', ...webAuth() }); if (!r.ok) throw new Error(); WEB_CONFIG = JSON.parse(JSON.stringify(WEB_CONFIG_DEFAULTS)); webClose(); renderFeatureCatalog(); banner('ok', 'Configurações avançadas eliminadas.'); } catch { banner('err', 'Não foi possível eliminar agora.'); } }));
+        const save = webActionButton('Guardar no site', 'primary', async () => { save.disabled = true; let next = current; if (key === 'quarantine') next = { enabled: webValue(form, 'enabled'), durationMinutes: Math.max(1, Number(webValue(form, 'durationMinutes')) || 30), action: webValue(form, 'action') }; else if (key === 'giveaways') next = { giveaways: [{ prize: webValue(form, 'prize'), channelId: webValue(form, 'channelId'), winners: Math.max(1, Number(webValue(form, 'winners')) || 1), endsAt: webValue(form, 'endsAt'), rules: webValue(form, 'rules') }] }; else if (key === 'workflows') next = [{ name: webValue(form, 'name'), trigger: webValue(form, 'trigger'), action: webValue(form, 'action'), channelId: webValue(form, 'channelId'), payload: webValue(form, 'payload'), enabled: webValue(form, 'enabled') }]; else if (key === 'polls-events') next = webValue(form, 'kind') === 'event' ? { polls: current.polls || [], events: [{ title: webValue(form, 'title'), description: webValue(form, 'description'), channelId: webValue(form, 'channelId'), endsAt: webValue(form, 'endsAt') }] } : { polls: [{ title: webValue(form, 'title'), description: webValue(form, 'description'), options: webValue(form, 'options').split('\n').map((x) => x.trim()).filter(Boolean), channelId: webValue(form, 'channelId'), endsAt: webValue(form, 'endsAt') }], events: current.events || [] }; else if (key === 'self-roles') next = { panels: [{ title: webValue(form, 'title'), description: webValue(form, 'description'), channelId: webValue(form, 'channelId'), roles: webValue(form, 'roles').split('\n').map((x) => x.trim()).filter(Boolean) }] }; else if (key === 'audit') next = { enabled: webValue(form, 'enabled'), retentionDays: Math.max(1, Number(webValue(form, 'retentionDays')) || 90), logChannelId: webValue(form, 'logChannelId') }; else if (key === 'permissions') next = { reviewRequired: webValue(form, 'reviewRequired'), allowedRoleIds: webValue(form, 'allowedRoleIds').split(',').map((x) => x.trim()).filter(Boolean) }; else if (key === 'privacy') next = { retentionDays: Math.max(1, Number(webValue(form, 'retentionDays')) || 90), allowExports: webValue(form, 'allowExports') }; else if (key === 'templates') next = [{ name: webValue(form, 'name'), description: webValue(form, 'description'), createdAt: new Date().toISOString() }]; const synced = await saveWebConfig(key, next); webClose(); renderFeatureCatalog(); banner(synced ? 'ok' : 'info', synced ? feature.name + ' guardado no site.' : feature.name + ' guardado neste navegador; a API será sincronizada quando estiver disponível.'); }); actions.appendChild(save); form.appendChild(actions); modal.hidden = false; requestAnimationFrame(() => form.querySelector('input,select,textarea')?.focus());
+      }
+
       const catalogLabel = (mode, key) => {
         if (mode === 'panel' && Object.prototype.hasOwnProperty.call(SRV.flags, key)) {
           return effFlag(key) ? ['Ativa', 'on'] : ['Inativa', 'off'];
@@ -1149,6 +1237,11 @@
         if (mode === 'panel') return effChan(key) ? ['Configurado', 'on'] : ['Por configurar', 'off'];
         if (mode === 'rank') return ['Neste painel', 'on'];
         if (mode === 'activity') return ['Neste painel', 'on'];
+        if (mode === 'discord') {
+          const value = WEB_CONFIG[key];
+          const configured = JSON.stringify(value) !== JSON.stringify(WEB_CONFIG_DEFAULTS[key]);
+          return [configured ? 'Configurado no site' : 'Configurar no site', configured ? 'on' : ''];
+        }
         return ['No Discord', ''];
       };
 
@@ -1180,12 +1273,13 @@
           title.appendChild(strong); title.appendChild(status);
           copy.appendChild(title); copy.appendChild(description);
           card.appendChild(icon); card.appendChild(copy);
-          if (feature.mode !== 'discord') {
+          if (feature.mode !== 'discord' || WEB_CONFIG_KEYS.includes(feature.key)) {
             const action = el('button', 'feature-action'); action.type = 'button';
             action.textContent = feature.mode === 'activity' ? 'Ver histórico' : (feature.mode === 'rank' ? 'Personalizar' : 'Configurar');
             action.addEventListener('click', () => {
               if (feature.mode === 'rank') openHelperView('rank');
               else if (feature.mode === 'activity') openHelperView('activity');
+              else if (feature.mode === 'discord') openWebFeature(feature.key);
               else openHelperView('features', feature.key);
             });
             card.appendChild(action);
@@ -1292,6 +1386,11 @@
           for (const s of chanSettings.settings || []) { CHAN_META[s.key] = { label: s.label, kind: s.kind }; SRV.chans[s.key] = s.value; }
           TEXT_META = {}; SRV.texts = {};
           for (const t of textsRes.texts || []) { TEXT_META[t.key] = { label: t.label, maxLen: t.maxLen }; SRV.texts[t.key] = t.value; }
+          try {
+            const webRes = await fetch(API_BASE + '/api/web-config', auth);
+            if (webRes.ok) { const webJson = await webRes.json(); if (webJson.config) WEB_CONFIG = { ...WEB_CONFIG_DEFAULTS, ...webJson.config }; }
+          } catch { /* versões antigas da API continuam a funcionar */ }
+          try { const localWeb = JSON.parse(localStorage.getItem('vozen-helper-web-config') || 'null'); if (localWeb && !API_BASE) WEB_CONFIG = { ...WEB_CONFIG_DEFAULTS, ...localWeb }; } catch { /* storage opcional */ }
           PENDING.clear();
           renderSettings(); renderSetupProgress(); renderFeatureCatalog(); updateSaveBar();
           setApiState('online', 'API ligada');
@@ -1684,6 +1783,9 @@
         button.addEventListener('click', () => openHelperView(button.dataset.openView));
       });
       document.getElementById('featureSearch').addEventListener('input', renderFeatureCatalog);
+      document.getElementById('webFeatureClose').addEventListener('click', webClose);
+      document.getElementById('webFeatureModal').addEventListener('click', (event) => { if (event.target.id === 'webFeatureModal') webClose(); });
+      document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !document.getElementById('webFeatureModal').hidden) webClose(); });
       document.querySelectorAll('[data-catalog-filter]').forEach((button) => {
         button.addEventListener('click', () => {
           CATALOG_FILTER = button.dataset.catalogFilter;
