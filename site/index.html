@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://cdn.discordapp.com; connect-src 'self' https://discord.com https://*.trycloudflare.com; form-action https://discord.com 'self'"
+      content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://cdn.discordapp.com; connect-src 'self' https://discord.com https://api.vozen.org; form-action https://discord.com 'self'"
     />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -150,9 +150,10 @@
       .p-logout:hover { border-color: var(--red); color: var(--red); }
       /* Switcher entre o painel do Helper e o do Vozen (plano 037). */
       .p-nav { display: inline-flex; gap: 6px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 4px; }
-      .p-nav a, .p-nav span { padding: 8px 15px; border-radius: 9px; font-family: var(--f-body); font-size: 13.5px; font-weight: 600; color: var(--text-1); text-decoration: none; cursor: pointer; }
+      .p-nav a, .p-nav span, .p-nav button { padding: 8px 15px; border-radius: 9px; font-family: var(--f-body); font-size: 13.5px; font-weight: 600; color: var(--text-1); text-decoration: none; cursor: pointer; }
+      .p-nav button { border: 0; background: transparent; }
       .p-nav .is-active { background: var(--grad); color: #06070e; cursor: default; }
-      .p-nav a:not(.is-active):hover { color: var(--aqua); }
+      .p-nav a:not(.is-active):hover, .p-nav button:not(.is-active):hover { color: var(--aqua); }
 
       .banner {
         display: none; margin: 18px 0 4px; padding: 14px 18px; border-radius: 14px;
@@ -281,7 +282,52 @@
         .savebar-actions { justify-content: flex-end; }
       }
       @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } .btn:hover, .toggle-pass:hover { transform: none; } }
+
+      /* Rank Card Studio integrado no Helper — só utiliza banners curados. */
+      #rankCardPanel { display: none; }
+      #rankCardPanel.show { display: block; }
+      .rank-studio { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(300px, .85fr); gap: 16px; margin-top: 22px; }
+      .rank-card-box { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+      .rank-card-box h2 { margin: 5px 0 20px; font-family: var(--f-display); font-size: 17px; color: var(--text-0); }
+      .rank-eyebrow { color: var(--aqua); font-family: var(--f-mono); font-size: 10px; letter-spacing: .13em; font-weight: 700; }
+      .rank-preview { min-height: 278px; display: flex; align-items: center; gap: 22px; padding: 30px; border-radius: 14px; background-color: #101725; background-size: cover; background-position: center; overflow: hidden; }
+      .rank-avatar { width: 112px; height: 112px; flex: none; display: grid; place-items: center; border: 4px solid var(--aqua); border-radius: 50%; background: rgba(5,6,15,.55); color: var(--aqua); font-size: 42px; }
+      .rank-content { min-width: 0; flex: 1; }
+      .rank-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .rank-top strong { font-size: 25px; color: var(--text-0); }
+      .rank-top b { margin-left: 12px; font-size: 12px; }
+      .rank-name { margin: 8px 0 34px; font-family: var(--f-mono); font-size: 12px; }
+      .rank-xp { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 11px; margin-bottom: 8px; }
+      .rank-track { height: 10px; border-radius: 999px; background: rgba(255,255,255,.16); overflow: hidden; }
+      .rank-track i { display: block; width: 32%; height: 100%; border-radius: inherit; background: var(--aqua); }
+      .rank-field { display: block; margin: 0 0 17px; color: var(--text-1); font-size: 13px; }
+      .rank-field output { float: right; color: var(--aqua); font-family: var(--f-mono); font-size: 12px; }
+      .rank-field select, .rank-field input[type=range] { width: 100%; margin-top: 8px; }
+      .rank-field select { padding: 10px 11px; border: 1px solid var(--line); border-radius: 9px; color: var(--text-0); background: rgba(0,0,0,.25); font: inherit; }
+      .rank-color-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; color: var(--text-1); font-size: 13px; }
+      .rank-color-row input[type=color] { width: 30px; height: 22px; padding: 0; border: 1px solid var(--line); background: transparent; }
+      .rank-swatches { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+      .rank-swatch { width: 20px; height: 20px; border: 2px solid transparent; border-radius: 50%; cursor: pointer; }
+      .rank-swatch.active { border-color: var(--text-0); outline: 1px solid var(--aqua); }
+      .rank-bg-head { display: flex; justify-content: space-between; align-items: baseline; margin: 6px 0 10px; color: var(--text-0); font-size: 15px; }
+      .rank-bg-head small { color: var(--text-1); font-size: 12px; }
+      .rank-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+      .rank-mode, .rank-banner { border: 1px solid var(--line); border-radius: 9px; background: rgba(0,0,0,.2); color: var(--text-1); cursor: pointer; font: inherit; }
+      .rank-mode { padding: 10px; }
+      .rank-mode.active { border-color: var(--aqua); background: rgba(46,230,200,.14); color: var(--text-0); }
+      .rank-banner-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .rank-banner { padding: 4px; overflow: hidden; text-align: left; }
+      .rank-banner.active { border-color: var(--aqua); box-shadow: 0 0 0 1px var(--aqua); }
+      .rank-banner img { display: block; width: 100%; height: 42px; object-fit: cover; border-radius: 5px; }
+      .rank-banner span { display: block; padding: 5px 3px 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+      .rank-solid-grid { display: flex; flex-wrap: wrap; gap: 9px; }
+      .rank-save-row { display: flex; justify-content: flex-end; gap: 9px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+      .rank-save-row button { padding: 10px 14px; border-radius: 9px; border: 1px solid var(--line); background: transparent; color: var(--text-1); cursor: pointer; font: inherit; }
+      .rank-save-row .rank-save { border: 0; background: var(--grad); color: #06070e; font-weight: 600; }
+      .rank-status { min-height: 18px; margin: 10px 0 0; color: var(--aqua); font-family: var(--f-mono); font-size: 11px; }
+      @media (max-width: 780px) { .rank-studio { grid-template-columns: 1fr; } .rank-preview { min-height: 240px; padding: 20px; } .rank-avatar { width: 88px; height: 88px; font-size: 30px; } .rank-top strong { font-size: 20px; } }
     </style>
+    <link rel="stylesheet" href="helper-panel.css" />
   </head>
   <body>
     <main class="card" id="authCard">
@@ -367,49 +413,169 @@
       </div>
 
       <div class="banner" id="panelBanner"></div>
+      <nav class="helper-subnav" aria-label="Secções do Helper" role="tablist">
+        <button type="button" class="is-active" id="helperTabHome" data-helper-view="home" role="tab" aria-selected="true" aria-controls="helperHome">Início</button>
+        <button type="button" id="helperTabFeatures" data-helper-view="features" role="tab" aria-selected="false" aria-controls="helperFeatures" tabindex="-1">Funcionalidades</button>
+        <button type="button" id="helperTabActivity" data-helper-view="activity" role="tab" aria-selected="false" aria-controls="helperActivity" tabindex="-1">Atividade</button>
+        <button type="button" id="helperTabRank" data-helper-view="rank" role="tab" aria-selected="false" aria-controls="rankCardPanel" tabindex="-1">Rank card</button>
+      </nav>
 
-      <div class="section-title">Visão geral</div>
-      <div class="stats-grid">
-        <div class="stat"><b id="stMessages">—</b><span>Mensagens</span></div>
-        <div class="stat"><b id="stJoins">—</b><span>Entradas</span></div>
-        <div class="stat"><b id="stLeaves">—</b><span>Saídas</span></div>
-        <div class="stat"><b id="stCases">—</b><span>Casos</span></div>
-      </div>
+      <section class="helper-view" id="helperHome" data-helper-section="home" role="tabpanel" aria-labelledby="helperTabHome">
+        <div class="welcome-card">
+          <div>
+            <span class="eyebrow">Primeiros passos</span>
+            <h2 id="helperHomeTitle">Vamos preparar o teu servidor.</h2>
+            <p>Ativa primeiro o essencial. Podes alterar tudo mais tarde e nada é aplicado até carregares em “Guardar alterações”.</p>
+          </div>
+          <div class="welcome-actions">
+            <button type="button" class="primary-action" data-open-view="features">Configurar o servidor</button>
+            <button type="button" class="secondary-action" data-open-view="activity">Ver atividade</button>
+          </div>
+        </div>
 
-      <div class="section-title">Casos de moderação recentes</div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>#</th><th>Tipo</th><th>Alvo</th><th>Moderador</th><th>Razão</th><th>Data</th></tr>
-          </thead>
-          <tbody id="casesBody">
-            <tr><td colspan="6" class="empty" id="casesEmpty">—</td></tr>
-          </tbody>
-        </table>
-      </div>
+        <div class="setup-summary">
+          <h3>Configuração recomendada</h3>
+          <span class="setup-count" id="setupCount">A verificar…</span>
+        </div>
+        <div class="setup-grid" id="setupGrid" aria-live="polite">
+          <div class="setup-card"><span class="setup-number">1</span><strong>A carregar proteção…</strong><p>Estamos a verificar as definições atuais.</p></div>
+          <div class="setup-card"><span class="setup-number">2</span><strong>A carregar boas-vindas…</strong><p>Estamos a verificar as definições atuais.</p></div>
+          <div class="setup-card"><span class="setup-number">3</span><strong>A carregar comunidade…</strong><p>Estamos a verificar as definições atuais.</p></div>
+        </div>
 
-      <div class="section-title">Registo de atividade</div>
-      <div class="act-filters" id="actFilters">
-        <button class="act-chip on" data-type="">Tudo</button>
-        <button class="act-chip" data-type="join">Entradas</button>
-        <button class="act-chip" data-type="leave">Saídas</button>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Tipo</th><th>Membro</th><th>Detalhe</th><th>Data</th></tr>
-          </thead>
-          <tbody id="activityBody">
-            <tr><td colspan="4" class="empty" id="activityEmpty">—</td></tr>
-          </tbody>
-        </table>
-      </div>
+        <div class="view-head">
+          <div>
+            <span class="eyebrow">Resumo do servidor</span>
+            <h2>O que aconteceu recentemente</h2>
+            <p class="view-lead">Uma leitura rápida da atividade registada pelo Helper.</p>
+          </div>
+          <span class="api-state" id="apiState" role="status"><i aria-hidden="true"></i><span>A ligar à API</span></span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat"><b id="stMessages">—</b><span>Mensagens registadas</span></div>
+          <div class="stat"><b id="stJoins">—</b><span>Novos membros</span></div>
+          <div class="stat"><b id="stLeaves">—</b><span>Membros que saíram</span></div>
+          <div class="stat"><b id="stCases">—</b><span>Casos de moderação</span></div>
+        </div>
+      </section>
 
-      <div class="section-title">Definições</div>
-      <div id="settingsBox">
-        <div class="empty">—</div>
-      </div>
-    </section>
+      <section class="helper-view" id="helperFeatures" data-helper-section="features" role="tabpanel" aria-labelledby="helperTabFeatures" hidden>
+        <div class="view-head">
+          <div>
+            <span class="eyebrow">Configurar</span>
+            <h2 id="helperFeaturesTitle">Funcionalidades do Helper</h2>
+            <p class="view-lead">Procura pelo que queres fazer. As funções com configuração no painel podem ser ajustadas já; as restantes indicam claramente onde são geridas.</p>
+          </div>
+        </div>
+        <div class="catalog-toolbar">
+          <div class="search-wrap">
+            <input class="feature-search" id="featureSearch" type="search" placeholder="Procurar, por exemplo: spam, níveis ou tickets…" autocomplete="off" aria-label="Procurar funcionalidades" />
+          </div>
+          <div class="catalog-filters" id="catalogFilters" aria-label="Filtrar funcionalidades">
+            <button type="button" class="catalog-filter is-active" data-catalog-filter="all" aria-pressed="true">Todas</button>
+            <button type="button" class="catalog-filter" data-catalog-filter="protection" aria-pressed="false">Proteção</button>
+            <button type="button" class="catalog-filter" data-catalog-filter="community" aria-pressed="false">Comunidade</button>
+            <button type="button" class="catalog-filter" data-catalog-filter="management" aria-pressed="false">Gestão</button>
+          </div>
+        </div>
+        <div class="feature-grid" id="featureCatalog" aria-live="polite">
+          <div class="feature-empty">A carregar funcionalidades…</div>
+        </div>
+
+        <div class="settings-intro" id="serverSettings">
+          <div>
+            <h3>Configurar o servidor</h3>
+            <p>As alterações ficam marcadas a amarelo. Revê-as e guarda quando estiveres pronto.</p>
+          </div>
+        </div>
+        <div id="settingsBox">
+          <div class="empty">A carregar definições…</div>
+        </div>
+      </section>
+
+      <section class="helper-view" id="helperActivity" data-helper-section="activity" role="tabpanel" aria-labelledby="helperTabActivity" hidden>
+        <div class="view-head">
+          <div>
+            <span class="eyebrow">Histórico</span>
+            <h2 id="helperActivityTitle">Atividade e moderação</h2>
+            <p class="view-lead">Consulta entradas, saídas e ações da equipa sem misturar esta informação com as definições.</p>
+          </div>
+        </div>
+
+        <div class="section-title">Casos de moderação recentes</div>
+        <p class="activity-note">Aqui aparecem avisos, expulsões, banimentos e outras ações registadas pelo Helper.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Tipo</th><th>Alvo</th><th>Moderador</th><th>Razão</th><th>Data</th></tr>
+            </thead>
+            <tbody id="casesBody">
+              <tr><td colspan="6" class="empty" id="casesEmpty">A carregar casos…</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section-title">Registo de membros</div>
+        <p class="activity-note">Vê quem entrou ou saiu e os detalhes que o Helper conseguiu registar.</p>
+        <div class="act-filters" id="actFilters">
+          <button type="button" class="act-chip on" data-type="">Tudo</button>
+          <button type="button" class="act-chip" data-type="join">Entradas</button>
+          <button type="button" class="act-chip" data-type="leave">Saídas</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Tipo</th><th>Membro</th><th>Detalhe</th><th>Data</th></tr>
+            </thead>
+            <tbody id="activityBody">
+              <tr><td colspan="4" class="empty" id="activityEmpty">A carregar atividade…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="helper-view" id="rankCardPanel" data-helper-section="rank" role="tabpanel" aria-labelledby="helperTabRank" hidden>
+        <div class="view-head">
+          <div>
+            <span class="eyebrow">Comunidade · Níveis</span>
+            <h2 id="rankCardTitle">Personaliza o rank card</h2>
+            <p class="view-lead">Escolhe uma cor sólida ou um dos banners aprovados. Os membros não podem enviar imagens próprias.</p>
+          </div>
+        </div>
+        <div class="rank-studio">
+          <div class="rank-card-box">
+            <span class="rank-eyebrow">PRÉ-VISUALIZAÇÃO</span>
+            <h2>Assim aparece no Discord</h2>
+            <div class="rank-preview" id="rankPreview">
+              <div class="rank-avatar" id="rankAvatar">✦</div>
+              <div class="rank-content">
+                <div class="rank-top"><strong id="rankPreviewName">Lunara</strong><div><b id="rankPreviewRank">Rank #17</b><b id="rankPreviewLevel">Nível 8</b></div></div>
+                <p class="rank-name" id="rankPreviewUsername">lunara#4821</p>
+                <div class="rank-xp"><span id="rankPreviewXp">429 / 1337 XP</span><span>32%</span></div>
+                <div class="rank-track"><i id="rankProgress"></i></div>
+              </div>
+            </div>
+          </div>
+          <div class="rank-card-box">
+            <span class="rank-eyebrow">PERSONALIZAÇÃO</span>
+            <h2>Estilo do rank card</h2>
+            <label class="rank-field">Fonte
+              <select id="rankFont"><option value="system-ui">Sistema</option><option value="Inter">Inter</option><option value="Roboto">Roboto</option><option value="Poppins">Poppins</option><option value="Space Grotesk">Space Grotesk</option><option value="Lexend">Lexend</option></select>
+            </label>
+            <div class="rank-color-row"><span>Cor principal</span><input id="rankPrimaryColor" type="color" value="#8EE5D2" aria-label="Escolher cor principal" /></div>
+            <div class="rank-swatches" id="rankPrimarySwatches"></div>
+            <div class="rank-color-row"><span>Cor do texto</span><input id="rankTextColor" type="color" value="#F4F7FB" aria-label="Escolher cor do texto" /></div>
+            <div class="rank-swatches" id="rankTextSwatches"></div>
+            <label class="rank-field">Opacidade do overlay <output id="rankOverlayOutput">36%</output><input id="rankOverlay" type="range" min="0" max="85" value="36" /></label>
+            <div class="rank-bg-head"><span>Fundo do rank card</span><small id="rankBgModeLabel">Cor sólida</small></div>
+            <div class="rank-modes"><button type="button" class="rank-mode active" id="rankSolidMode">Cor sólida</button><button type="button" class="rank-mode" id="rankBannerMode">Banners curados</button></div>
+            <div id="rankSolidOptions" class="rank-solid-grid"></div>
+            <div id="rankBannerOptions" class="rank-banner-grid" hidden></div>
+            <div class="rank-save-row"><button type="button" id="rankReset">Restaurar</button><button type="button" class="rank-save" id="rankSave">Guardar localmente</button></div>
+            <p class="rank-status" id="rankStatus" role="status"></p>
+          </div>
+        </div>
+      </section>
 
     <!-- barra de guardar (aparece quando há alterações pendentes) -->
     <div class="savebar" id="saveBar" aria-hidden="true">
@@ -421,6 +587,7 @@
         </div>
       </div>
     </div>
+    </section>
 
     <!-- URL da API, mantido atualizado pela VPS (deploy key). Carrega antes do script. -->
     <script src="api-url.js"></script>
@@ -442,16 +609,16 @@
       // mesmo que o túnel mude. Vazio = painel em modo "offline". `let` porque
       // refreshApiBase() o atualiza.
       //
-      // Só se confia num URL https cujo host termine em .trycloudflare.com (allow-list).
+      // Só se confia no endpoint Helper oficial, por HTTPS e no caminho esperado.
       // O api-url.js é same-origin, mas se fosse adulterado não pode passar a apontar o
       // painel — e o token do Discord enviado em enter/session — para uma origem arbitrária.
       // A verificação aplica-se ao valor INICIAL e ao refresh. NOTA (infra): a correção
       // definitiva é um túnel nomeado / subdomínio próprio, para o wildcard
-      // *.trycloudflare.com do CSP passar a um host exato — e esta allow-list fixar-se nele.
       function isTrustedApiBase(url) {
         try {
           const u = new URL(url);
-          return u.protocol === 'https:' && u.hostname.endsWith('.trycloudflare.com');
+          return u.protocol === 'https:' && u.hostname === 'api.vozen.org'
+            && (u.pathname === '/helper' || u.pathname.startsWith('/helper/'));
         } catch (_e) {
           return false;
         }
@@ -562,6 +729,13 @@
         b.textContent = msg;
       };
       const hideBanner = () => document.getElementById('panelBanner').classList.remove('show');
+      const setApiState = (state, text) => {
+        const node = document.getElementById('apiState');
+        if (!node) return;
+        node.className = 'api-state' + (state ? ' ' + state : '');
+        const label = node.querySelector('span');
+        if (label) label.textContent = text;
+      };
 
       function showPanel(user) {
         document.getElementById('authCard').style.display = 'none';
@@ -636,6 +810,50 @@
         welcomedm: ['welcomedm.message'],
       };
       const MOD_CHANS = ['chan.log'];
+      const FEATURE_HELP = {
+        antispam: 'Reduz mensagens repetidas e comportamento de spam.',
+        antiscam: 'Deteta ligações e padrões comuns de fraude.',
+        antinuke: 'Ajuda a travar alterações destrutivas em massa.',
+        joingate: 'Aplica verificações básicas a novos membros.',
+        raid: 'Reage a entradas suspeitas de muitas contas ao mesmo tempo.',
+        leveling: 'Atribui XP por atividade e cria uma progressão por níveis.',
+        starboard: 'Destaca mensagens populares num canal escolhido.',
+        suggestions: 'Organiza sugestões da comunidade num canal próprio.',
+        tickets: 'Permite abrir pedidos privados de apoio no Discord.',
+        bumpreminder: 'Lembra a comunidade de promover o servidor.',
+        welcomedm: 'Envia uma mensagem privada quando alguém entra.',
+        'chan.log': 'Canal onde o Helper regista ações de moderação.',
+        'chan.levelup': 'Canal onde aparecem as mensagens de subida de nível.',
+        'xp.exclude': 'Canais onde as mensagens não dão XP.',
+        'chan.starboard': 'Canal que recebe as mensagens destacadas.',
+        'chan.suggestions': 'Canal usado para publicar sugestões.',
+        'welcomedm.message': 'Mensagem enviada automaticamente aos novos membros.',
+      };
+      const FEATURE_CATALOG = [
+        { key: 'antispam', name: 'Anti-spam', icon: '◫', category: 'protection', mode: 'panel', description: FEATURE_HELP.antispam },
+        { key: 'antiscam', name: 'Anti-scam', icon: '◇', category: 'protection', mode: 'panel', description: FEATURE_HELP.antiscam },
+        { key: 'antinuke', name: 'Anti-nuke', icon: '⌁', category: 'protection', mode: 'panel', description: FEATURE_HELP.antinuke },
+        { key: 'joingate', name: 'Proteção de entradas', icon: '↪', category: 'protection', mode: 'panel', description: FEATURE_HELP.joingate },
+        { key: 'raid', name: 'Proteção anti-raid', icon: '⚑', category: 'protection', mode: 'panel', description: FEATURE_HELP.raid },
+        { key: 'chan.log', name: 'Registo de moderação', icon: '≡', category: 'protection', mode: 'panel', description: FEATURE_HELP['chan.log'] },
+        { key: 'cases', name: 'Casos de moderação', icon: '§', category: 'management', mode: 'activity', description: 'Histórico de avisos, expulsões, banimentos e outras ações.' },
+        { key: 'quarantine', name: 'Quarentena e shadow mode', icon: '⊘', category: 'protection', mode: 'discord', description: 'Restringe membros de risco sem apagar o histórico.' },
+        { key: 'leveling', name: 'Níveis e XP', icon: '↗', category: 'community', mode: 'panel', description: FEATURE_HELP.leveling },
+        { key: 'rank-card', name: 'Rank card', icon: '▣', category: 'community', mode: 'rank', description: 'Personaliza o cartão de nível com cores ou banners aprovados.' },
+        { key: 'starboard', name: 'Starboard', icon: '☆', category: 'community', mode: 'panel', description: FEATURE_HELP.starboard },
+        { key: 'suggestions', name: 'Sugestões', icon: '◌', category: 'community', mode: 'panel', description: FEATURE_HELP.suggestions },
+        { key: 'tickets', name: 'Tickets de suporte', icon: '□', category: 'community', mode: 'panel', description: FEATURE_HELP.tickets },
+        { key: 'welcomedm', name: 'Boas-vindas por mensagem', icon: '✦', category: 'community', mode: 'panel', description: FEATURE_HELP.welcomedm },
+        { key: 'bumpreminder', name: 'Lembrete de bump', icon: '↥', category: 'community', mode: 'panel', description: FEATURE_HELP.bumpreminder },
+        { key: 'giveaways', name: 'Giveaways', icon: '♢', category: 'community', mode: 'discord', description: 'Cria sorteios e escolhe vencedores através de comandos.' },
+        { key: 'polls-events', name: 'Sondagens e eventos', icon: '◉', category: 'community', mode: 'discord', description: 'Organiza decisões e encontros diretamente no Discord.' },
+        { key: 'self-roles', name: 'Painéis de cargos', icon: '⊞', category: 'community', mode: 'discord', description: 'Deixa os membros escolherem cargos em painéis próprios.' },
+        { key: 'workflows', name: 'Automações', icon: '⌘', category: 'management', mode: 'discord', description: 'Encadeia ações do Helper para tarefas repetitivas.' },
+        { key: 'audit', name: 'Auditoria e permissões', icon: '◎', category: 'management', mode: 'discord', description: 'Ajuda a acompanhar alterações e a saúde das permissões.' },
+        { key: 'privacy', name: 'Privacidade e dados', icon: '◈', category: 'management', mode: 'discord', description: 'Controla retenção, exportação e eliminação dos dados do servidor.' },
+        { key: 'templates', name: 'Modelos e importação', icon: '▤', category: 'management', mode: 'discord', description: 'Reutiliza configurações e transfere definições entre servidores.' },
+      ];
+      let CATALOG_FILTER = 'all';
 
       const el = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
 
@@ -674,6 +892,8 @@
         const chipInfo = a && a.classList && a.classList.contains('chip')
           ? { k: a.dataset.k, id: a.dataset.id } : null;
         renderSettings();
+        renderSetupProgress();
+        renderFeatureCatalog();
         updateSaveBar();
         if (chipInfo) {
           const again = document.querySelector('.chip[data-k="' + chipInfo.k + '"][data-id="' + chipInfo.id + '"]');
@@ -698,6 +918,7 @@
         btn.appendChild(lab); btn.appendChild(chev);
         const panel = el('div', 'dd-panel');
         const search = el('input', 'dd-search'); search.type = 'text'; search.placeholder = 'Procurar canal…';
+        search.setAttribute('aria-label', 'Procurar canal para ' + meta.label);
         const list = el('div', 'dd-list');
         panel.appendChild(search); panel.appendChild(list);
         dd.appendChild(btn); dd.appendChild(panel);
@@ -773,11 +994,16 @@
         const meta = FLAGS_META[key];
         if (!meta) return null;
         const row = el('div', 'set-row'); if (isFlagPending(key)) row.classList.add('pending');
+        row.dataset.featureKey = key;
         const lbl = el('div', 'lbl');
         lbl.appendChild(el('span', 'pending-dot'));
-        const nn = el('div', 'set-name'); nn.textContent = meta.label; lbl.appendChild(nn);
+        const copy = el('div', 'set-copy');
+        const nn = el('div', 'set-name'); nn.textContent = meta.label; copy.appendChild(nn);
+        const desc = el('div', 'set-sub'); desc.textContent = FEATURE_HELP[key] || 'Ativa ou desativa esta funcionalidade.'; copy.appendChild(desc);
+        lbl.appendChild(copy);
         const sw = el('label', 'switch');
         const inp = document.createElement('input'); inp.type = 'checkbox'; inp.checked = !!effFlag(key);
+        inp.setAttribute('aria-label', (inp.checked ? 'Desativar ' : 'Ativar ') + meta.label);
         const sl = el('span', 'slider'); sw.appendChild(inp); sw.appendChild(sl);
         inp.addEventListener('change', () => setPendingFlag(key, inp.checked));
         row.appendChild(lbl); row.appendChild(sw);
@@ -787,9 +1013,13 @@
       function channelRow(key, sub) {
         const meta = CHAN_META[key];
         const row = el('div', sub ? 'sub-row' : 'set-row'); if (isChanPending(key)) row.classList.add('pending');
+        row.dataset.featureKey = key;
         const lbl = el('div', 'lbl');
         lbl.appendChild(el('span', 'pending-dot'));
-        const nn = el('div', 'set-name'); nn.textContent = meta ? meta.label : key; lbl.appendChild(nn);
+        const copy = el('div', 'set-copy');
+        const nn = el('div', 'set-name'); nn.textContent = meta ? meta.label : key; copy.appendChild(nn);
+        if (!sub && FEATURE_HELP[key]) { const desc = el('div', 'set-sub'); desc.textContent = FEATURE_HELP[key]; copy.appendChild(desc); }
+        lbl.appendChild(copy);
         row.appendChild(lbl); row.appendChild(channelControl(key));
         return row;
       }
@@ -800,6 +1030,7 @@
         const meta = TEXT_META[key];
         if (!meta) return null;
         const wrap = el('div', 'text-sub'); if (isTextPending(key)) wrap.classList.add('pending');
+        wrap.dataset.featureKey = key;
         const head = el('div', 'lbl');
         head.appendChild(el('span', 'pending-dot'));
         const nn = el('div', 'set-name'); nn.textContent = meta.label; head.appendChild(nn);
@@ -836,13 +1067,19 @@
           const d = el('div', 'empty'); d.textContent = 'A carregar…'; box.appendChild(d); return;
         }
         const gMod = el('div', 'group mod');
-        const hMod = el('div', 'group-head'); hMod.textContent = 'Moderação'; gMod.appendChild(hMod);
+        const hMod = el('div', 'group-head');
+        const hModTitle = el('span'); hModTitle.textContent = 'Proteção automática';
+        const hModHelp = el('small'); hModHelp.textContent = 'Recomendado para começar';
+        hMod.appendChild(hModTitle); hMod.appendChild(hModHelp); gMod.appendChild(hMod);
         for (const k of MOD_FLAGS) { const r = featureRow(k); if (r) gMod.appendChild(r); }
         for (const ck of MOD_CHANS) if (CHAN_META[ck]) gMod.appendChild(channelRow(ck, false));
         box.appendChild(gMod);
 
         const gCom = el('div', 'group');
-        const hCom = el('div', 'group-head'); hCom.textContent = 'Comunidade'; gCom.appendChild(hCom);
+        const hCom = el('div', 'group-head');
+        const hComTitle = el('span'); hComTitle.textContent = 'Comunidade e boas-vindas';
+        const hComHelp = el('small'); hComHelp.textContent = 'Ativa apenas o que fizer sentido';
+        hCom.appendChild(hComTitle); hCom.appendChild(hComHelp); gCom.appendChild(hCom);
         for (const k of COM_FLAGS) {
           const r = featureRow(k); if (!r) continue; gCom.appendChild(r);
           const subs = (FEATURE_CHANS[k] || []).filter((sk) => CHAN_META[sk]);
@@ -859,6 +1096,100 @@
           }
         }
         box.appendChild(gCom);
+      }
+
+      function renderSetupProgress() {
+        const grid = document.getElementById('setupGrid');
+        if (!grid) return;
+        const ready = Object.keys(FLAGS_META).length > 0;
+        const steps = [
+          {
+            title: 'Protege o servidor',
+            description: 'Ativa anti-spam, anti-scam e proteção anti-raid.',
+            done: ready && !!effFlag('antispam') && !!effFlag('antiscam') && !!effFlag('raid'),
+            feature: 'antispam',
+          },
+          {
+            title: 'Recebe novos membros',
+            description: 'Liga a mensagem de boas-vindas e adapta o texto.',
+            done: ready && !!effFlag('welcomedm') && !!effText('welcomedm.message'),
+            feature: 'welcomedm',
+          },
+          {
+            title: 'Dá vida à comunidade',
+            description: 'Começa pelos níveis e acrescenta as outras funções quando precisares.',
+            done: ready && !!effFlag('leveling'),
+            feature: 'leveling',
+          },
+        ];
+        grid.textContent = '';
+        let complete = 0;
+        steps.forEach((step, index) => {
+          if (step.done) complete++;
+          const card = el('article', 'setup-card' + (step.done ? ' complete' : ''));
+          const number = el('span', 'setup-number'); number.textContent = step.done ? '✓' : String(index + 1);
+          const title = el('strong'); title.textContent = step.title;
+          const text = el('p'); text.textContent = ready ? step.description : 'Não foi possível verificar esta etapa ainda.';
+          const action = el('button'); action.type = 'button';
+          action.textContent = step.done ? 'Rever configuração →' : 'Configurar agora →';
+          action.addEventListener('click', () => openHelperView('features', step.feature));
+          card.appendChild(number); card.appendChild(title); card.appendChild(text); card.appendChild(action);
+          grid.appendChild(card);
+        });
+        const count = document.getElementById('setupCount');
+        count.textContent = ready ? complete + ' de ' + steps.length + ' concluídos' : 'Estado indisponível';
+      }
+
+      const catalogLabel = (mode, key) => {
+        if (mode === 'panel' && Object.prototype.hasOwnProperty.call(SRV.flags, key)) {
+          return effFlag(key) ? ['Ativa', 'on'] : ['Inativa', 'off'];
+        }
+        if (mode === 'panel') return effChan(key) ? ['Configurado', 'on'] : ['Por configurar', 'off'];
+        if (mode === 'rank') return ['Neste painel', 'on'];
+        if (mode === 'activity') return ['Neste painel', 'on'];
+        return ['No Discord', ''];
+      };
+
+      function renderFeatureCatalog() {
+        const box = document.getElementById('featureCatalog');
+        if (!box) return;
+        const query = (document.getElementById('featureSearch')?.value || '').trim().toLocaleLowerCase('pt-PT');
+        const items = FEATURE_CATALOG.filter((feature) => {
+          const categoryMatches = CATALOG_FILTER === 'all' || feature.category === CATALOG_FILTER;
+          const text = (feature.name + ' ' + feature.description).toLocaleLowerCase('pt-PT');
+          return categoryMatches && (!query || text.includes(query));
+        });
+        box.textContent = '';
+        if (!items.length) {
+          const empty = el('div', 'feature-empty');
+          empty.textContent = 'Não encontrámos nenhuma funcionalidade com essa pesquisa.';
+          box.appendChild(empty);
+          return;
+        }
+        items.forEach((feature) => {
+          const card = el('article', 'feature-card');
+          const icon = el('span', 'feature-icon'); icon.textContent = feature.icon; icon.setAttribute('aria-hidden', 'true');
+          const copy = el('div', 'feature-copy');
+          const title = el('div', 'feature-title');
+          const strong = el('strong'); strong.textContent = feature.name;
+          const statusData = catalogLabel(feature.mode, feature.key);
+          const status = el('span', 'feature-status ' + statusData[1]); status.textContent = statusData[0];
+          const description = el('p'); description.textContent = feature.description;
+          title.appendChild(strong); title.appendChild(status);
+          copy.appendChild(title); copy.appendChild(description);
+          card.appendChild(icon); card.appendChild(copy);
+          if (feature.mode !== 'discord') {
+            const action = el('button', 'feature-action'); action.type = 'button';
+            action.textContent = feature.mode === 'activity' ? 'Ver histórico' : (feature.mode === 'rank' ? 'Personalizar' : 'Configurar');
+            action.addEventListener('click', () => {
+              if (feature.mode === 'rank') openHelperView('rank');
+              else if (feature.mode === 'activity') openHelperView('activity');
+              else openHelperView('features', feature.key);
+            });
+            card.appendChild(action);
+          }
+          box.appendChild(card);
+        });
       }
 
       let saveBarTimer = null; // timer do "✓ Guardado" — controlado para não esconder pendentes
@@ -911,6 +1242,8 @@
         }
         btn.disabled = false;
         renderSettings();
+        renderSetupProgress();
+        renderFeatureCatalog();
         if (failed.length) {
           updateSaveBar();
           banner('err', 'Falhou guardar: ' + failed.join(', ') + '. Continua(m) pendente(s).');
@@ -936,6 +1269,8 @@
       function discardAll() {
         PENDING.clear();
         renderSettings();
+        renderSetupProgress();
+        renderFeatureCatalog();
         updateSaveBar();
       }
 
@@ -956,10 +1291,20 @@
           TEXT_META = {}; SRV.texts = {};
           for (const t of textsRes.texts || []) { TEXT_META[t.key] = { label: t.label, maxLen: t.maxLen }; SRV.texts[t.key] = t.value; }
           PENDING.clear();
-          renderSettings(); updateSaveBar();
+          renderSettings(); renderSetupProgress(); renderFeatureCatalog(); updateSaveBar();
+          setApiState('online', 'API ligada');
+          return true;
         } catch {
           const box = document.getElementById('settingsBox'); box.textContent = '';
-          const d = el('div', 'empty'); d.textContent = 'Não foi possível carregar as definições.'; box.appendChild(d);
+          const d = el('div', 'settings-error');
+          const title = el('strong'); title.textContent = 'Não foi possível carregar as definições.';
+          const text = el('p'); text.textContent = 'Os restantes dados do painel podem continuar disponíveis. Verifica a ligação e tenta novamente.';
+          const retry = el('button', 'retry-action'); retry.type = 'button'; retry.textContent = 'Tentar novamente';
+          retry.addEventListener('click', () => loadSettings(auth));
+          d.appendChild(title); d.appendChild(text); d.appendChild(retry); box.appendChild(d);
+          renderSetupProgress(); renderFeatureCatalog();
+          setApiState('offline', 'API com ligação parcial');
+          return false;
         }
       }
 
@@ -1105,32 +1450,49 @@
           headers: SESSION ? { Authorization: 'Bearer ' + SESSION } : {},
           credentials: 'include',
         };
-        let statsRes, casesRes;
+        setApiState('', 'A ligar à API');
+        const settingsPromise = loadSettings(auth);
+        let partialFailure = false;
         try {
-          const [sr, cr] = await Promise.all([
-            fetch(API_BASE + '/api/stats', auth),
-            fetch(API_BASE + '/api/cases', auth),
-          ]);
-          statsRes = await readJson(sr); casesRes = await readJson(cr);
+          const statsRes = await fetch(API_BASE + '/api/stats', auth).then(readJson);
+          renderStats(statsRes);
         } catch (err) {
-          if (String(err && err.message) !== '401') banner('err', 'Não foi possível obter os dados da API.');
-          return;
+          if (String(err && err.message) !== '401') partialFailure = true;
         }
-        renderStats(statsRes);
-        renderCases(casesRes.cases);
-        void loadSettings(auth);
-        // Atividade: tolerante — se a API ainda não tiver o endpoint (ex.: antes do deploy),
-        // mostra vazio SEM partir o resto do painel.
+        try {
+          const casesRes = await fetch(API_BASE + '/api/cases', auth).then(readJson);
+          renderCases(casesRes.cases);
+        } catch (err) {
+          if (String(err && err.message) !== '401') {
+            partialFailure = true;
+            const body = document.getElementById('casesBody');
+            body.textContent = '';
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 6; td.className = 'empty'; td.textContent = 'Não foi possível carregar os casos agora.';
+            tr.appendChild(td); body.appendChild(tr);
+          }
+        }
         wireActFilters();
         try {
           const ar = await fetch(API_BASE + '/api/activity', auth);
           if (ar.status === 401) { expireSession(); return; }
-          const actRes = ar.ok ? await ar.json() : null;
+          if (!ar.ok) throw new Error('http ' + ar.status);
+          const actRes = await ar.json();
           ACTIVITY = (actRes && actRes.activity) || [];
         } catch (_e) {
+          partialFailure = true;
           ACTIVITY = [];
         }
         renderActivity();
+        if (!(await settingsPromise)) partialFailure = true;
+        if (partialFailure) {
+          banner('info', 'Alguns dados não ficaram disponíveis. As secções que carregaram continuam a funcionar.');
+          setApiState('offline', 'API com ligação parcial');
+        } else {
+          hideBanner();
+          setApiState('online', 'API ligada');
+        }
       }
 
       async function resumePanel(s) {
@@ -1206,6 +1568,133 @@
           show('blocked');
         }
       }
+
+      // Rank Card Studio integrado: a configuração é segura por desenho — os membros
+      // só podem escolher os dez banners curados ou uma cor sólida. Até o endpoint de
+      // publicação do Helper ficar ligado à sessão legada, o rascunho fica no browser.
+      const RANK_DEFAULTS = { font: 'system-ui', primary: '#8EE5D2', text: '#F4F7FB', overlay: 36, mode: 'solid', background: '#101725', banner: null };
+      const RANK_BANNERS = [
+        ['aurora-lake', 'Aurora Lake', 'rank-card-banners/banner-01-aurora-lake.png'],
+        ['neon-rain', 'Neon Rain', 'rank-card-banners/banner-02-neon-rain.png'],
+        ['enchanted-forest', 'Enchanted Forest', 'rank-card-banners/banner-03-enchanted-forest.png'],
+        ['desert-ruins', 'Desert Ruins', 'rank-card-banners/banner-04-desert-ruins.png'],
+        ['coral-cavern', 'Coral Cavern', 'rank-card-banners/banner-05-coral-cavern.png'],
+        ['sky-islands', 'Sky Islands', 'rank-card-banners/banner-06-sky-islands.png'],
+        ['volcanic-forge', 'Volcanic Forge', 'rank-card-banners/banner-07-volcanic-forge.png'],
+        ['moonlit-village', 'Moonlit Village', 'rank-card-banners/banner-08-moonlit-village.png'],
+        ['starship-hangar', 'Starship Hangar', 'rank-card-banners/banner-09-starship-hangar.png'],
+        ['lavender-storm', 'Lavender Storm', 'rank-card-banners/banner-10-lavender-storm.png'],
+      ];
+      const RANK_COLORS = ['#8EE5D2', '#7F9CF5', '#F6AD55', '#F687B3', '#A78BFA', '#F4F7FB'];
+      const RANK_SOLIDS = ['#101725', '#172033', '#1F2937', '#312E46', '#3B2434', '#243A36'];
+      const rankPreview = document.getElementById('rankPreview');
+      const rankAvatar = document.getElementById('rankAvatar');
+      const rankProgress = document.getElementById('rankProgress');
+      const rankPreviewRank = document.getElementById('rankPreviewRank');
+      const rankStatus = document.getElementById('rankStatus');
+      let rankState;
+      try { rankState = { ...RANK_DEFAULTS, ...JSON.parse(localStorage.getItem('vozen-helper-rank-card') || '{}') }; } catch { rankState = { ...RANK_DEFAULTS }; }
+
+      function rankSet(partial) { rankState = { ...rankState, ...partial }; rankRender(); }
+      function rankRender() {
+        document.getElementById('rankFont').value = rankState.font;
+        document.getElementById('rankPrimaryColor').value = rankState.primary;
+        document.getElementById('rankTextColor').value = rankState.text;
+        document.getElementById('rankOverlay').value = String(rankState.overlay);
+        document.getElementById('rankOverlayOutput').textContent = rankState.overlay + '%';
+        const banner = RANK_BANNERS.find((entry) => entry[0] === rankState.banner);
+        rankPreview.style.backgroundColor = rankState.background;
+        rankPreview.style.backgroundImage = banner && rankState.mode === 'banner'
+          ? `linear-gradient(rgba(0,0,0,${rankState.overlay / 100}), rgba(0,0,0,${rankState.overlay / 100})), url("${banner[2]}")` : 'none';
+        rankPreview.style.fontFamily = rankState.font;
+        rankAvatar.style.borderColor = rankState.primary;
+        rankAvatar.style.color = rankState.primary;
+        rankProgress.style.background = rankState.primary;
+        rankPreviewRank.style.color = rankState.primary;
+        document.getElementById('rankPreviewName').style.color = rankState.text;
+        document.getElementById('rankPreviewUsername').style.color = rankState.primary;
+        document.getElementById('rankPreviewXp').style.color = rankState.text;
+        document.getElementById('rankPreviewLevel').style.color = rankState.text;
+        document.getElementById('rankBgModeLabel').textContent = rankState.mode === 'banner' ? 'Banner curado' : 'Cor sólida';
+        document.getElementById('rankSolidMode').classList.toggle('active', rankState.mode !== 'banner');
+        document.getElementById('rankBannerMode').classList.toggle('active', rankState.mode === 'banner');
+        document.getElementById('rankSolidOptions').hidden = rankState.mode === 'banner';
+        document.getElementById('rankBannerOptions').hidden = rankState.mode !== 'banner';
+        document.querySelectorAll('[data-rank-color="primary"]').forEach((b) => b.classList.toggle('active', b.dataset.color === rankState.primary));
+        document.querySelectorAll('[data-rank-color="text"]').forEach((b) => b.classList.toggle('active', b.dataset.color === rankState.text));
+        document.querySelectorAll('[data-rank-solid]').forEach((b) => b.classList.toggle('active', b.dataset.rankSolid === rankState.background));
+        document.querySelectorAll('[data-rank-banner]').forEach((b) => b.classList.toggle('active', b.dataset.rankBanner === rankState.banner));
+      }
+      function rankSwatches(containerId, colors, kind) {
+        const box = document.getElementById(containerId);
+        colors.forEach((color) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'rank-swatch'; b.style.background = color; b.dataset.rankColor = kind; b.dataset.color = color; b.setAttribute('aria-label', color); b.addEventListener('click', () => rankSet(kind === 'primary' ? { primary: color } : { text: color })); box.appendChild(b); });
+      }
+      rankSwatches('rankPrimarySwatches', RANK_COLORS, 'primary');
+      rankSwatches('rankTextSwatches', RANK_COLORS, 'text');
+      RANK_SOLIDS.forEach((color) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'rank-swatch'; b.style.background = color; b.dataset.rankSolid = color; b.setAttribute('aria-label', 'Fundo ' + color); b.addEventListener('click', () => rankSet({ mode: 'solid', background: color })); document.getElementById('rankSolidOptions').appendChild(b); });
+      RANK_BANNERS.forEach(([id, label, path]) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'rank-banner'; b.dataset.rankBanner = id; b.innerHTML = `<img src="${path}" alt=""><span>${label}</span>`; b.addEventListener('click', () => rankSet({ mode: 'banner', banner: id })); document.getElementById('rankBannerOptions').appendChild(b); });
+      document.getElementById('rankFont').addEventListener('change', (e) => rankSet({ font: e.target.value }));
+      document.getElementById('rankPrimaryColor').addEventListener('input', (e) => rankSet({ primary: e.target.value.toUpperCase() }));
+      document.getElementById('rankTextColor').addEventListener('input', (e) => rankSet({ text: e.target.value.toUpperCase() }));
+      document.getElementById('rankOverlay').addEventListener('input', (e) => rankSet({ overlay: Number(e.target.value) }));
+      document.getElementById('rankSolidMode').addEventListener('click', () => rankSet({ mode: 'solid' }));
+      document.getElementById('rankBannerMode').addEventListener('click', () => rankSet({ mode: 'banner', banner: rankState.banner || RANK_BANNERS[0][0] }));
+      document.getElementById('rankReset').addEventListener('click', () => { rankState = { ...RANK_DEFAULTS }; rankStatus.textContent = 'Pré-visualização restaurada.'; rankRender(); });
+      document.getElementById('rankSave').addEventListener('click', () => { localStorage.setItem('vozen-helper-rank-card', JSON.stringify(rankState)); rankStatus.textContent = 'Guardado neste navegador.'; });
+
+      function openHelperView(view, featureKey) {
+        document.querySelectorAll('[data-helper-section]').forEach((section) => {
+          section.hidden = section.dataset.helperSection !== view;
+        });
+        document.querySelectorAll('[data-helper-view]').forEach((button) => {
+          const active = button.dataset.helperView === view;
+          button.classList.toggle('is-active', active);
+          button.setAttribute('aria-selected', String(active));
+          button.tabIndex = active ? 0 : -1;
+        });
+        if (featureKey) {
+          requestAnimationFrame(() => {
+            const target = document.querySelector('[data-feature-key="' + featureKey + '"]') || document.getElementById('serverSettings');
+            if (!target) return;
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.classList.add('attention');
+            setTimeout(() => target.classList.remove('attention'), 1500);
+          });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+
+      document.querySelectorAll('[data-helper-view]').forEach((button) => {
+        button.addEventListener('click', () => openHelperView(button.dataset.helperView));
+        button.addEventListener('keydown', (event) => {
+          if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+          event.preventDefault();
+          const tabs = [...document.querySelectorAll('[data-helper-view]')];
+          const current = tabs.indexOf(button);
+          const offset = event.key === 'ArrowRight' ? 1 : -1;
+          const next = tabs[(current + offset + tabs.length) % tabs.length];
+          openHelperView(next.dataset.helperView);
+          next.focus();
+        });
+      });
+      document.querySelectorAll('[data-open-view]').forEach((button) => {
+        button.addEventListener('click', () => openHelperView(button.dataset.openView));
+      });
+      document.getElementById('featureSearch').addEventListener('input', renderFeatureCatalog);
+      document.querySelectorAll('[data-catalog-filter]').forEach((button) => {
+        button.addEventListener('click', () => {
+          CATALOG_FILTER = button.dataset.catalogFilter;
+          document.querySelectorAll('[data-catalog-filter]').forEach((filterButton) => {
+            filterButton.classList.toggle('is-active', filterButton === button);
+            filterButton.setAttribute('aria-pressed', String(filterButton === button));
+          });
+          renderFeatureCatalog();
+        });
+      });
+      renderFeatureCatalog();
+      renderSetupProgress();
+      rankRender();
 
       document.getElementById('btnSave').addEventListener('click', saveAll);
       document.getElementById('btnDiscard').addEventListener('click', discardAll);
