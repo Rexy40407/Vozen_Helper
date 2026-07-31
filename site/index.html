@@ -358,26 +358,28 @@
       body.has-panel { display: block; padding: 0; background: #20222d; }
       #panel { position: relative; display: none; max-width: none; min-height: 100vh; padding: 0; background: #20222d; }
       #panel.show { display: block; }
-      .mee-sidebar { position: fixed; inset: 0 auto 0 0; z-index: 30; width: 286px; padding: 26px 18px 18px; background: #1a1c25; border-right: 1px solid rgba(255,255,255,.06); overflow-y: auto; }
-      .mee-sidebar-brand { display: flex; align-items: center; gap: 12px; padding: 0 10px 24px; color: #f8f9fc; }
-      .mee-sidebar-brand strong { display: block; letter-spacing: .16em; font-size: 20px; font-weight: 800; }
-      .mee-sidebar-brand small { display: block; margin-top: 3px; color: #9ca2b8; font: 700 9px var(--f-mono); letter-spacing: .18em; }
-      .mee-logo { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: #55c8e9; color: #15202c; font-size: 22px; box-shadow: 0 8px 18px rgba(0,0,0,.22); }
-      .mee-server { display: grid; grid-template-columns: 28px 1fr 20px; align-items: center; gap: 9px; width: 100%; margin-bottom: 22px; padding: 12px 11px; border: 0; border-radius: 9px; background: #111219; color: #f5f6fa; text-align: left; cursor: pointer; font: 600 14px var(--f-body); }
-      .mee-server-icon { display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid rgba(255,255,255,.6); border-radius: 50%; font-size: 11px; }
-      .mee-chevron { color: #c5cadb; text-align: right; font-size: 17px; }
-      .mee-side-nav { display: grid; gap: 3px; padding-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,.08); }
-      .mee-side-link, .mee-side-section button { display: flex; align-items: center; gap: 14px; width: 100%; padding: 10px 12px; border: 0; border-radius: 8px; background: transparent; color: #9ca2b8; text-align: left; cursor: pointer; font: 500 14px var(--f-body); transition: color .16s ease, background .16s ease; }
-      .mee-side-link span { width: 18px; color: #a6adc4; font-size: 18px; text-align: center; }
-      .mee-side-link:hover, .mee-side-section button:hover { color: #fff; background: rgba(255,255,255,.05); }
-      .mee-side-link.is-active { color: #fff; background: #292d3b; box-shadow: inset 3px 0 #62cfe0; }
-      .mee-side-section { padding-top: 26px; }
-      .mee-side-section > span { display: block; padding: 0 12px 9px; color: #f6f7fb; font: 700 10px var(--f-mono); letter-spacing: .08em; }
-      .mee-side-section button { padding-block: 8px; font-size: 13.5px; }
-      .mee-side-section button::before { content: '•'; color: #8d95ad; margin-right: 2px; }
-      .mee-sidebar-foot { display: flex; align-items: center; gap: 8px; margin: 26px 12px 0; color: #9ca2b8; font: 12px var(--f-mono); }
-      .mee-online-dot { width: 7px; height: 7px; border-radius: 50%; background: #58e0cf; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
-      .mee-main { min-height: 100vh; margin-left: 286px; }
+      .vozen-sidebar { position: fixed; inset: 0 auto 0 0; z-index: 30; width: 74px; padding: 20px 12px 16px; background: #0d1220; border-right: 1px solid rgba(255,255,255,.08); overflow-y: auto; }
+      .vozen-sidebar-brand { display: grid; justify-items: center; gap: 8px; padding: 0 0 24px; color: #f8f9fc; }
+      .vozen-sidebar-brand strong { display: none; }
+      .vozen-sidebar-brand small { display: none; }
+      .vozen-logo { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 13px; background: var(--grad); color: #111827; font-size: 22px; box-shadow: 0 8px 18px rgba(0,0,0,.22); }
+      .vozen-server { display: grid; place-items: center; width: 100%; margin-bottom: 22px; padding: 9px 5px; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; background: #151b2b; color: #f5f6fa; cursor: pointer; font: 600 11px var(--f-body); }
+      .vozen-server span:not(.vozen-server-icon) { display: none; }
+      .vozen-server-icon { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid rgba(255,255,255,.65); border-radius: 9px; font-size: 11px; }
+      .vozen-chevron { display: none; }
+      .vozen-side-nav { display: grid; gap: 9px; padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,.08); }
+      .vozen-side-link, .vozen-side-section button { display: grid; place-items: center; gap: 0; width: 100%; min-height: 44px; padding: 8px 4px; border: 0; border-radius: 12px; background: transparent; color: #7f8aa8; text-align: center; cursor: pointer; font: 500 10px var(--f-body); transition: color .16s ease, background .16s ease, transform .16s ease; }
+      .vozen-side-link > span:first-child { display: block; width: auto; color: #a6adc4; font-size: 20px; line-height: 1; }
+      .vozen-side-label { display: none; }
+      .vozen-side-link:hover, .vozen-side-section button:hover { color: #fff; background: rgba(121,164,255,.1); transform: translateY(-1px); }
+      .vozen-side-link.is-active { color: #f7fbff; background: linear-gradient(145deg, rgba(102,114,255,.27), rgba(46,230,200,.12)); box-shadow: inset 0 0 0 1px rgba(142,229,210,.35); }
+      .vozen-side-section { display: grid; gap: 8px; padding-top: 22px; }
+      .vozen-side-section > span { display: block; padding: 0 0 6px; color: #52617e; text-align: center; font: 700 8px var(--f-mono); letter-spacing: .08em; writing-mode: vertical-rl; transform: rotate(180deg); justify-self: center; }
+      .vozen-side-section button { font-size: 9px; }
+      .vozen-side-section button::before { content: ''; display: block; width: 6px; height: 6px; margin: 0 auto 4px; border-radius: 50%; background: #65718c; }
+      .vozen-sidebar-foot { display: grid; justify-items: center; gap: 7px; margin: 26px 0 0; color: #71809e; font: 9px var(--f-mono); text-align: center; }
+      .vozen-online-dot { width: 7px; height: 7px; border-radius: 50%; background: #58e0cf; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+      .vozen-main { min-height: 100vh; margin-left: 74px; }
       .p-head { min-height: 80px; margin: 0; padding: 17px 38px; background: #1a1c25; border-bottom: 1px solid rgba(255,255,255,.05); }
       .p-head .p-brand { display: none; }
       .p-head .p-nav { order: 1; margin-left: auto; margin-right: 12px; background: transparent; border: 0; }
@@ -390,24 +392,27 @@
       .helper-subnav { display: none; }
       .helper-view { max-width: none; padding: 40px 40px 90px; }
       .helper-view > .view-head { max-width: 1520px; margin: 0 auto; }
+      #helperHome .welcome-card { display: none; }
+      #helperHome .setup-summary, #helperHome .setup-grid, #helperHome .view-head, #helperHome .stats-grid { max-width: 1180px; margin-left: auto; margin-right: auto; }
       #helperHome, #helperActivity, #rankCardPanel { background: #20222d; }
       #helperFeatures { background: #20222d; }
       .view-head h2, .section-title { font-family: var(--f-body); font-size: 24px; letter-spacing: -.02em; }
       .view-lead { max-width: 720px; color: #a8aec3; }
-      .mee-hero-banner { position: relative; display: flex; align-items: stretch; justify-content: space-between; max-width: 1060px; min-height: 250px; margin: 0 auto 106px; overflow: hidden; border-radius: 12px; background: linear-gradient(115deg, #284e75 0%, #4f9cae 52%, #ddad77 100%); box-shadow: 0 22px 55px rgba(0,0,0,.25); }
-      .mee-hero-banner::before, .mee-hero-banner::after { content: ''; position: absolute; border-radius: 50%; pointer-events: none; }
-      .mee-hero-banner::before { width: 340px; height: 340px; right: 72px; bottom: -220px; background: rgba(235,252,246,.22); }
-      .mee-hero-banner::after { width: 240px; height: 240px; right: 210px; top: -170px; background: rgba(255,255,255,.12); }
-      .mee-hero-copy { position: relative; z-index: 1; max-width: 620px; padding: 44px 44px; color: #fff; }
-      .mee-hero-kicker { color: #b9f4ef; font: 700 10px var(--f-mono); letter-spacing: .2em; }
-      .mee-hero-copy h2 { margin: 12px 0 8px; color: #fff; font: 800 clamp(28px, 4vw, 47px) var(--f-body); letter-spacing: -.04em; }
-      .mee-hero-copy p { margin: 0 0 22px; color: rgba(255,255,255,.84); font-size: 16px; }
-      .mee-hero-action { padding: 11px 18px; border: 0; border-radius: 8px; background: #fff; color: #26354e; cursor: pointer; font: 700 13px var(--f-body); }
-      .mee-hero-art { position: relative; width: 37%; min-width: 220px; overflow: hidden; }
-      .mee-hero-art::before { content: ''; position: absolute; inset: 28px 35px 24px 15px; border-radius: 48% 52% 42% 58%; background: rgba(236,255,250,.18); transform: rotate(-9deg); }
-      .mee-hero-art span { position: absolute; right: 30%; top: 32%; z-index: 1; color: #fff4ce; font-size: 76px; transform: rotate(12deg); text-shadow: 0 14px 22px rgba(0,0,0,.22); }
-      .mee-hero-art i, .mee-hero-art b { position: absolute; display: block; border-radius: 50%; background: rgba(255,255,255,.34); }
-      .mee-hero-art i { width: 12px; height: 12px; right: 23%; top: 24%; }.mee-hero-art b { width: 8px; height: 8px; right: 13%; bottom: 25%; }
+      .vozen-command { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(260px, .8fr); gap: 16px; max-width: 1180px; margin: 0 auto 54px; }
+      .vozen-command-main { position: relative; min-height: 250px; overflow: hidden; border: 1px solid rgba(142,229,210,.2); border-radius: 20px; background: radial-gradient(80% 130% at 0% 0%, rgba(102,114,255,.34), transparent 70%), #151b2b; box-shadow: 0 22px 55px rgba(0,0,0,.25); }
+      .vozen-command-main::before { content: ''; position: absolute; width: 310px; height: 310px; right: -90px; bottom: -180px; border: 1px solid rgba(142,229,210,.3); border-radius: 42%; transform: rotate(25deg); }
+      .vozen-command-copy { position: relative; z-index: 1; max-width: 620px; padding: 38px 40px; color: #fff; }
+      .vozen-command-kicker { color: #8ee5d2; font: 700 10px var(--f-mono); letter-spacing: .2em; }
+      .vozen-command-copy h2 { margin: 12px 0 8px; color: #fff; font: 800 clamp(28px, 4vw, 47px) var(--f-body); letter-spacing: -.04em; }
+      .vozen-command-copy p { margin: 0 0 22px; color: #b9c2d8; font-size: 16px; }
+      .vozen-command-action { padding: 11px 18px; border: 0; border-radius: 10px; background: #8ee5d2; color: #111827; cursor: pointer; font: 700 13px var(--f-body); }
+      .vozen-command-glyph { position: absolute; right: 16%; top: 28%; z-index: 1; color: #f1fff9; font-size: 76px; transform: rotate(12deg); text-shadow: 0 14px 22px rgba(0,0,0,.22); }
+      .vozen-command-rail { display: grid; gap: 12px; }
+      .vozen-status-tile { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; background: #151b2b; }
+      .vozen-status-tile strong { display: block; color: #f8f9fc; font: 700 15px var(--f-body); }
+      .vozen-status-tile span { display: block; margin-top: 4px; color: #8190ae; font: 11px var(--f-mono); }
+      .vozen-status-value { color: #8ee5d2 !important; font-size: 15px !important; }
+      .vozen-status-value.is-offline { color: #ffc24b !important; }
       .catalog-toolbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; max-width: 1520px; margin: 0 auto 20px; padding-top: 14px; border-bottom: 1px solid rgba(255,255,255,.1); }
       .catalog-toolbar .search-wrap { display: block; order: 2; width: 240px; padding-bottom: 8px; }
       .catalog-toolbar .feature-search { width: 100%; padding: 9px 12px; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; background: #1a1c25; color: #f8f9fc; font: 13px var(--f-body); }
@@ -415,16 +420,16 @@
       .catalog-filters { display: flex; gap: 0; overflow-x: auto; }
       .catalog-filter { padding: 13px 18px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: #7f87a3; white-space: nowrap; font-size: 14px; }
       .catalog-filter:hover { color: #fff; }.catalog-filter.is-active { border-bottom-color: #f5f6fa; color: #fff; }
-      .feature-grid { max-width: 1520px; margin: 0 auto; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
-      .feature-card { min-height: 250px; padding: 24px; border: 0; border-radius: 8px; background: #1a1c25; box-shadow: none; }
-      .feature-card:hover { transform: translateY(-3px); background: #222532; }
-      .feature-icon { width: 54px; height: 54px; border-radius: 9px; background: #153b6b; color: #80ddf3; font-size: 27px; }
-      .feature-title { margin-top: 18px; }.feature-title strong { color: #f8f9fc; font-size: 16px; }.feature-status { background: #4a4331; color: #ffd269; border: 0; }
-      .feature-copy p { color: #9ca2b8; line-height: 1.45; }.feature-action { margin-top: 18px; border: 0; border-radius: 8px; background: #3a3d47; color: #fff; }
+      .feature-grid { max-width: 1180px; margin: 0 auto; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .feature-card { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; align-items: center; min-height: 132px; padding: 18px; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; background: #151b2b; box-shadow: none; }
+      .feature-card:hover { transform: translateY(-2px); border-color: rgba(142,229,210,.35); background: #192238; }
+      .feature-icon { align-self: start; width: 42px; height: 42px; border-radius: 12px; background: #1c3159; color: #8ee5d2; font-size: 22px; }
+      .feature-title { margin-top: 0; }.feature-title strong { color: #f8f9fc; font-size: 15px; }.feature-status { background: transparent; color: #8ee5d2; border: 0; padding: 0; font: 11px var(--f-mono); }
+      .feature-copy p { margin: 6px 0 0; color: #9ca2b8; line-height: 1.4; font-size: 12.5px; }.feature-action { margin: 0 0 0 10px; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; background: transparent; color: #dbe5f7; }
       .settings-intro, #settingsBox { max-width: 1060px; margin-left: auto; margin-right: auto; }
-      @media (max-width: 1050px) { .feature-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-      @media (max-width: 780px) { .mee-sidebar { position: static; width: auto; min-height: auto; padding: 14px; }.mee-side-nav, .mee-side-section { display: none; }.mee-sidebar-brand { padding-bottom: 14px; }.mee-server { margin-bottom: 0; }.mee-main { margin-left: 0; }.p-head { padding: 14px 18px; }.p-head > div:last-child::before { display: none; }.helper-view { padding: 24px 18px 70px; }.mee-hero-banner { min-height: 280px; margin-bottom: 50px; }.mee-hero-copy { padding: 32px 24px; }.mee-hero-art { min-width: 120px; width: 33%; }.catalog-toolbar { align-items: stretch; flex-direction: column; }.catalog-toolbar .search-wrap { order: 0; width: 100%; }.feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }.feature-card { padding: 17px; min-height: 220px; } }
-      @media (max-width: 520px) { .feature-grid { grid-template-columns: 1fr; }.mee-hero-art { display: none; }.p-head { flex-wrap: wrap; }.p-head .p-nav { order: 2; width: 100%; justify-content: center; margin: 0; } }
+      @media (max-width: 1050px) { .feature-grid { grid-template-columns: 1fr; } }
+      @media (max-width: 780px) { .vozen-sidebar { position: fixed; inset: auto 0 0; display: flex; align-items: center; justify-content: space-around; width: auto; height: 66px; padding: 8px 10px; border-top: 1px solid rgba(255,255,255,.1); border-right: 0; overflow: visible; }.vozen-sidebar-brand, .vozen-server, .vozen-side-section, .vozen-sidebar-foot { display: none; }.vozen-side-nav { display: flex; width: 100%; justify-content: space-around; gap: 6px; padding: 0; border: 0; }.vozen-side-link { min-height: 48px; width: 64px; }.vozen-side-label { display: block; margin-top: 3px; color: inherit; font-size: 10px; }.vozen-main { margin-left: 0; padding-bottom: 66px; }.p-head { padding: 14px 18px; }.p-head > div:last-child::before { display: none; }.helper-view { padding: 24px 18px 70px; }.vozen-command { grid-template-columns: 1fr; margin-bottom: 34px; }.vozen-command-main { min-height: 270px; }.vozen-command-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }.catalog-toolbar { align-items: stretch; flex-direction: column; }.catalog-toolbar .search-wrap { order: 0; width: 100%; }.feature-grid { grid-template-columns: 1fr; gap: 12px; }.feature-card { padding: 17px; min-height: 120px; } }
+      @media (max-width: 520px) { .feature-grid { grid-template-columns: 1fr; }.feature-card { grid-template-columns: 42px minmax(0,1fr); }.feature-card .feature-action { grid-column: 2; justify-self: start; margin: 10px 0 0; }.vozen-command-main { min-height: 300px; }.vozen-command-glyph { right: 14%; top: 42%; }.vozen-command-rail { grid-template-columns: 1fr; }.p-head { flex-wrap: wrap; }.p-head .p-nav { order: 2; width: 100%; justify-content: center; margin: 0; } }
     </style>
   </head>
   <body>
@@ -490,19 +495,19 @@
 
     <!-- ── PAINEL ─────────────────────────────────────────────── -->
     <section id="panel">
-      <aside class="mee-sidebar" id="meeSidebar" aria-label="Navegação do Helper">
-        <div class="mee-sidebar-brand"><div class="mee-logo">✦</div><div><strong>VOZEN</strong><small>HELPER STUDIO</small></div></div>
-        <button class="mee-server" type="button"><span class="mee-server-icon">◉</span><span id="meeServerName">Servidor atual</span><span class="mee-chevron">⌄</span></button>
-        <nav class="mee-side-nav">
-          <button type="button" class="mee-side-link is-active" data-side-view="home"><span>▦</span> Painel</button>
-          <button type="button" class="mee-side-link" data-side-view="activity"><span>♙</span> Atividade</button>
-          <button type="button" class="mee-side-link" data-side-view="rank"><span>◉</span> Rank card</button>
-          <button type="button" class="mee-side-link" data-side-view="features"><span>⚙</span> Configurações</button>
+      <aside class="vozen-sidebar" id="vozenSidebar" aria-label="Navegação do Helper">
+        <div class="vozen-sidebar-brand"><div class="vozen-logo">✦</div><div><strong>VOZEN</strong><small>HELPER STUDIO</small></div></div>
+        <button class="vozen-server" type="button"><span class="vozen-server-icon">◉</span><span id="vozenServerName">Servidor atual</span><span class="vozen-chevron">⌄</span></button>
+        <nav class="vozen-side-nav">
+          <button type="button" class="vozen-side-link is-active" data-side-view="home"><span>▦</span><span class="vozen-side-label">Painel</span></button>
+          <button type="button" class="vozen-side-link" data-side-view="activity"><span>♙</span><span class="vozen-side-label">Atividade</span></button>
+          <button type="button" class="vozen-side-link" data-side-view="rank"><span>◉</span><span class="vozen-side-label">Rank card</span></button>
+          <button type="button" class="vozen-side-link" data-side-view="features"><span>⚙</span><span class="vozen-side-label">Configurações</span></button>
         </nav>
-        <div class="mee-side-section"><span>FUNCIONALIDADES</span><button type="button" data-side-category="all">Todos os módulos</button><button type="button" data-side-category="protection">Proteção</button><button type="button" data-side-category="community">Comunidade</button><button type="button" data-side-category="management">Gestão</button></div>
-        <div class="mee-sidebar-foot"><span class="mee-online-dot"></span><span>API ligada</span></div>
+        <div class="vozen-side-section"><span>FUNCIONALIDADES</span><button type="button" data-side-category="all">Todos os módulos</button><button type="button" data-side-category="protection">Proteção</button><button type="button" data-side-category="community">Comunidade</button><button type="button" data-side-category="management">Gestão</button></div>
+        <div class="vozen-sidebar-foot"><span class="vozen-online-dot"></span><span>API ligada</span></div>
       </aside>
-      <div class="mee-main">
+      <div class="vozen-main">
       <div class="p-head">
         <div class="p-brand">
           <div class="mark" aria-hidden="true">
@@ -535,6 +540,10 @@
       </nav>
 
       <section class="helper-view" id="helperHome" data-helper-section="home" role="tabpanel" aria-labelledby="helperTabHome">
+        <div class="vozen-command">
+          <div class="vozen-command-main"><div class="vozen-command-copy"><span class="vozen-command-kicker">CENTRO DE COMANDO</span><h2>O teu servidor, sob controlo.</h2><p>Vê o que precisa de atenção e configura o Helper por etapas simples.</p><button type="button" class="vozen-command-action" data-open-view="features">Configurar o Helper</button></div><span class="vozen-command-glyph" aria-hidden="true">✦</span></div>
+          <div class="vozen-command-rail"><div class="vozen-status-tile"><div><strong>Estado do Helper</strong><span>Ligação ao servidor</span></div><span class="vozen-status-value">● Online</span></div><div class="vozen-status-tile"><div><strong>Próximo passo</strong><span>Configuração recomendada</span></div><span class="vozen-status-value">→</span></div></div>
+        </div>
         <div class="welcome-card">
           <div>
             <span class="eyebrow">Primeiros passos</span>
@@ -574,9 +583,9 @@
       </section>
 
       <section class="helper-view" id="helperFeatures" data-helper-section="features" role="tabpanel" aria-labelledby="helperTabFeatures" hidden>
-        <div class="mee-hero-banner">
-          <div class="mee-hero-copy"><span class="mee-hero-kicker">VOZEN HELPER</span><h2>O teu servidor, mais simples.</h2><p>Configura proteção, comunidade e automações num só lugar.</p><button type="button" class="mee-hero-action" data-open-view="features">Explorar funcionalidades</button></div>
-          <div class="mee-hero-art" aria-hidden="true"><span>✦</span><i></i><b></b></div>
+        <div class="vozen-command">
+          <div class="vozen-command-main"><div class="vozen-command-copy"><span class="vozen-command-kicker">CENTRO DE COMANDO</span><h2>O teu servidor, sob controlo.</h2><p>Vê o que precisa de atenção e configura o Helper por etapas simples.</p><button type="button" class="vozen-command-action" data-open-view="features">Configurar o Helper</button></div><span class="vozen-command-glyph" aria-hidden="true">✦</span></div>
+          <div class="vozen-command-rail"><div class="vozen-status-tile"><div><strong>Estado do Helper</strong><span>Ligação ao servidor</span></div><span class="vozen-status-value">● Online</span></div><div class="vozen-status-tile"><div><strong>Próximo passo</strong><span>Configuração recomendada</span></div><span class="vozen-status-value">→</span></div></div>
         </div>
         <div class="view-head">
           <div>
@@ -860,10 +869,15 @@
       const hideBanner = () => document.getElementById('panelBanner').classList.remove('show');
       const setApiState = (state, text) => {
         const node = document.getElementById('apiState');
-        if (!node) return;
-        node.className = 'api-state' + (state ? ' ' + state : '');
-        const label = node.querySelector('span');
-        if (label) label.textContent = text;
+        if (node) {
+          node.className = 'api-state' + (state ? ' ' + state : '');
+          const label = node.querySelector('span');
+          if (label) label.textContent = text;
+        }
+        document.querySelectorAll('.vozen-status-tile:first-child .vozen-status-value').forEach((item) => {
+          item.textContent = state === 'offline' ? '● Atenção' : (state === 'online' ? '● Online' : '● A ligar');
+          item.classList.toggle('is-offline', state === 'offline');
+        });
       };
 
       function showPanel(user) {
