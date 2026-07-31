@@ -150,9 +150,10 @@
       .p-logout:hover { border-color: var(--red); color: var(--red); }
       /* Switcher entre o painel do Helper e o do Vozen (plano 037). */
       .p-nav { display: inline-flex; gap: 6px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 4px; }
-      .p-nav a, .p-nav span { padding: 8px 15px; border-radius: 9px; font-family: var(--f-body); font-size: 13.5px; font-weight: 600; color: var(--text-1); text-decoration: none; cursor: pointer; }
+      .p-nav a, .p-nav span, .p-nav button { padding: 8px 15px; border-radius: 9px; font-family: var(--f-body); font-size: 13.5px; font-weight: 600; color: var(--text-1); text-decoration: none; cursor: pointer; }
+      .p-nav button { border: 0; background: transparent; }
       .p-nav .is-active { background: var(--grad); color: #06070e; cursor: default; }
-      .p-nav a:not(.is-active):hover { color: var(--aqua); }
+      .p-nav a:not(.is-active):hover, .p-nav button:not(.is-active):hover { color: var(--aqua); }
 
       .banner {
         display: none; margin: 18px 0 4px; padding: 14px 18px; border-radius: 14px;
@@ -281,6 +282,50 @@
         .savebar-actions { justify-content: flex-end; }
       }
       @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } .btn:hover, .toggle-pass:hover { transform: none; } }
+
+      /* Rank Card Studio integrado no Helper — só utiliza banners curados. */
+      #rankCardPanel { display: none; }
+      #rankCardPanel.show { display: block; }
+      .rank-studio { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(300px, .85fr); gap: 16px; margin-top: 22px; }
+      .rank-card-box { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+      .rank-card-box h2 { margin: 5px 0 20px; font-family: var(--f-display); font-size: 17px; color: var(--text-0); }
+      .rank-eyebrow { color: var(--aqua); font-family: var(--f-mono); font-size: 10px; letter-spacing: .13em; font-weight: 700; }
+      .rank-preview { min-height: 278px; display: flex; align-items: center; gap: 22px; padding: 30px; border-radius: 14px; background-color: #101725; background-size: cover; background-position: center; overflow: hidden; }
+      .rank-avatar { width: 112px; height: 112px; flex: none; display: grid; place-items: center; border: 4px solid var(--aqua); border-radius: 50%; background: rgba(5,6,15,.55); color: var(--aqua); font-size: 42px; }
+      .rank-content { min-width: 0; flex: 1; }
+      .rank-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .rank-top strong { font-size: 25px; color: var(--text-0); }
+      .rank-top b { margin-left: 12px; font-size: 12px; }
+      .rank-name { margin: 8px 0 34px; font-family: var(--f-mono); font-size: 12px; }
+      .rank-xp { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 11px; margin-bottom: 8px; }
+      .rank-track { height: 10px; border-radius: 999px; background: rgba(255,255,255,.16); overflow: hidden; }
+      .rank-track i { display: block; width: 32%; height: 100%; border-radius: inherit; background: var(--aqua); }
+      .rank-field { display: block; margin: 0 0 17px; color: var(--text-1); font-size: 13px; }
+      .rank-field output { float: right; color: var(--aqua); font-family: var(--f-mono); font-size: 12px; }
+      .rank-field select, .rank-field input[type=range] { width: 100%; margin-top: 8px; }
+      .rank-field select { padding: 10px 11px; border: 1px solid var(--line); border-radius: 9px; color: var(--text-0); background: rgba(0,0,0,.25); font: inherit; }
+      .rank-color-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; color: var(--text-1); font-size: 13px; }
+      .rank-color-row input[type=color] { width: 30px; height: 22px; padding: 0; border: 1px solid var(--line); background: transparent; }
+      .rank-swatches { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+      .rank-swatch { width: 20px; height: 20px; border: 2px solid transparent; border-radius: 50%; cursor: pointer; }
+      .rank-swatch.active { border-color: var(--text-0); outline: 1px solid var(--aqua); }
+      .rank-bg-head { display: flex; justify-content: space-between; align-items: baseline; margin: 6px 0 10px; color: var(--text-0); font-size: 15px; }
+      .rank-bg-head small { color: var(--text-1); font-size: 12px; }
+      .rank-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+      .rank-mode, .rank-banner { border: 1px solid var(--line); border-radius: 9px; background: rgba(0,0,0,.2); color: var(--text-1); cursor: pointer; font: inherit; }
+      .rank-mode { padding: 10px; }
+      .rank-mode.active { border-color: var(--aqua); background: rgba(46,230,200,.14); color: var(--text-0); }
+      .rank-banner-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .rank-banner { padding: 4px; overflow: hidden; text-align: left; }
+      .rank-banner.active { border-color: var(--aqua); box-shadow: 0 0 0 1px var(--aqua); }
+      .rank-banner img { display: block; width: 100%; height: 42px; object-fit: cover; border-radius: 5px; }
+      .rank-banner span { display: block; padding: 5px 3px 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+      .rank-solid-grid { display: flex; flex-wrap: wrap; gap: 9px; }
+      .rank-save-row { display: flex; justify-content: flex-end; gap: 9px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+      .rank-save-row button { padding: 10px 14px; border-radius: 9px; border: 1px solid var(--line); background: transparent; color: var(--text-1); cursor: pointer; font: inherit; }
+      .rank-save-row .rank-save { border: 0; background: var(--grad); color: #06070e; font-weight: 600; }
+      .rank-status { min-height: 18px; margin: 10px 0 0; color: var(--aqua); font-family: var(--f-mono); font-size: 11px; }
+      @media (max-width: 780px) { .rank-studio { grid-template-columns: 1fr; } .rank-preview { min-height: 240px; padding: 20px; } .rank-avatar { width: 88px; height: 88px; font-size: 30px; } .rank-top strong { font-size: 20px; } }
     </style>
   </head>
   <body>
@@ -362,11 +407,13 @@
         <nav class="p-nav" aria-label="Trocar de painel">
           <span class="is-active" aria-current="page">Helper</span>
           <a href="vozen.html">Vozen</a>
+          <button type="button" id="rankCardNav">Rank card</button>
         </nav>
         <button class="p-logout" id="logoutBtn" type="button">Terminar sessão</button>
       </div>
 
       <div class="banner" id="panelBanner"></div>
+      <div id="helperOverview">
 
       <div class="section-title">Visão geral</div>
       <div class="stats-grid">
@@ -409,9 +456,48 @@
       <div id="settingsBox">
         <div class="empty">—</div>
       </div>
-    </section>
 
     <!-- barra de guardar (aparece quando há alterações pendentes) -->
+      </div>
+
+      <section id="rankCardPanel" aria-labelledby="rankCardTitle">
+        <div class="section-title">Community · Levels</div>
+        <div class="rank-studio">
+          <div class="rank-card-box">
+            <span class="rank-eyebrow">LIVE PREVIEW</span>
+            <h2 id="rankCardTitle">Personaliza o rank card</h2>
+            <div class="rank-preview" id="rankPreview">
+              <div class="rank-avatar" id="rankAvatar">✦</div>
+              <div class="rank-content">
+                <div class="rank-top"><strong id="rankPreviewName">Enderman</strong><div><b id="rankPreviewRank">Rank #44</b><b id="rankPreviewLevel">Level 12</b></div></div>
+                <p class="rank-name" id="rankPreviewUsername">enderman#0123</p>
+                <div class="rank-xp"><span id="rankPreviewXp">429 / 1337 XP</span><span>32%</span></div>
+                <div class="rank-track"><i id="rankProgress"></i></div>
+              </div>
+            </div>
+          </div>
+          <div class="rank-card-box">
+            <span class="rank-eyebrow">CUSTOMIZE RANK CARD</span>
+            <h2>Estilo do servidor</h2>
+            <label class="rank-field">Fonte
+              <select id="rankFont"><option value="system-ui">System</option><option value="Inter">Inter</option><option value="Roboto">Roboto</option><option value="Poppins">Poppins</option><option value="Space Grotesk">Space Grotesk</option><option value="Lexend">Lexend</option></select>
+            </label>
+            <div class="rank-color-row"><span>Cor principal</span><input id="rankPrimaryColor" type="color" value="#8EE5D2" /></div>
+            <div class="rank-swatches" id="rankPrimarySwatches"></div>
+            <div class="rank-color-row"><span>Cor do texto</span><input id="rankTextColor" type="color" value="#F4F7FB" /></div>
+            <div class="rank-swatches" id="rankTextSwatches"></div>
+            <label class="rank-field">Opacidade do overlay <output id="rankOverlayOutput">36%</output><input id="rankOverlay" type="range" min="0" max="85" value="36" /></label>
+            <div class="rank-bg-head"><span>Fundo do rank card</span><small id="rankBgModeLabel">Cor sólida</small></div>
+            <div class="rank-modes"><button type="button" class="rank-mode active" id="rankSolidMode">Cor sólida</button><button type="button" class="rank-mode" id="rankBannerMode">Banners curados</button></div>
+            <div id="rankSolidOptions" class="rank-solid-grid"></div>
+            <div id="rankBannerOptions" class="rank-banner-grid" hidden></div>
+            <div class="rank-save-row"><button type="button" id="rankReset">Restaurar</button><button type="button" class="rank-save" id="rankSave">Guardar localmente</button></div>
+            <p class="rank-status" id="rankStatus" role="status"></p>
+          </div>
+        </div>
+      </section>
+    </section>
+
     <div class="savebar" id="saveBar" aria-hidden="true">
       <div class="savebar-inner">
         <span class="savebar-msg" id="saveMsg">Alterações por guardar</span>
@@ -1206,6 +1292,86 @@
           show('blocked');
         }
       }
+
+      // Rank Card Studio integrado: a configuração é segura por desenho — os membros
+      // só podem escolher os dez banners curados ou uma cor sólida. Até o endpoint de
+      // publicação do Helper ficar ligado à sessão legada, o rascunho fica no browser.
+      const RANK_DEFAULTS = { font: 'system-ui', primary: '#8EE5D2', text: '#F4F7FB', overlay: 36, mode: 'solid', background: '#101725', banner: null };
+      const RANK_BANNERS = [
+        ['aurora-lake', 'Aurora Lake', 'rank-card-banners/banner-01-aurora-lake.png'],
+        ['neon-rain', 'Neon Rain', 'rank-card-banners/banner-02-neon-rain.png'],
+        ['enchanted-forest', 'Enchanted Forest', 'rank-card-banners/banner-03-enchanted-forest.png'],
+        ['desert-ruins', 'Desert Ruins', 'rank-card-banners/banner-04-desert-ruins.png'],
+        ['coral-cavern', 'Coral Cavern', 'rank-card-banners/banner-05-coral-cavern.png'],
+        ['sky-islands', 'Sky Islands', 'rank-card-banners/banner-06-sky-islands.png'],
+        ['volcanic-forge', 'Volcanic Forge', 'rank-card-banners/banner-07-volcanic-forge.png'],
+        ['moonlit-village', 'Moonlit Village', 'rank-card-banners/banner-08-moonlit-village.png'],
+        ['starship-hangar', 'Starship Hangar', 'rank-card-banners/banner-09-starship-hangar.png'],
+        ['lavender-storm', 'Lavender Storm', 'rank-card-banners/banner-10-lavender-storm.png'],
+      ];
+      const RANK_COLORS = ['#8EE5D2', '#7F9CF5', '#F6AD55', '#F687B3', '#A78BFA', '#F4F7FB'];
+      const RANK_SOLIDS = ['#101725', '#172033', '#1F2937', '#312E46', '#3B2434', '#243A36'];
+      const rankPreview = document.getElementById('rankPreview');
+      const rankAvatar = document.getElementById('rankAvatar');
+      const rankProgress = document.getElementById('rankProgress');
+      const rankPreviewRank = document.getElementById('rankPreviewRank');
+      const rankStatus = document.getElementById('rankStatus');
+      let rankState;
+      try { rankState = { ...RANK_DEFAULTS, ...JSON.parse(localStorage.getItem('vozen-helper-rank-card') || '{}') }; } catch { rankState = { ...RANK_DEFAULTS }; }
+
+      function rankSet(partial) { rankState = { ...rankState, ...partial }; rankRender(); }
+      function rankRender() {
+        document.getElementById('rankFont').value = rankState.font;
+        document.getElementById('rankPrimaryColor').value = rankState.primary;
+        document.getElementById('rankTextColor').value = rankState.text;
+        document.getElementById('rankOverlay').value = String(rankState.overlay);
+        document.getElementById('rankOverlayOutput').textContent = rankState.overlay + '%';
+        const banner = RANK_BANNERS.find((entry) => entry[0] === rankState.banner);
+        rankPreview.style.backgroundColor = rankState.background;
+        rankPreview.style.backgroundImage = banner && rankState.mode === 'banner'
+          ? `linear-gradient(rgba(0,0,0,${rankState.overlay / 100}), rgba(0,0,0,${rankState.overlay / 100})), url("${banner[2]}")` : 'none';
+        rankPreview.style.fontFamily = rankState.font;
+        rankAvatar.style.borderColor = rankState.primary;
+        rankAvatar.style.color = rankState.primary;
+        rankProgress.style.background = rankState.primary;
+        rankPreviewRank.style.color = rankState.primary;
+        document.getElementById('rankPreviewName').style.color = rankState.text;
+        document.getElementById('rankPreviewUsername').style.color = rankState.primary;
+        document.getElementById('rankPreviewXp').style.color = rankState.text;
+        document.getElementById('rankPreviewLevel').style.color = rankState.text;
+        document.getElementById('rankBgModeLabel').textContent = rankState.mode === 'banner' ? 'Banner curado' : 'Cor sólida';
+        document.getElementById('rankSolidMode').classList.toggle('active', rankState.mode !== 'banner');
+        document.getElementById('rankBannerMode').classList.toggle('active', rankState.mode === 'banner');
+        document.getElementById('rankSolidOptions').hidden = rankState.mode === 'banner';
+        document.getElementById('rankBannerOptions').hidden = rankState.mode !== 'banner';
+        document.querySelectorAll('[data-rank-color="primary"]').forEach((b) => b.classList.toggle('active', b.dataset.color === rankState.primary));
+        document.querySelectorAll('[data-rank-color="text"]').forEach((b) => b.classList.toggle('active', b.dataset.color === rankState.text));
+        document.querySelectorAll('[data-rank-solid]').forEach((b) => b.classList.toggle('active', b.dataset.rankSolid === rankState.background));
+        document.querySelectorAll('[data-rank-banner]').forEach((b) => b.classList.toggle('active', b.dataset.rankBanner === rankState.banner));
+      }
+      function rankSwatches(containerId, colors, kind) {
+        const box = document.getElementById(containerId);
+        colors.forEach((color) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'rank-swatch'; b.style.background = color; b.dataset.rankColor = kind; b.dataset.color = color; b.setAttribute('aria-label', color); b.addEventListener('click', () => rankSet(kind === 'primary' ? { primary: color } : { text: color })); box.appendChild(b); });
+      }
+      rankSwatches('rankPrimarySwatches', RANK_COLORS, 'primary');
+      rankSwatches('rankTextSwatches', RANK_COLORS, 'text');
+      RANK_SOLIDS.forEach((color) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'rank-swatch'; b.style.background = color; b.dataset.rankSolid = color; b.setAttribute('aria-label', 'Fundo ' + color); b.addEventListener('click', () => rankSet({ mode: 'solid', background: color })); document.getElementById('rankSolidOptions').appendChild(b); });
+      RANK_BANNERS.forEach(([id, label, path]) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'rank-banner'; b.dataset.rankBanner = id; b.innerHTML = `<img src="${path}" alt=""><span>${label}</span>`; b.addEventListener('click', () => rankSet({ mode: 'banner', banner: id })); document.getElementById('rankBannerOptions').appendChild(b); });
+      document.getElementById('rankFont').addEventListener('change', (e) => rankSet({ font: e.target.value }));
+      document.getElementById('rankPrimaryColor').addEventListener('input', (e) => rankSet({ primary: e.target.value.toUpperCase() }));
+      document.getElementById('rankTextColor').addEventListener('input', (e) => rankSet({ text: e.target.value.toUpperCase() }));
+      document.getElementById('rankOverlay').addEventListener('input', (e) => rankSet({ overlay: Number(e.target.value) }));
+      document.getElementById('rankSolidMode').addEventListener('click', () => rankSet({ mode: 'solid' }));
+      document.getElementById('rankBannerMode').addEventListener('click', () => rankSet({ mode: 'banner', banner: rankState.banner || RANK_BANNERS[0][0] }));
+      document.getElementById('rankReset').addEventListener('click', () => { rankState = { ...RANK_DEFAULTS }; rankStatus.textContent = 'Pré-visualização restaurada.'; rankRender(); });
+      document.getElementById('rankSave').addEventListener('click', () => { localStorage.setItem('vozen-helper-rank-card', JSON.stringify(rankState)); rankStatus.textContent = 'Guardado neste navegador.'; });
+      const helperOverview = document.getElementById('helperOverview');
+      const rankCardPanel = document.getElementById('rankCardPanel');
+      const rankCardNav = document.getElementById('rankCardNav');
+      const helperNav = document.querySelector('.p-nav .is-active');
+      rankCardNav.addEventListener('click', () => { helperOverview.style.display = 'none'; rankCardPanel.classList.add('show'); rankCardNav.classList.add('is-active'); helperNav.classList.remove('is-active'); helperNav.removeAttribute('aria-current'); });
+      helperNav.addEventListener('click', () => { helperOverview.style.display = ''; rankCardPanel.classList.remove('show'); rankCardNav.classList.remove('is-active'); helperNav.classList.add('is-active'); helperNav.setAttribute('aria-current', 'page'); });
+      rankRender();
 
       document.getElementById('btnSave').addEventListener('click', saveAll);
       document.getElementById('btnDiscard').addEventListener('click', discardAll);
