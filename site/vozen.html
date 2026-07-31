@@ -176,14 +176,6 @@
       .p-brand .mark svg { width: 24px; height: 24px; }
       .p-title { font-family: var(--f-display); font-size: 20px; font-weight: 800; color: var(--text-0); letter-spacing: -0.02em; }
       .p-user { font-size: 13px; color: var(--text-2); font-family: var(--f-mono); }
-      /* Switcher entre os dois painéis (o pedido do desenho). */
-      .p-nav { display: inline-flex; gap: 6px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 4px; }
-      .p-nav a, .p-nav span {
-        padding: 8px 15px; border-radius: 9px; font-family: var(--f-body); font-size: 13.5px; font-weight: 600;
-        color: var(--text-1); text-decoration: none; cursor: pointer;
-      }
-      .p-nav .is-active { background: var(--grad); color: #06070e; cursor: default; }
-      .p-nav a:not(.is-active):hover { color: var(--aqua); }
       .p-logout {
         background: var(--panel); border: 1px solid var(--line); color: var(--text-1);
         padding: 9px 15px; border-radius: 11px; cursor: pointer; font-family: var(--f-body); font-size: 14px; font-weight: 500;
@@ -379,10 +371,6 @@
             <div class="p-user" id="panelUser">sessão iniciada</div>
           </div>
         </div>
-        <nav class="p-nav" aria-label="Trocar de painel">
-          <a href="./">Helper</a>
-          <span class="is-active" aria-current="page">Vozen</span>
-        </nav>
         <button class="p-logout" id="logoutBtn" type="button">Terminar sessão</button>
       </div>
 
