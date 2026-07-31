@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://cdn.discordapp.com; connect-src 'self' https://discord.com https://*.trycloudflare.com; form-action https://discord.com 'self'"
+      content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://cdn.discordapp.com; connect-src 'self' https://discord.com https://api.vozen.org; form-action https://discord.com 'self'"
     />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -362,7 +362,6 @@
         <nav class="p-nav" aria-label="Trocar de painel">
           <span class="is-active" aria-current="page">Helper</span>
           <a href="vozen.html">Vozen</a>
-          <a href="rank-card.html">Rank card</a>
         </nav>
         <button class="p-logout" id="logoutBtn" type="button">Terminar sessão</button>
       </div>
@@ -443,16 +442,16 @@
       // mesmo que o túnel mude. Vazio = painel em modo "offline". `let` porque
       // refreshApiBase() o atualiza.
       //
-      // Só se confia num URL https cujo host termine em .trycloudflare.com (allow-list).
+      // Só se confia no endpoint Helper oficial, por HTTPS e no caminho esperado.
       // O api-url.js é same-origin, mas se fosse adulterado não pode passar a apontar o
       // painel — e o token do Discord enviado em enter/session — para uma origem arbitrária.
       // A verificação aplica-se ao valor INICIAL e ao refresh. NOTA (infra): a correção
       // definitiva é um túnel nomeado / subdomínio próprio, para o wildcard
-      // *.trycloudflare.com do CSP passar a um host exato — e esta allow-list fixar-se nele.
       function isTrustedApiBase(url) {
         try {
           const u = new URL(url);
-          return u.protocol === 'https:' && u.hostname.endsWith('.trycloudflare.com');
+          return u.protocol === 'https:' && u.hostname === 'api.vozen.org'
+            && (u.pathname === '/helper' || u.pathname.startsWith('/helper/'));
         } catch (_e) {
           return false;
         }
