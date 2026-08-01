@@ -530,7 +530,6 @@
           <a href="vozen.html">Vozen</a>
         </nav>
         <div style="display:flex;align-items:center;gap:10px">
-          <a class="p-logout" href="studio/">Abrir Studio beta</a>
           <button class="p-logout" id="logoutBtn" type="button">Terminar sessão</button>
         </div>
       </div>
@@ -767,27 +766,6 @@
       }
       const initApiBase = (window.API_BASE || '').trim();
       let API_BASE = isTrustedApiBase(initApiBase) ? initApiBase : '';
-
-      // Ponte para o OAuth PKCE do Helper Studio. O Discord só aceita o
-      // callback GitHub Pages já registado na aplicação; depois encaminhamos
-      // o código para a API, mantendo o verifier apenas nesta sessão.
-      (function bridgeStudioOAuth() {
-        const params = new URLSearchParams(location.search);
-        const code = params.get('code');
-        const state = params.get('state');
-        if (!code || !state) return;
-        let verifier = '';
-        try {
-          verifier = sessionStorage.getItem('vh_oauth_verifier') || '';
-          sessionStorage.removeItem('vh_oauth_verifier');
-        } catch (_e) { /* storage opcional */ }
-        if (!verifier) return;
-        const callback = new URL('https://api.vozen.org/rust/api/oauth/callback');
-        callback.searchParams.set('code', code);
-        callback.searchParams.set('state', state);
-        callback.searchParams.set('code_verifier', verifier);
-        window.location.replace(callback.toString());
-      })();
 
       // Re-busca o api-url.js SEM cache no arranque. O <script src="api-url.js"> é
       // cacheado pelo browser (GitHub Pages), por isso quando o túnel muda de URL a
