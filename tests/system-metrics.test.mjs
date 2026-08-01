@@ -11,13 +11,14 @@ test('Supabase has the same expandable seven-day statistics surface as SQLite', 
   assert.match(page, /renderSupabaseHistory\(supabase && supabase\.history\)/);
 });
 
-test('a single disclosure control opens every metrics detail, including active server names', () => {
+test('metrics use accessible disclosure controls, including active server names', () => {
   assert.match(page, /\.ops__sidebar\s*\{\s*display: grid; align-self: stretch; align-content: start;/);
   assert.match(page, /\.ops__live\s*\{\s*display: flex; flex-direction: column; justify-content: flex-start;/);
   assert.match(page, /id="activeServers"/);
-  assert.match(page, /id="metricsDetailsToggle"/);
-  assert.match(page, /document\.querySelectorAll\('\[data-metrics-detail\]'\)/);
-  assert.doesNotMatch(page, /id="databaseDetails"|id="supabaseDetails"|id="activeServersDetails"/);
+  assert.match(page, /id="databaseDetails"/);
+  assert.match(page, /id="supabaseDetails"/);
+  assert.match(page, /id="activeServersDetails"/);
+  assert.match(page, /<summary>/);
   assert.match(page, /function renderActiveServers\(servers\)/);
   assert.match(page, /renderActiveServers\(metrics\.activeVoiceServers\)/);
 });

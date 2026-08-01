@@ -196,12 +196,13 @@
 
       /* Leitura operacional: uma faixa única com duas células, em vez de cartões decorativos.
          A cor é sempre derivada da ocupação REAL do volume onde a SQLite vive. */
-      .ops { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(250px, .85fr) auto; align-items: stretch; margin-bottom: 20px; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; backdrop-filter: blur(14px); }
+      .ops { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(250px, .85fr) auto; align-items: start; margin-bottom: 20px; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; backdrop-filter: blur(14px); }
       .ops__storage { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
-      .ops__sidebar { display: grid; align-self: stretch; align-content: start; min-width: 0; border-left: 1px solid var(--line); }
+      .ops__sidebar { display: grid; align-self: stretch; align-content: start; min-width: 0; }
       .ops__metric { min-width: 0; padding: 20px 22px; }
       .ops__metric + .ops__metric { border-left: 1px solid var(--line); }
       .ops__storage > .ops__metric + .ops__metric { border-left: 1px solid var(--line); }
+      .ops__sidebar > .ops__metric + .ops__metric { border-top: 1px solid var(--line); }
       .ops__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
       .ops__label { color: var(--text-2); font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
       .ops__state { display: inline-flex; align-items: center; min-height: 24px; padding: 4px 9px; border: 1px solid color-mix(in srgb, var(--ops-tone, var(--text-2)) 38%, transparent); border-radius: 999px; color: var(--ops-tone, var(--text-1)); background: color-mix(in srgb, var(--ops-tone, var(--text-2)) 11%, transparent); font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; white-space: nowrap; }
@@ -214,7 +215,11 @@
       .ops__track { height: 6px; margin-top: 15px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, .08); }
       .ops__fill { display: block; width: 100%; height: 100%; border-radius: inherit; transform: scaleX(0); transform-origin: left center; background: var(--ops-tone, var(--text-2)); transition: transform .35s cubic-bezier(.22, 1, .36, 1), background-color .2s ease; }
       .ops__details { margin-top: 15px; border-top: 1px solid rgba(255, 255, 255, .08); }
+      .ops__details summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0 0; cursor: pointer; color: var(--text-1); font-size: 12.5px; font-weight: 650; list-style: none; }
+      .ops__details summary::-webkit-details-marker { display: none; }
+      .ops__details summary:focus-visible { outline: 2px solid var(--aqua); outline-offset: 4px; border-radius: 4px; }
       .ops__details-chevron { width: 8px; height: 8px; flex: none; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .18s ease; }
+      .ops__details[open] .ops__details-chevron { transform: rotate(225deg) translate(-2px, -1px); }
       .ops__details-body { padding-top: 13px; }
       .ops__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; margin: 0; }
       .ops__fact { min-width: 0; }
@@ -238,18 +243,16 @@
       .ops__live-value { display: inline-flex; align-items: center; gap: 10px; }
       .ops__live-value .ops__value { font-size: clamp(27px, 2.5vw, 35px); }
       .ops__pulse { width: 9px; height: 9px; flex: none; border-radius: 50%; background: var(--aqua); box-shadow: 0 0 0 5px rgba(46, 230, 200, .12); }
-      .ops__actions { align-self: start; justify-self: center; display: grid; gap: 8px; margin: 18px; }
-      .ops__details-toggle, .ops__refresh { width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 11px; cursor: pointer; color: var(--text-1); background: transparent; display: grid; place-items: center; transition: color .16s ease, border-color .16s ease; }
-      .ops__details-toggle:hover, .ops__refresh:hover { color: var(--aqua); border-color: rgba(46, 230, 200, .45); }
-      .ops__details-toggle:focus-visible, .ops__refresh:focus-visible { outline: 2px solid var(--aqua); outline-offset: 3px; }
-      .ops__details-toggle[aria-expanded="true"] .ops__details-chevron { transform: rotate(225deg) translate(-2px, -1px); }
+      .ops__refresh { align-self: center; justify-self: center; width: 42px; height: 42px; margin: 0 18px; border: 1px solid var(--line); border-radius: 11px; cursor: pointer; color: var(--text-1); background: transparent; display: grid; place-items: center; transition: color .16s ease, border-color .16s ease; }
+      .ops__refresh:hover { color: var(--aqua); border-color: rgba(46, 230, 200, .45); }
+      .ops__refresh:focus-visible { outline: 2px solid var(--aqua); outline-offset: 3px; }
       .ops__refresh[disabled] { cursor: wait; opacity: .55; }
       .ops__refresh svg { width: 19px; height: 19px; transform-origin: center; transition: transform .16s ease; }
       .ops__refresh:not([disabled]):hover svg { transform: rotate(18deg); }
       .ops__refresh.is-loading svg { animation: ops-refresh-spin .7s linear infinite; will-change: transform; }
       @keyframes ops-refresh-spin { to { transform: rotate(360deg); } }
       .ops__updated { display: block; margin-top: 10px; color: var(--text-2); font-family: var(--f-mono); font-size: 10.5px; }
-      @media (max-width: 760px) { .ops { grid-template-columns: 1fr; } .ops__storage { grid-template-columns: 1fr; } .ops__metric + .ops__metric, .ops__storage > .ops__metric + .ops__metric { border-top: 1px solid var(--line); border-left: 0; } .ops__actions { grid-template-columns: 1fr 1fr; width: 100%; margin: 0; gap: 0; border-top: 1px solid var(--line); } .ops__details-toggle, .ops__refresh { width: auto; height: auto; margin: 0; padding: 12px 18px; justify-self: stretch; border: 0; border-radius: 0; display: inline-flex; justify-content: center; gap: 8px; font-family: var(--f-body); font-weight: 600; font-size: 13px; } .ops__details-toggle { border-right: 1px solid var(--line); } .ops__details-toggle::before { content: "Detalhes"; } .ops__refresh::after { content: "Atualizar"; } }
+      @media (max-width: 760px) { .ops { grid-template-columns: 1fr; } .ops__storage { grid-template-columns: 1fr; } .ops__metric + .ops__metric, .ops__storage > .ops__metric + .ops__metric, .ops__sidebar > .ops__metric + .ops__metric { border-top: 1px solid var(--line); border-left: 0; } .ops__refresh { width: auto; height: auto; margin: 0; padding: 12px 18px; justify-self: stretch; border-width: 1px 0 0; border-radius: 0; display: inline-flex; gap: 8px; font-family: var(--f-body); font-weight: 600; font-size: 13px; } .ops__refresh::after { content: "Atualizar"; } }
       @media (max-width: 430px) { .ops__history-row { grid-template-columns: 68px minmax(0, 1fr) auto; column-gap: 7px; } }
       @media (prefers-reduced-motion: reduce) { .ops__fill, .ops__refresh, .ops__refresh svg { transition: none; } .ops__refresh.is-loading svg { animation: none; } }
 
@@ -321,7 +324,7 @@
       <h1>Vozen · Painel</h1>
 
       <!-- Estado 0: portão do Vozen Helper (mesma password). Saltado quando vens do Helper. -->
-      <form class="sect show" id="sGate" autocomplete="off">
+      <form class="sect" id="sGate" autocomplete="off" hidden>
         <p class="sub">Introduz as credenciais do Vozen Helper para continuar.</p>
         <div class="field">
           <label for="gateUser">Utilizador</label>
@@ -340,7 +343,7 @@
       </form>
 
       <!-- Estado 1: entrar com Discord -->
-      <div class="sect" id="sDiscord">
+      <div class="sect show" id="sDiscord">
         <p class="sub">Consola de administração. Precisas de entrar com a conta do dono.</p>
         <button class="btn" id="discordBtn" type="button">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4.4A19 19 0 0 0 15.3 3l-.2.5c1.7.5 2.5 1 3.4 1.6a13 13 0 0 0-10.9 0C8.4 4.5 9.4 4 11 3.5L10.7 3A19 19 0 0 0 6 4.4C3 8.8 2.2 13.1 2.6 17.3a19 19 0 0 0 5.7 2.9l.5-.8c-.8-.3-1.5-.6-2.2-1 .2-.1.4-.3.5-.4a13.6 13.6 0 0 0 11.8 0l.5.4c-.7.4-1.4.7-2.2 1l.5.8a19 19 0 0 0 5.7-2.9c.5-4.9-.8-9.1-3.6-12.9zM9 14.7c-.9 0-1.6-.8-1.6-1.9S8.1 11 9 11s1.7.9 1.6 1.9c0 1-.7 1.8-1.6 1.8zm6 0c-.9 0-1.6-.8-1.6-1.9S14.1 11 15 11s1.7.9 1.6 1.9c0 1-.7 1.8-1.6 1.8z"/></svg>
@@ -402,7 +405,8 @@
           <p class="ops__detail" id="databaseDetail">A obter a leitura do volume…</p>
           <div class="ops__track" aria-hidden="true"><span class="ops__fill" id="databaseFill"></span></div>
           <span class="ops__updated" id="metricsUpdated">Atualização automática a cada 30 segundos</span>
-          <div class="ops__details" data-metrics-detail hidden>
+          <details class="ops__details" id="databaseDetails">
+            <summary><span>Ver detalhes e histórico</span><span class="ops__details-chevron" aria-hidden="true"></span></summary>
             <div class="ops__details-body">
               <dl class="ops__facts">
                 <div class="ops__fact"><dt>Tamanho SQLite</dt><dd id="databaseExactSize">—</dd></div>
@@ -415,7 +419,7 @@
                 <ol class="ops__history-list" id="databaseHistory" aria-live="polite"></ol>
               </div>
             </div>
-          </div>
+          </details>
         </article>
         <article class="ops__metric" id="supabaseMetric" data-state="unknown">
           <div class="ops__top">
@@ -425,7 +429,8 @@
           <strong class="ops__value" id="supabaseSize" aria-live="polite">—</strong>
           <p class="ops__detail" id="supabaseDetail">A aguardar a ligação ao PostgreSQL…</p>
           <div class="ops__track" aria-hidden="true"><span class="ops__fill" id="supabaseFill"></span></div>
-          <div class="ops__details" data-metrics-detail hidden>
+          <details class="ops__details" id="supabaseDetails">
+            <summary><span>Ver detalhes e histórico</span><span class="ops__details-chevron" aria-hidden="true"></span></summary>
             <div class="ops__details-body">
               <dl class="ops__facts">
                 <div class="ops__fact"><dt>Base PostgreSQL</dt><dd id="supabaseExactSize">—</dd></div>
@@ -438,7 +443,7 @@
                 <ol class="ops__history-list" id="supabaseHistory" aria-live="polite"></ol>
               </div>
             </div>
-          </div>
+          </details>
         </article>
         </div>
         <div class="ops__sidebar">
@@ -446,22 +451,22 @@
             <div class="ops__top"><span class="ops__label">Em simultâneo</span></div>
             <div class="ops__live-value"><span class="ops__pulse" aria-hidden="true"></span><strong class="ops__value" id="activeSessions" aria-live="polite">—</strong></div>
             <p class="ops__detail" id="activeSessionsDetail">Chamadas de voz ativas agora</p>
-            <div class="ops__details" data-metrics-detail hidden>
+            <details class="ops__details" id="activeServersDetails">
+              <summary><span>Ver servidores online</span><span class="ops__details-chevron" aria-hidden="true"></span></summary>
               <div class="ops__details-body">
-                <span class="ops__label">Servidores online</span>
                 <ol class="ops__history-list" id="activeServers" aria-live="polite"></ol>
               </div>
-            </div>
+            </details>
+          </article>
+          <article class="ops__metric" id="outboxMetric" data-state="unknown">
+            <div class="ops__top"><span class="ops__label">Mirror outbox</span><span class="ops__state" id="outboxState">Sem leitura</span></div>
+            <strong class="ops__value" id="outboxRows" aria-live="polite">-</strong>
+            <p class="ops__detail" id="outboxDetail">Batches pendentes no mirror PostgreSQL</p>
           </article>
         </div>
-        <div class="ops__actions">
-          <button class="ops__details-toggle" id="metricsDetailsToggle" type="button" aria-expanded="false" aria-label="Mostrar detalhes dos indicadores" title="Mostrar detalhes dos indicadores">
-            <span class="ops__details-chevron" aria-hidden="true"></span>
-          </button>
-          <button class="ops__refresh" id="metricsRefresh" type="button" aria-label="Atualizar indicadores agora" title="Atualizar indicadores agora">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.4-4.8L3 9"/><path d="M3 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 14.4 4.8L21 15"/><path d="M21 20v-5h-5"/></svg>
-          </button>
-        </div>
+        <button class="ops__refresh" id="metricsRefresh" type="button" aria-label="Atualizar indicadores agora" title="Atualizar indicadores agora">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.4-4.8L3 9"/><path d="M3 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 14.4 4.8L21 15"/><path d="M21 20v-5h-5"/></svg>
+        </button>
       </section>
 
       <!-- Tab: Passes -->
@@ -574,27 +579,19 @@
     </div>
 
     <script>
-      const API_BASE = 'https://api.vozen.org';
+      // Caddy exposes the Rust runtime at the API host root. Keep the former /rust mount as a
+      // fallback for older VPS proxies so a migration never strands an existing panel session.
+      const API_BASES = ['https://api.vozen.org', 'https://api.vozen.org/rust'];
+      let API_BASE = API_BASES[0];
       const CLIENT_ID = '1526211106081734666';
       const REDIRECT_URI = 'https://rexy40407.github.io/vozen-helper-bot/vozen.html';
       const SCOPE = 'identify';
 
       // Portão cosmético — as MESMAS credenciais do Vozen Helper (SHA-256, cliente). Não é
       // segurança a sério (o gate real é o OAuth do dono, na API); serve para pedir a mesma
-      // "porta da frente" do Helper. GATE_KEY: flag partilhada nesta sessão do separador,
       // posta pelo Helper quando passas o portão dele, para não pedir duas vezes.
-      const U_HASH = '5060326c2e0cdc5c11ef1416d6ad912ec3a30185b97f086591a0af2735bb7c1f';
-      const P_HASH = '93b4e89b30655360c3c97641dd1f4ec2829dd863b5c126c03c74655241c06d1d';
-      const GATE_KEY = 'vh_gate';
       const SESSION_KEY = 'vozen_admin_sess';
       const SESSION_IDLE_MS = 5 * 60 * 1000;
-      const gatePassed = () => {
-        try {
-          return sessionStorage.getItem(GATE_KEY) === '1';
-        } catch (_e) {
-          return false;
-        }
-      };
 
       let discordToken = ''; // token OAuth do Discord (só para o login)
       let session = ''; // token de sessão da consola (persistido apenas neste separador)
@@ -688,6 +685,7 @@
         try {
           sessionStorage.setItem(SESSION_KEY, JSON.stringify({
             token: session,
+            apiBase: API_BASE,
             last: Date.now(),
             expiresAt: sessionExpiresAt || 0,
           }));
@@ -749,47 +747,29 @@
           const saved = readStoredSession();
           if (storedSessionIsFresh(saved)) {
             session = saved.token;
+            API_BASE = API_BASES.includes(saved.apiBase) ? saved.apiBase : API_BASES[0];
             sessionExpiresAt = Number(saved.expiresAt) || 0;
             openPanel();
           } else {
             clearStoredSession();
-            showSect(gatePassed() ? 'sDiscord' : 'sGate');
+            showSect('sDiscord');
           }
         }
       }
 
-      async function sha256(s) {
-        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
-        return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
-      }
-
       // Mostrar/ocultar a password do portão.
-      $('gateToggle').addEventListener('click', () => {
-        const inp = $('gatePass');
-        const shown = inp.type === 'text';
-        inp.type = shown ? 'password' : 'text';
-        $('gateEyeOn').style.display = shown ? '' : 'none';
-        $('gateEyeOff').style.display = shown ? 'none' : '';
-        inp.focus();
-      });
-
       // Portão: mesmas credenciais do Helper. Ao passar, marca a flag e mostra o "Entrar com Discord".
-      $('sGate').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const u = await sha256($('gateUser').value.trim().toLowerCase());
-        const p = await sha256($('gatePass').value);
-        if (u === U_HASH && p === P_HASH) {
-          $('gateErr').classList.remove('show');
+      // Legacy credential gate removed; owner OAuth is authoritative.
+      if (false) { /* legacy gate intentionally disabled */
+        /* OAuth is the only authentication path. */
+        if (false) {
           try {
-            sessionStorage.setItem(GATE_KEY, '1');
           } catch (_e) {
             /* sessionStorage bloqueado: sem problema, apenas não persiste */
           }
           showSect('sDiscord');
-        } else {
-          $('gateErr').classList.add('show');
         }
-      });
+      }
 
       $('discordBtn').addEventListener('click', () => (window.location.href = authUrl()));
       $('retryBtn').addEventListener('click', () => (window.location.href = authUrl()));
@@ -797,27 +777,27 @@
       // Login só com o token OAuth do Discord: o servidor confirma que a identidade é o dono
       // (OWNER_ID) e devolve a sessão. Sem password — quem não for o dono leva 403.
       async function doLogin() {
-        try {
-          const r = await fetch(API_BASE + '/api/admin/login', {
-            method: 'POST',
-            headers: { authorization: 'Bearer ' + discordToken },
-          });
-          if (!r.ok) {
-            showSect('sDenied');
+        for (const base of API_BASES) {
+          try {
+            const r = await fetch(base + '/api/admin/login', {
+              method: 'POST',
+              headers: { authorization: 'Bearer ' + discordToken },
+            });
+            if (!r.ok) continue;
+            const d = await r.json();
+            if (!d.token) continue;
+            API_BASE = base;
+            session = d.token;
+            sessionExpiresAt = Number(d.expiresAt) || 0;
+            saveStoredSession();
+            openPanel();
             return;
+          } catch (_e) {
+            // Try the next API mount. A temporary Rust/legacy outage should not make
+            // the other healthy runtime impossible to use.
           }
-          const d = await r.json();
-          session = d.token || '';
-          sessionExpiresAt = Number(d.expiresAt) || 0;
-          if (!session) {
-            showSect('sDenied');
-            return;
-          }
-          saveStoredSession();
-          openPanel();
-        } catch (_e) {
-          showSect('sDenied');
         }
+        showSect('sDenied');
       }
 
       $('logoutBtn').addEventListener('click', async () => {
@@ -852,6 +832,22 @@
         });
         if (response.ok) touchStoredSession();
         return response;
+      }
+
+      async function adminJson(path, opts = {}) {
+        const response = await api(path, opts);
+        if (response.status === 403) {
+          logoutStale();
+          throw new Error('auth');
+        }
+        let data;
+        try { data = await response.json(); } catch (_e) { throw new Error('invalid_json'); }
+        if (!response.ok) {
+          const error = new Error(data.error || 'request_failed');
+          error.status = response.status;
+          throw error;
+        }
+        return data;
       }
 
       function openPanel() {
@@ -1065,6 +1061,15 @@
         renderDatabaseHistory(metrics.databaseHistory);
         renderSupabaseHistory(supabase && supabase.history);
         renderActiveServers(metrics.activeVoiceServers);
+        const outbox = metrics && metrics.postgresOutbox && typeof metrics.postgresOutbox === 'object'
+          ? metrics.postgresOutbox : null;
+        const outboxRows = outbox ? Math.max(0, Number(outbox.pendingRows) || 0) : NaN;
+        $('outboxRows').textContent = Number.isFinite(outboxRows) ? String(outboxRows) : '-';
+        $('outboxMetric').dataset.state = outbox ? (outboxRows ? 'warn' : 'healthy') : 'unknown';
+        $('outboxState').textContent = outbox ? (outboxRows ? 'Pendente' : 'Em dia') : 'Sem leitura';
+        $('outboxDetail').textContent = outbox
+          ? (outboxRows ? formatBytes(outbox.pendingBytes) + ' a aguardar entrega' : 'Sem batches pendentes')
+          : 'Mirror PostgreSQL desativado ou sem leitura';
         $('metricsUpdated').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
       }
 
@@ -1087,6 +1092,10 @@
         $('supabaseFree').textContent = '—';
         $('supabaseAverage').textContent = '—';
         $('supabaseFill').style.transform = 'scaleX(0)';
+        $('outboxMetric').dataset.state = 'unknown';
+        $('outboxState').textContent = 'Indisponivel';
+        $('outboxRows').textContent = '-';
+        $('outboxDetail').textContent = 'Nao foi possivel obter a leitura agora.';
         renderDatabaseHistory([]);
         renderSupabaseHistory([]);
         renderActiveServers([]);
@@ -1112,16 +1121,6 @@
       }
 
       $('metricsRefresh').addEventListener('click', loadSystemMetrics);
-      $('metricsDetailsToggle').addEventListener('click', () => {
-        const toggle = $('metricsDetailsToggle');
-        const open = toggle.getAttribute('aria-expanded') !== 'true';
-        toggle.setAttribute('aria-expanded', String(open));
-        toggle.setAttribute('aria-label', open ? 'Esconder detalhes dos indicadores' : 'Mostrar detalhes dos indicadores');
-        toggle.setAttribute('title', open ? 'Esconder detalhes dos indicadores' : 'Mostrar detalhes dos indicadores');
-        document.querySelectorAll('[data-metrics-detail]').forEach((detail) => {
-          detail.hidden = !open;
-        });
-      });
 
       // Tabs
       $('tabGrants').addEventListener('click', () => switchTab('grants'));
@@ -1140,15 +1139,13 @@
       }
 
       async function loadGuilds() {
-        serversLoaded = true;
+        serversLoaded = false;
         const msg = $('guildsMsg');
         msg.className = 'msg';
         msg.textContent = '';
         let d;
         try {
-          const r = await api('/api/admin/guilds');
-          if (r.status === 403) return logoutStale();
-          d = await r.json();
+          d = await adminJson('/api/admin/guilds');
         } catch (_e) {
           serversLoaded = false; // permite tentar de novo
           msg.className = 'msg bad';
@@ -1156,6 +1153,7 @@
           return;
         }
         renderGuilds(d.guilds || []);
+        serversLoaded = true;
       }
 
       function renderGuilds(guilds) {
@@ -1262,9 +1260,7 @@
         msg.textContent = '';
         let d;
         try {
-          const r = await api('/api/admin/toptalkers');
-          if (r.status === 403) return logoutStale();
-          d = await r.json();
+          d = await adminJson('/api/admin/toptalkers');
         } catch (_e) {
           msg.className = 'msg bad';
           msg.textContent = 'Erro de rede.';
@@ -1285,12 +1281,20 @@
           rank.textContent = String(i + 1);
           li.appendChild(rank);
           const label = t.username || t.id;
-          if (t.avatar) {
+          const avatarUrl = t.avatar || t.avatarUrl || t.avatar_url || '';
+          if (avatarUrl) {
             const img = document.createElement('img');
             img.className = 'tt-av';
-            img.src = t.avatar;
+            img.src = avatarUrl;
             img.alt = '';
             img.loading = 'lazy';
+            img.referrerPolicy = 'no-referrer';
+            img.addEventListener('error', () => {
+              const fallback = document.createElement('span');
+              fallback.className = 'tt-av tt-av--none';
+              fallback.textContent = (label[0] || '?').toUpperCase();
+              img.replaceWith(fallback);
+            }, { once: true });
             li.appendChild(img);
           } else {
             const av = document.createElement('span');
@@ -1333,14 +1337,17 @@
       }
 
       async function loadPasses() {
-        let d;
         try {
-          const r = await api('/api/admin/passes');
-          if (r.status === 403) return logoutStale();
-          d = await r.json();
+          const d = await adminJson('/api/admin/passes');
+          renderPasses(d);
         } catch (_e) {
+          $('grantMsg').className = 'msg bad';
+          $('grantMsg').textContent = 'Não foi possível atualizar os passes. Tenta novamente.';
           return;
         }
+      }
+
+      function renderPasses(d) {
         const body = $('passesBody');
         body.textContent = '';
         const rows = [];
@@ -1448,10 +1455,12 @@
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ kind, id }),
           });
-          if (r.status === 403) return logoutStale();
-          loadPasses();
+          if (!r.ok) throw new Error('revoke_failed');
+          await loadPasses();
         } catch (_e) {
           btn.disabled = false;
+          $('grantMsg').className = 'msg bad';
+          $('grantMsg').textContent = 'Não foi possível revogar o passe.';
         }
       }
 
