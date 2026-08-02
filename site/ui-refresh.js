@@ -2,10 +2,10 @@
   "use strict";
 
   const routes = [
-    ["/", "Painel", "⌂"],
+    ["/", "Dashboard", "⌂"],
     ["/quick-setup", "Setup", "✦"],
-    ["/features", "Módulos", "◇"],
-    ["/activity", "Atividade", "◷"],
+    ["/features", "Modules", "◇"],
+    ["/activity", "Activity", "◷"],
     ["/rank-card", "XP", "▣"],
   ];
   const state = { lastPath: "", scheduled: 0, applying: false };
@@ -44,7 +44,7 @@
 
     sidebar.dataset.uiShell = "true";
     const existingNav = one("nav", sidebar);
-    if (existingNav) existingNav.setAttribute("aria-label", "Navegação principal");
+    if (existingNav) existingNav.setAttribute("aria-label", "Main navigation");
 
     let mobileHeader = one("#vozen-mobile-header");
     if (!mobileHeader) {
@@ -55,8 +55,8 @@
         <div class="vozen-mobile-server">
           <span class="vozen-mobile-server-mark" aria-hidden="true">◈</span>
           <label class="vozen-mobile-server-select">
-            <span>Servidor</span>
-            <select aria-label="Selecionar servidor"></select>
+            <span>Server</span>
+            <select aria-label="Select server"></select>
           </label>
         </div>
         <span class="vozen-mobile-sync" role="status" aria-live="polite"></span>`;
@@ -84,7 +84,7 @@
       mobileNav = document.createElement("nav");
       mobileNav.id = "vozen-mobile-nav";
       mobileNav.className = "vozen-mobile-nav";
-      mobileNav.setAttribute("aria-label", "Navegação móvel");
+      mobileNav.setAttribute("aria-label", "Mobile navigation");
       mobileNav.innerHTML = routes
         .map(([href, label, icon]) => `<a href="#${href}" data-route="${href}"><span aria-hidden="true">${icon}</span><b>${label}</b></a>`)
         .join("");
@@ -104,9 +104,9 @@
     if (desktopSync) {
       desktopSync.setAttribute("role", "status");
       desktopSync.setAttribute("aria-live", "polite");
-      desktopSync.dataset.syncState = /erro|offline/i.test(desktopSync.textContent)
+      desktopSync.dataset.syncState = /error|offline/i.test(desktopSync.textContent)
         ? "error"
-        : /sincroniz|tudo certo/i.test(desktopSync.textContent)
+        : /sync|all good/i.test(desktopSync.textContent)
           ? "synced"
           : "syncing";
       if (mobileSync) {
@@ -114,7 +114,7 @@
         if (mobileSync.textContent !== syncText) mobileSync.textContent = syncText;
       }
     } else if (mobileSync) {
-      if (mobileSync.textContent !== "Sincronizado") mobileSync.textContent = "Sincronizado";
+      if (mobileSync.textContent !== "Synced") mobileSync.textContent = "Synced";
     }
 
     document.body.dataset.uiRoute = path;
@@ -127,8 +127,8 @@
 
     const primary = one("button.primary", welcome);
     if (primary) {
-      primary.textContent = "Continuar setup";
-      primary.setAttribute("aria-label", "Continuar a configuração rápida");
+      primary.textContent = "Continue setup";
+      primary.setAttribute("aria-label", "Continue quick setup");
       if (!primary.dataset.uiBound) {
         primary.dataset.uiBound = "true";
         primary.addEventListener("click", () => go("/quick-setup"));
@@ -163,9 +163,10 @@
   function featureStatus(card) {
     const text = cleanText(one(".pill", card)?.textContent).toLowerCase();
     if (text.includes("beta")) return "beta";
-    if (text.includes("ativa")) return "active";
-    if (text.includes("dispon")) return "available";
-    if (text.includes("bloque")) return "blocked";
+    if (text.includes("ativa") || text.includes("active")) return "active";
+    if (text.includes("dispon") || text.includes("avail")) return "available";
+    if (text.includes("bloque") || text.includes("block")) return "blocked";
+    if (text.includes("plane") || text.includes("plan")) return "planned";
     return "planned";
   }
 
@@ -176,19 +177,19 @@
 
     const cards = all(".feature", grid);
     const counts = { active: 0, available: 0, beta: 0, planned: 0, blocked: 0 };
-    const categories = new Map([["all", "Todas"]]);
+    const categories = new Map([["all", "All"]]);
     cards.forEach((card) => {
       const status = featureStatus(card);
       counts[status] += 1;
       const category = [...card.querySelectorAll(".feature-icon")][0]?.className.match(/feature-icon ([^ ]+)/)?.[1];
       if (category && !categories.has(category)) {
         const labels = {
-          protection: "Proteção",
-          community: "Comunidade",
-          management: "Gestão",
-          utility: "Utilidades",
-          social: "Alertas sociais",
-          growth: "Crescimento",
+          protection: "Protection",
+          community: "Community",
+          management: "Management",
+          utility: "Utilities",
+          social: "Social alerts",
+          growth: "Growth",
           web3: "Web3",
         };
         categories.set(category, labels[category] || category);
@@ -211,12 +212,12 @@
       controls = document.createElement("section");
       controls.id = "vozen-catalog-controls";
       controls.className = "vozen-catalog-controls card";
-      controls.setAttribute("aria-label", "Filtros de funcionalidades");
+      controls.setAttribute("aria-label", "Module filters");
       controls.innerHTML = `
         <div class="vozen-catalog-controls-main">
           <label class="vozen-search-label">
-            <span>Pesquisar módulos</span>
-            <input type="search" class="vozen-catalog-search" placeholder="Pesquisar funcionalidade…" autocomplete="off">
+            <span>Search modules</span>
+            <input type="search" class="vozen-catalog-search" placeholder="Search modules…" autocomplete="off">
           </label>
           <div class="vozen-status-filters" role="group" aria-label="Disponibilidade"></div>
         </div>
@@ -240,11 +241,11 @@
     const selectedCategory = params.get("category") || "all";
     const search = params.get("q") || "";
     const statusLabels = [
-      ["active", "Ativos", counts.active],
-      ["available", "Disponíveis", counts.active + counts.available],
+      ["active", "Active", counts.active],
+      ["available", "Available", counts.active + counts.available],
       ["beta", "Beta", counts.beta],
-      ["planned", "Planeados", counts.planned],
-      ["blocked", "Bloqueados", counts.blocked],
+      ["planned", "Planned", counts.planned],
+      ["blocked", "Blocked", counts.blocked],
       ["roadmap", "Roadmap", counts.planned + counts.blocked],
     ];
     const filterWrap = one(".vozen-status-filters", controls);
@@ -329,7 +330,7 @@
       empty = document.createElement("div");
       empty.id = "vozen-catalog-empty";
       empty.className = "vozen-catalog-empty card";
-      empty.innerHTML = `<span aria-hidden="true">⌕</span><h3>Nenhum módulo corresponde aos filtros</h3><p>Experimenta remover a pesquisa ou voltar a mostrar os módulos disponíveis.</p><button type="button" class="secondary">Limpar filtros</button>`;
+      empty.innerHTML = `<span aria-hidden="true">⌕</span><h3>No modules match these filters</h3><p>Try clearing the search or showing available modules again.</p><button type="button" class="secondary">Clear filters</button>`;
       grid.after(empty);
       one("button", empty).addEventListener("click", () => {
         writeFeatureQuery({ status: "available", category: "all", q: "" });
@@ -349,20 +350,20 @@
     if (!progress || one(".vozen-setup-journey", page)) return;
     const journey = document.createElement("div");
     journey.className = "vozen-setup-journey";
-    journey.setAttribute("aria-label", "Fases da configuração");
+    journey.setAttribute("aria-label", "Setup phases");
     journey.innerHTML = `
-      <div class="active"><span>1</span><div><b>Objetivos</b><small>Define o essencial</small></div></div>
-      <div><span>2</span><div><b>Módulos</b><small>Aplica defaults seguros</small></div></div>
-      <div><span>3</span><div><b>Publicar</b><small>Revê e confirma</small></div></div>`;
+      <div class="active"><span>1</span><div><b>Goals</b><small>Define the essentials</small></div></div>
+      <div><span>2</span><div><b>Modules</b><small>Apply safe defaults</small></div></div>
+      <div><span>3</span><div><b>Publish</b><small>Review and confirm</small></div></div>`;
     progress.before(journey);
-    progress.setAttribute("aria-label", "Subpassos da configuração");
+    progress.setAttribute("aria-label", "Setup substeps");
   }
 
   function enhanceActivity() {
     const empty = one(".activity .empty");
     if (!empty || empty.dataset.uiEnhanced) return;
     empty.dataset.uiEnhanced = "true";
-    empty.innerHTML = `<span class="vozen-empty-icon" aria-hidden="true">◷</span><h3>A atividade começa aqui</h3><p>Quando configurares ou publicares um módulo, encontrarás aqui o histórico do servidor.</p><button type="button" class="primary">Configurar o primeiro módulo</button>`;
+    empty.innerHTML = `<span class="vozen-empty-icon" aria-hidden="true">◷</span><h3>Activity starts here</h3><p>After you configure or publish a module, this is where your server history will appear.</p><button type="button" class="primary">Configure your first module</button>`;
     one("button", empty).addEventListener("click", () => go("/features"));
   }
 
@@ -437,7 +438,7 @@
               result.setAttribute("aria-live", "polite");
               simulate.after(result);
             }
-            result.textContent = "Simulação concluída — nenhuma ação foi enviada.";
+            result.textContent = "Simulation complete — no action was sent.";
           });
         }
       }
