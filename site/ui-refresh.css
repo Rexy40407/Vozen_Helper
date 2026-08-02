@@ -1,0 +1,890 @@
+:root {
+  --ui-bg: #070b12;
+  --ui-surface: #101725;
+  --ui-surface-raised: #141f30;
+  --ui-surface-soft: #0c1320;
+  --ui-border: #2b3b55;
+  --ui-border-strong: #46617f;
+  --ui-text: #f4f7fb;
+  --ui-muted: #a9b7cc;
+  --ui-subtle: #7f91ad;
+  --ui-accent: #8ee5d2;
+  --ui-accent-strong: #59cdbd;
+  --ui-blue: #7f9cf5;
+  --ui-danger: #f687a8;
+  --ui-space-1: 4px;
+  --ui-space-2: 8px;
+  --ui-space-3: 12px;
+  --ui-space-4: 16px;
+  --ui-space-5: 24px;
+  --ui-space-6: 32px;
+  --ui-space-7: 48px;
+  --ui-space-8: 64px;
+  --ui-motion: 180ms ease;
+}
+
+html {
+  min-width: 320px;
+  background: var(--ui-bg);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  max-width: 100%;
+  overflow-x: hidden;
+  color: var(--ui-text);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+button,
+input,
+select,
+textarea,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+select,
+input[type="checkbox"],
+input[type="radio"] {
+  min-height: 44px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 3px solid var(--ui-accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #8ee5d233;
+}
+
+.shell {
+  grid-template-columns: 248px minmax(0, 1fr);
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 560px;
+  align-self: start;
+  z-index: 10;
+}
+
+.main {
+  width: 100%;
+  max-width: 1440px;
+  padding: 40px clamp(24px, 5vw, 64px) 112px;
+}
+
+header h1 {
+  font-size: clamp(32px, 3vw, 40px);
+  line-height: 1.1;
+}
+
+.welcome h2,
+.catalog-toolbar h2,
+.section-heading h2,
+.quick-setup-head h2,
+.quick-setup-hero h2,
+.quick-setup-complete h2 {
+  font-size: 28px;
+  line-height: 34px;
+}
+
+.welcome h2 {
+  max-width: 560px;
+}
+
+.section-heading h3,
+.quick-setup-form h3,
+.quick-setup-aside h3,
+.detail-aside h3 {
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.welcome,
+.quick-setup-hero,
+.quick-setup-form,
+.quick-setup-aside,
+.detail-intro,
+.config-section,
+.detail-aside,
+.preview-panel,
+.controls,
+.quota {
+  border-color: var(--ui-border);
+}
+
+.header-state {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.header-state[data-sync-state="synced"]::first-letter {
+  color: var(--ui-accent);
+}
+
+.runtime {
+  display: none;
+}
+
+.nav,
+.filter,
+.link-button,
+.back-link,
+.primary,
+.secondary,
+.template,
+.setup-choice,
+.mode,
+.swatch,
+.banner-option {
+  transition: border-color var(--ui-motion), background-color var(--ui-motion), color var(--ui-motion), transform var(--ui-motion), box-shadow var(--ui-motion);
+}
+
+.primary,
+.secondary {
+  min-height: 44px;
+  padding: 10px 16px;
+}
+
+.metrics {
+  margin: 16px 0 40px;
+}
+
+.ui-metric-strip {
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  background: #0c1421cc;
+  overflow: hidden;
+}
+
+.ui-metric-strip .metric {
+  min-height: 92px;
+  border-radius: 0;
+  border: 0;
+  box-shadow: inset -1px 0 var(--ui-border);
+}
+
+.ui-secondary-info {
+  opacity: .9;
+}
+
+.vozen-mobile-header,
+.vozen-mobile-nav {
+  display: none;
+}
+
+/* Catalog: compact rows, sticky controls, and a usable default view. */
+.vozen-catalog-layout {
+  display: grid;
+  grid-template-columns: 196px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.vozen-catalog-controls {
+  display: contents;
+}
+
+.vozen-catalog-controls-main {
+  grid-column: 2;
+  grid-row: 1;
+  position: sticky;
+  top: 20px;
+  z-index: 3;
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  background: #101725f2;
+  box-shadow: 0 10px 30px #0003;
+  backdrop-filter: blur(14px);
+}
+
+.vozen-category-panel {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  position: sticky;
+  top: 20px;
+  display: grid;
+  gap: 8px;
+  align-self: start;
+  padding: 14px;
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  background: var(--ui-surface-soft);
+}
+
+.vozen-category-panel > label {
+  color: var(--ui-subtle);
+  font: 600 11px/16px "Space Grotesk", sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.vozen-category-list {
+  display: grid;
+  gap: 4px;
+}
+
+.vozen-category-list button {
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--ui-muted);
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+}
+
+.vozen-category-list button:hover,
+.vozen-category-list button.active {
+  color: var(--ui-text);
+  border-color: #3e5c76;
+  background: #142337;
+}
+
+.vozen-category-list button.active {
+  color: var(--ui-accent);
+  box-shadow: inset 2px 0 var(--ui-accent);
+}
+
+.vozen-category-select {
+  display: none;
+  width: 100%;
+  min-height: 44px;
+  color: var(--ui-text);
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.vozen-search-label {
+  display: grid;
+  gap: 6px;
+  color: var(--ui-muted);
+  font-size: 12px;
+}
+
+.vozen-search-label span {
+  color: var(--ui-subtle);
+  font: 600 11px/16px "Space Grotesk", sans-serif;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.vozen-catalog-search {
+  width: 100%;
+  min-height: 44px;
+  color: var(--ui-text);
+  background: #0d1624;
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  outline: 0;
+  padding: 10px 12px;
+}
+
+.vozen-status-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vozen-filter-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  padding: 7px 10px;
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  color: var(--ui-muted);
+  background: transparent;
+  font-size: 12px;
+}
+
+.vozen-filter-button span {
+  color: var(--ui-subtle);
+  font-size: 11px;
+}
+
+.vozen-filter-button:hover,
+.vozen-filter-button.active {
+  color: var(--ui-accent);
+  border-color: var(--ui-accent-strong);
+  background: #12383a;
+}
+
+.vozen-filter-button.active span {
+  color: var(--ui-text);
+}
+
+.vozen-catalog-layout > .feature-grid {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.vozen-catalog-layout > .feature-grid .feature {
+  display: grid;
+  grid-template-columns: 44px minmax(160px, 1fr) minmax(92px, auto) minmax(132px, 148px);
+  grid-template-areas: "icon title status action" "icon description status action";
+  align-items: center;
+  gap: 2px 12px;
+  min-height: 88px;
+  padding: 14px 16px;
+  transition: border-color var(--ui-motion), transform var(--ui-motion), background-color var(--ui-motion);
+}
+
+.vozen-catalog-layout > .feature-grid .feature:hover {
+  border-color: var(--ui-border-strong);
+  background: #142033;
+  transform: translateY(-1px);
+}
+
+.vozen-catalog-layout .feature-top {
+  display: contents;
+}
+
+.vozen-catalog-layout .feature-icon {
+  grid-area: icon;
+  width: 40px;
+  height: 40px;
+}
+
+.vozen-catalog-layout .feature h3 {
+  grid-area: title;
+  margin: 0;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.vozen-catalog-layout .feature p {
+  grid-area: description;
+  overflow: hidden;
+  color: var(--ui-muted);
+  font-size: 13px;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vozen-catalog-layout .feature .pill {
+  grid-area: status;
+  justify-self: start;
+  white-space: nowrap;
+}
+
+.vozen-catalog-layout .feature button {
+  grid-area: action;
+  width: 100%;
+}
+
+.vozen-catalog-empty {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.vozen-catalog-empty > span {
+  color: var(--ui-accent);
+  font-size: 28px;
+}
+
+.vozen-catalog-empty h3 {
+  margin: 0;
+  font: 600 18px/24px "Space Grotesk", sans-serif;
+}
+
+.vozen-catalog-empty p {
+  max-width: 420px;
+  margin: 0;
+  color: var(--ui-muted);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* Quick setup keeps the existing API-driven substeps but adds a clear three-phase model. */
+.vozen-setup-journey {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  background: #0e1724;
+}
+
+.vozen-setup-journey > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--ui-subtle);
+}
+
+.vozen-setup-journey > div.active {
+  color: var(--ui-accent);
+  background: #17343c;
+}
+
+.vozen-setup-journey span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font: 700 12px/1 "Space Grotesk", sans-serif;
+}
+
+.vozen-setup-journey b,
+.vozen-setup-journey small {
+  display: block;
+}
+
+.vozen-setup-journey b {
+  font-size: 13px;
+}
+
+.vozen-setup-journey small {
+  margin-top: 2px;
+  color: var(--ui-subtle);
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.ui-quick-setup .setup-progress {
+  margin-top: 0;
+}
+
+/* Module states and simulation feedback. */
+.ui-module-form .sticky-actions:not(.is-visible) {
+  display: none;
+}
+
+.ui-module-form .sticky-actions.is-visible {
+  min-height: 60px;
+}
+
+.ui-module-form [aria-invalid="true"] {
+  border-color: var(--ui-danger) !important;
+  box-shadow: 0 0 0 3px #f687a81c;
+}
+
+.vozen-simulation-output {
+  margin-top: 10px;
+  padding: 11px 12px;
+  border: 1px solid #357d79;
+  border-radius: 8px;
+  color: #d9fff7;
+  background: #172a36;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.activity .empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 52px 24px;
+}
+
+.activity .empty h3 {
+  margin: 0;
+  color: var(--ui-text);
+  font: 600 18px/24px "Space Grotesk", sans-serif;
+}
+
+.activity .empty p {
+  max-width: 430px;
+  margin: 0;
+  color: var(--ui-muted);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.vozen-empty-icon {
+  color: var(--ui-accent);
+  font-size: 28px;
+}
+
+@media (max-width: 1100px) {
+  .main {
+    padding-inline: 32px;
+  }
+
+  .vozen-catalog-layout > .feature-grid .feature {
+    grid-template-columns: 44px minmax(130px, 1fr) minmax(82px, auto) 120px;
+  }
+}
+
+@media (max-width: 900px) and (min-width: 721px) {
+  .vozen-catalog-layout {
+    display: block;
+  }
+
+  .vozen-catalog-controls-main,
+  .vozen-category-panel {
+    position: static;
+    margin-bottom: 10px;
+  }
+
+  .vozen-category-panel {
+    display: block;
+  }
+
+  .vozen-category-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .vozen-category-list button {
+    flex: 1 1 130px;
+  }
+
+  .vozen-catalog-layout > .feature-grid {
+    display: grid;
+    width: 100%;
+  }
+
+  .vozen-catalog-layout > .feature-grid .feature {
+    grid-template-columns: 44px minmax(0, 1fr) minmax(82px, auto) 120px;
+  }
+}
+
+@media (max-width: 720px) {
+  body {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+
+  .shell {
+    display: block;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .main {
+    max-width: none;
+    padding: 88px 16px calc(128px + env(safe-area-inset-bottom));
+  }
+
+  header {
+    display: block;
+    margin-bottom: 24px;
+  }
+
+  header h1 {
+    font-size: 32px;
+    line-height: 36px;
+  }
+
+  .header-state {
+    display: none;
+  }
+
+  .welcome h2,
+  .catalog-toolbar h2,
+  .section-heading h2,
+  .quick-setup-head h2,
+  .quick-setup-hero h2,
+  .quick-setup-complete h2 {
+    font-size: 24px;
+    line-height: 30px;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ui-metric-strip .metric {
+    min-height: 84px;
+    padding: 16px 14px;
+  }
+
+  .ui-metric-strip .metric:nth-child(2n) {
+    box-shadow: none;
+  }
+
+  .vozen-mobile-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 72px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--ui-border);
+    background: #080d17f5;
+    box-shadow: 0 8px 20px #0003;
+    backdrop-filter: blur(14px);
+  }
+
+  .vozen-mobile-server {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .vozen-mobile-server-mark {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border-radius: 9px;
+    color: #07101c;
+    background: linear-gradient(135deg, var(--ui-accent), var(--ui-blue));
+  }
+
+  .vozen-mobile-server-select {
+    display: grid;
+    min-width: 0;
+    gap: 0;
+  }
+
+  .vozen-mobile-server-select span {
+    color: var(--ui-subtle);
+    font-size: 10px;
+    line-height: 14px;
+  }
+
+  .vozen-mobile-server-select select {
+    width: min(42vw, 180px);
+    min-height: 44px;
+    padding: 4px 24px 4px 0;
+    border: 0;
+    outline: 0;
+    color: var(--ui-text);
+    background: transparent;
+    font-size: 13px;
+    text-overflow: ellipsis;
+  }
+
+  .vozen-mobile-sync {
+    flex: none;
+    max-width: 42%;
+    overflow: hidden;
+    color: var(--ui-accent);
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .vozen-mobile-nav {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 30;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--ui-border);
+    background: #0b121ef5;
+    box-shadow: 0 -8px 24px #0004;
+    backdrop-filter: blur(14px);
+  }
+
+  .vozen-mobile-nav a {
+    display: grid;
+    place-items: center;
+    gap: 2px;
+    min-width: 0;
+    min-height: 52px;
+    padding: 6px 3px;
+    border-radius: 9px;
+    color: var(--ui-subtle);
+    text-decoration: none;
+  }
+
+  .vozen-mobile-nav a.active,
+  .vozen-mobile-nav a:hover {
+    color: var(--ui-accent);
+    background: #14283a;
+  }
+
+  .vozen-mobile-nav a span {
+    font-size: 17px;
+    line-height: 18px;
+  }
+
+  .vozen-mobile-nav a b {
+    overflow: hidden;
+    max-width: 100%;
+    font-size: 10px;
+    line-height: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .vozen-catalog-layout {
+    display: block;
+  }
+
+  .vozen-catalog-controls {
+    display: block;
+  }
+
+  .vozen-catalog-controls-main,
+  .vozen-category-panel {
+    position: static;
+    margin-bottom: 10px;
+  }
+
+  .vozen-category-panel {
+    display: grid;
+  }
+
+  .vozen-category-list {
+    display: none;
+  }
+
+  .vozen-category-select {
+    display: block;
+  }
+
+  .vozen-status-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .vozen-status-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .vozen-filter-button {
+    flex: 0 0 auto;
+  }
+
+  .vozen-catalog-layout > .feature-grid {
+    display: grid;
+  }
+
+  .vozen-catalog-layout > .feature-grid .feature {
+    grid-template-columns: 40px minmax(0, 1fr);
+    grid-template-areas: "icon title" "icon description" "status action";
+    gap: 3px 10px;
+    padding: 14px;
+  }
+
+  .vozen-catalog-layout .feature .pill {
+    grid-column: 1;
+    margin-top: 8px;
+  }
+
+  .vozen-catalog-layout .feature button {
+    grid-column: 2;
+    margin-top: 8px;
+  }
+
+  .vozen-catalog-layout .feature p {
+    white-space: normal;
+  }
+
+  .vozen-catalog-empty {
+    margin-top: 10px;
+  }
+
+  .vozen-setup-journey {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .vozen-setup-journey > div {
+    min-height: 44px;
+  }
+
+  .ui-quick-setup .setup-progress {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .ui-quick-setup .setup-progress::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ui-quick-setup .progress-step {
+    min-width: 150px;
+  }
+
+  .ui-quick-setup .sticky-actions,
+  .ui-module-form .sticky-actions.is-visible {
+    position: sticky;
+    bottom: calc(68px + env(safe-area-inset-bottom));
+    z-index: 12;
+    justify-content: stretch;
+    margin-inline: -16px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--ui-border);
+    background: #0b121ef5;
+    box-shadow: 0 -8px 22px #0004;
+    backdrop-filter: blur(14px);
+  }
+
+  .ui-quick-setup .sticky-actions > *,
+  .ui-module-form .sticky-actions.is-visible > * {
+    flex: 1;
+  }
+
+  .ui-module-form .detail-layout {
+    padding-bottom: 12px;
+  }
+
+  .activity .table {
+    overflow: visible;
+  }
+
+  .activity .table-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
