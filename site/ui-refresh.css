@@ -28,6 +28,7 @@
   --preview-accent: #5edcf5;
   --preview-secondary: #8ee5d2;
   width: min(960px, 100%);
+  max-height: min(820px, calc(100dvh - 32px));
   border-radius: 20px;
 }
 
@@ -125,7 +126,7 @@
 
 .vozen-signal-stage {
   position: relative;
-  min-height: 382px;
+  min-height: 500px;
   overflow: hidden;
   border: 1px solid #35516d;
   border-radius: 16px;
@@ -177,7 +178,7 @@
 
 .vozen-scene {
   position: relative;
-  min-height: 332px;
+  min-height: 452px;
   overflow: hidden;
 }
 
@@ -203,26 +204,15 @@
 }
 
 .vozen-stage-item.is-complete {
-  opacity: .78;
+  opacity: .7;
 }
 
 .vozen-stage-item.is-active {
   opacity: 1;
 }
 
-/* Only the current beat owns the stage. Completed beats leave the visual
-   layout immediately so sequential scenes cannot stack cards on top of one
-   another during the crossfade. */
-.vozen-stage-item.is-complete:not(.is-active) {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateY(-4px) scale(.98);
-}
-
-.vozen-stage-item.is-active {
-  visibility: visible;
-}
+/* Completed beats remain as quiet context. Each scene below assigns a
+   dedicated vertical slot so the story builds without cards colliding. */
 
 .vozen-scene-avatar,
 .vozen-welcome-avatar {
@@ -374,7 +364,8 @@
 
 .vozen-scene-action {
   right: 22px;
-  bottom: 34px;
+  top: 292px;
+  bottom: auto;
   left: 30%;
   border: 1px solid color-mix(in srgb, var(--preview-accent) 55%, #29435d);
   background: rgb(94 220 245 / 9%);
@@ -396,7 +387,7 @@
 
 .vozen-scene-result {
   right: 20px;
-  bottom: 24px;
+  bottom: 22px;
   left: 20px;
   grid-template-columns: 24px minmax(0, 1fr);
   align-items: center;
@@ -491,7 +482,8 @@
 .vozen-welcome-message {
   position: absolute;
   right: 22px;
-  bottom: 84px;
+  top: 190px;
+  bottom: auto;
   left: 22px;
   display: grid;
   gap: 3px;
@@ -508,7 +500,8 @@
 .vozen-welcome-actions {
   position: absolute;
   right: 22px;
-  bottom: 76px;
+  top: 310px;
+  bottom: auto;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -524,8 +517,7 @@
   line-height: 14px;
 }
 
-.vozen-scene-welcome .vozen-scene-result { bottom: 24px; opacity: 0; }
-.vozen-scene-welcome .vozen-scene-result.is-active { opacity: 1; }
+.vozen-scene-welcome .vozen-scene-result { bottom: 22px; }
 
 .vozen-level-message,
 .vozen-cooldown-check,
@@ -538,7 +530,7 @@
 }
 
 .vozen-level-message {
-  top: 42px;
+  top: 30px;
   display: grid;
   grid-template-columns: 34px minmax(0, 1fr);
   gap: 10px;
@@ -567,9 +559,9 @@
   background: rgb(240 197 106 / 8%);
 }
 
-.vozen-cooldown-check { top: 78px; color: var(--preview-accent); }
+.vozen-cooldown-check { top: 104px; color: var(--preview-accent); }
 .vozen-cooldown-check strong { color: #effbfa; font: 700 14px/19px "Space Grotesk", sans-serif; }
-.vozen-xp-reward { top: 138px; display: grid; grid-template-columns: 42px auto; justify-content: center; }
+.vozen-xp-reward { top: 164px; display: grid; grid-template-columns: 42px auto; justify-content: center; }
 .vozen-xp-reward strong { color: var(--preview-accent); font: 700 24px/28px "Space Grotesk", sans-serif; }
 .vozen-xp-reward small { grid-column: 2; margin-top: -5px; color: #8faac2; font-size: 10px; }
 
@@ -581,35 +573,35 @@
 .vozen-xp-orbit i:nth-child(3) { bottom: 4px; left: 4px; background: var(--preview-accent); }
 .vozen-xp-reward.is-active .vozen-xp-orbit { animation: vozen-orbit-spin 900ms cubic-bezier(.2, 0, 0, 1) both; }
 
-.vozen-xp-progress { bottom: 72px; padding: 12px; border: 1px solid #36536f; border-radius: 11px; background: #111f30; }
+.vozen-xp-progress { top: 266px; bottom: auto; padding: 12px; border: 1px solid #36536f; border-radius: 11px; background: #111f30; }
 .vozen-xp-progress-head { display: flex; justify-content: space-between; color: #a9bed2; font: 700 10px/14px "Space Grotesk", sans-serif; letter-spacing: .08em; }
 .vozen-xp-progress-head strong { color: var(--preview-accent); }
 .vozen-xp-track { height: 8px; margin-top: 10px; overflow: hidden; border-radius: 999px; background: #20354b; }
 .vozen-xp-track span { display: block; width: var(--xp-progress, 72%); height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--preview-secondary), var(--preview-accent)); transition: width 180ms linear; }
 
-.vozen-level-up { bottom: 23px; color: var(--preview-secondary); background: rgb(142 229 210 / 8%); }
+.vozen-level-up { top: 348px; bottom: auto; color: var(--preview-secondary); background: rgb(142 229 210 / 8%); }
 .vozen-level-up strong { color: #effbfa; font: 700 14px/19px "Space Grotesk", sans-serif; }
 .vozen-level-up small { color: #8faac2; font-size: 10px; }
 
-.vozen-twitch-status { position: absolute; top: 46px; right: 22px; left: 22px; display: grid; grid-template-columns: 9px auto 1fr; align-items: center; gap: 7px; padding: 11px; border: 1px solid #36536f; border-radius: 11px; background: #111f30; }
+.vozen-twitch-status { position: absolute; top: 26px; right: 22px; left: 22px; display: grid; grid-template-columns: 9px auto 1fr; align-items: center; gap: 7px; padding: 11px; border: 1px solid #36536f; border-radius: 11px; background: #111f30; }
 .vozen-twitch-dot { width: 8px; height: 8px; border-radius: 50%; background: #7891aa; }
 .vozen-twitch-dot.is-live { background: var(--preview-secondary); box-shadow: 0 0 0 5px rgb(142 229 210 / 8%); }
 .vozen-twitch-status strong { color: #c8d8ea; font: 700 11px/15px "Space Grotesk", sans-serif; }
 .vozen-twitch-status small { justify-self: end; overflow: hidden; color: #8faac2; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
-.vozen-broadcast-rings { position: absolute; top: 100px; left: 50%; display: grid; place-items: center; width: 90px; height: 90px; transform: translateX(-50%); }
+.vozen-broadcast-rings { position: absolute; top: 78px; left: 50%; display: grid; place-items: center; width: 90px; height: 90px; transform: translateX(-50%); }
 .vozen-broadcast-rings span { position: relative; z-index: 1; display: grid; place-items: center; width: 46px; height: 46px; border: 1px solid var(--preview-accent); border-radius: 14px; color: var(--preview-accent); background: #15233b; }
 .vozen-broadcast-rings i { position: absolute; width: 42px; height: 42px; border: 1px solid var(--preview-secondary); border-radius: 50%; opacity: 0; }
 .vozen-broadcast-rings i:nth-child(2) { width: 64px; height: 64px; border-color: var(--preview-accent); }
 .vozen-broadcast-rings.is-active i { animation: vozen-ring-out 900ms cubic-bezier(.2, 0, 0, 1) both; }
 .vozen-broadcast-rings.is-active i:nth-child(2) { animation-delay: 110ms; }
-.vozen-twitch-match { position: absolute; right: 22px; bottom: 104px; left: 22px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border: 1px solid color-mix(in srgb, var(--preview-accent) 56%, #29435d); border-radius: 10px; background: rgb(168 176 255 / 8%); }
+.vozen-twitch-match { position: absolute; top: 186px; right: 22px; bottom: auto; left: 22px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border: 1px solid color-mix(in srgb, var(--preview-accent) 56%, #29435d); border-radius: 10px; background: rgb(168 176 255 / 8%); }
 .vozen-twitch-match strong { color: #edf7ff; font: 700 12px/17px "Space Grotesk", sans-serif; }
-.vozen-alert-card { position: absolute; right: 22px; bottom: 70px; left: 22px; display: grid; gap: 3px; padding: 12px; border: 1px solid color-mix(in srgb, var(--preview-secondary) 60%, #29435d); border-radius: 11px; background: rgb(255 122 132 / 8%); }
+.vozen-alert-card { position: absolute; top: 246px; right: 22px; bottom: auto; left: 22px; display: grid; gap: 3px; padding: 12px; border: 1px solid color-mix(in srgb, var(--preview-secondary) 60%, #29435d); border-radius: 11px; background: rgb(255 122 132 / 8%); }
 .vozen-alert-live { width: max-content; padding: 3px 6px; border-radius: 5px; color: #21141b; background: var(--preview-secondary); font: 800 9px/12px "Space Grotesk", sans-serif; letter-spacing: .08em; }
 .vozen-alert-card strong { color: #edf7ff; font: 700 14px/19px "Space Grotesk", sans-serif; }
 .vozen-alert-card p { overflow: hidden; margin: 0; color: #c8d8ea; font-size: 12px; line-height: 17px; text-overflow: ellipsis; white-space: nowrap; }
 .vozen-alert-card small, .vozen-twitch-destination small { color: #8faac2; font-size: 10px; line-height: 14px; }
-.vozen-twitch-destination { position: absolute; right: 22px; bottom: 22px; left: 22px; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 9px 11px; border: 1px solid color-mix(in srgb, var(--preview-accent) 60%, #29435d); border-radius: 10px; background: #111f30; }
+.vozen-twitch-destination { position: absolute; right: 22px; bottom: 20px; left: 22px; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 9px 11px; border: 1px solid color-mix(in srgb, var(--preview-accent) 60%, #29435d); border-radius: 10px; background: #111f30; }
 .vozen-twitch-destination span { color: var(--preview-accent); font: 700 12px/16px "Space Grotesk", sans-serif; }
 .vozen-twitch-destination strong { color: #edf7ff; font: 700 12px/16px "Space Grotesk", sans-serif; }
 
@@ -652,8 +644,8 @@
 @media (max-width: 600px) {
   .vozen-simulation-dialog { max-height: calc(100dvh - 16px); border-radius: 16px; }
   .vozen-simulation-content { gap: 12px; padding: 14px 12px 10px; }
-  .vozen-signal-stage { min-height: 330px; }
-  .vozen-scene { min-height: 282px; }
+  .vozen-signal-stage { min-height: 530px; }
+  .vozen-scene { min-height: 482px; }
   .vozen-scenario-rail { grid-template-columns: minmax(0, 1fr); padding: 8px; }
   .vozen-scenario-step { min-height: 44px; }
   .vozen-scenario-step small { font-size: 13px; }
@@ -662,9 +654,20 @@
   .vozen-preview-controls button { flex: 1 1 110px; }
   .vozen-chat-lane { right: 12px; left: 12px; }
   .vozen-scene-shield { top: 90px; right: 20px; width: 64px; height: 64px; }
-  .vozen-scene-action { right: 12px; bottom: 26px; left: 12px; }
+  .vozen-scene-action { top: 322px; right: 12px; bottom: auto; left: 12px; }
   .vozen-scene-result { right: 12px; bottom: 18px; left: 12px; }
   .vozen-welcome-message, .vozen-level-message, .vozen-twitch-status, .vozen-alert-card, .vozen-twitch-match, .vozen-twitch-destination { right: 12px; left: 12px; }
+  .vozen-welcome-message { top: 190px; }
+  .vozen-welcome-actions { top: 322px; right: 12px; }
+  .vozen-level-message { top: 28px; }
+  .vozen-cooldown-check { top: 102px; }
+  .vozen-xp-reward { top: 160px; }
+  .vozen-xp-progress { top: 264px; }
+  .vozen-level-up { top: 346px; }
+  .vozen-twitch-status { top: 26px; }
+  .vozen-broadcast-rings { top: 78px; }
+  .vozen-twitch-match { top: 186px; }
+  .vozen-alert-card { top: 246px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1587,7 +1590,7 @@ body.vozen-modal-open {
   z-index: 1;
   display: grid;
   width: min(680px, 100%);
-  max-height: min(760px, calc(100vh - 48px));
+  max-height: min(820px, calc(100dvh - 32px));
   overflow: auto;
   border: 1px solid #46617f;
   border-radius: 18px;
