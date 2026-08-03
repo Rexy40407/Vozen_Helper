@@ -899,3 +899,604 @@ header h1 {
     transition-duration: 1ms !important;
   }
 }
+
+/* Signal Deck catalog: a semantic list with category-led visual identity. */
+:root {
+  --catalog-surface: #0f1724;
+  --catalog-surface-raised: #131f30;
+  --catalog-surface-hover: #162438;
+  --catalog-cyan: #8ee5d2;
+  --catalog-motion: 180ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.vozen-catalog-layout {
+  grid-template-columns: 208px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.vozen-catalog-controls-main {
+  gap: 12px;
+  padding: 16px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--catalog-surface) 94%, transparent);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 18%);
+}
+
+.vozen-category-panel {
+  gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #0b1320;
+}
+
+.vozen-category-list {
+  gap: 4px;
+}
+
+.vozen-category-list button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-color: transparent;
+  color: var(--ui-muted);
+  transition: background-color var(--catalog-motion), border-color var(--catalog-motion), color var(--catalog-motion), transform var(--catalog-motion);
+}
+
+.vozen-category-list button:hover,
+.vozen-category-list button.active {
+  border-color: #3b5874;
+  color: var(--ui-text);
+  background: #142337;
+  transform: translateX(2px);
+}
+
+.vozen-category-list button.active {
+  color: var(--catalog-cyan);
+  box-shadow: inset 2px 0 var(--catalog-cyan);
+}
+
+.vozen-category-button-main,
+.vozen-filter-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.vozen-category-button-main > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vozen-category-count,
+.vozen-filter-count {
+  flex: none;
+  color: var(--ui-subtle);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.vozen-category-list button.active .vozen-category-count,
+.vozen-category-list button:hover .vozen-category-count {
+  color: var(--ui-text);
+}
+
+.vozen-svg-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.vozen-category-svg {
+  width: 17px;
+  height: 17px;
+  color: var(--catalog-cyan);
+}
+
+.vozen-status-svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.vozen-status-filters {
+  gap: 8px;
+}
+
+.vozen-filter-button {
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  color: var(--ui-muted);
+  background: #0d1624;
+  transition: background-color var(--catalog-motion), border-color var(--catalog-motion), color var(--catalog-motion), box-shadow var(--catalog-motion);
+}
+
+.vozen-filter-button:hover,
+.vozen-filter-button.active {
+  color: var(--catalog-cyan);
+  border-color: var(--catalog-cyan);
+  background: #12383a;
+  box-shadow: 0 0 0 3px #8ee5d214;
+}
+
+.vozen-filter-button.active .vozen-filter-count {
+  color: var(--ui-text);
+}
+
+.vozen-catalog-result-summary {
+  min-height: 16px;
+  margin: 0;
+  color: var(--ui-subtle);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.vozen-catalog-layout > .feature-grid {
+  gap: 10px;
+}
+
+.vozen-recommendations-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  grid-column: 1;
+  padding: 4px 4px 2px;
+}
+
+.vozen-recommendations-heading h3 {
+  margin: 2px 0 4px;
+  color: var(--ui-text);
+  font: 650 20px/26px "Space Grotesk", sans-serif;
+}
+
+.vozen-recommendations-heading p {
+  margin: 0;
+  color: var(--ui-muted);
+  font-size: 13px;
+  line-height: 19px;
+}
+
+.vozen-eyebrow {
+  color: var(--catalog-cyan);
+  font: 650 10px/14px "Space Grotesk", sans-serif;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.vozen-recommendation-count {
+  flex: none;
+  padding: 6px 9px;
+  border: 1px solid #3b756f;
+  border-radius: 999px;
+  color: var(--catalog-cyan);
+  background: #12383a99;
+  font: 650 11px/16px "Space Grotesk", sans-serif;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.vozen-catalog-layout > .feature-grid .feature.vozen-module-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 172px 108px;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "icon category status action"
+    "icon title status action"
+    "icon description context action";
+  align-items: center;
+  gap: 1px 16px;
+  min-height: 88px;
+  padding: 14px 16px;
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  background: var(--catalog-surface);
+  cursor: pointer;
+  transition: background-color var(--catalog-motion), border-color var(--catalog-motion), box-shadow var(--catalog-motion), transform var(--catalog-motion);
+}
+
+.vozen-catalog-layout > .feature-grid .feature.vozen-module-row::after {
+  position: absolute;
+  right: 16px;
+  bottom: -32px;
+  width: 190px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--module-tone) 9%, transparent), transparent 70%);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--catalog-motion);
+}
+
+.vozen-catalog-layout > .feature-grid .feature.vozen-module-row:hover,
+.vozen-catalog-layout > .feature-grid .feature.vozen-module-row:focus-within {
+  border-color: color-mix(in srgb, var(--module-tone) 42%, var(--ui-border));
+  background: var(--catalog-surface-hover);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 16%);
+  transform: translateY(-1px);
+}
+
+.vozen-catalog-layout > .feature-grid .feature.vozen-module-row:hover::after,
+.vozen-catalog-layout > .feature-grid .feature.vozen-module-row:focus-within::after {
+  opacity: 1;
+}
+
+.vozen-catalog-layout .feature-top {
+  display: contents;
+}
+
+.vozen-catalog-layout .feature-icon.vozen-module-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  grid-area: icon;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--module-tone) 28%, var(--ui-border));
+  border-radius: 12px;
+  color: var(--module-tone);
+  background: color-mix(in srgb, var(--module-tone) 12%, #112033);
+  transition: background-color var(--catalog-motion), border-color var(--catalog-motion), color var(--catalog-motion), transform var(--catalog-motion);
+}
+
+.vozen-catalog-layout .feature-icon.vozen-module-icon::before {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 25% 25%, currentColor 1px, transparent 1.5px), linear-gradient(135deg, transparent 45%, currentColor 46%, transparent 48%);
+  background-position: 0 0, 0 0;
+  background-size: 12px 12px, 14px 14px;
+  content: "";
+  opacity: .08;
+  pointer-events: none;
+}
+
+.vozen-catalog-layout .feature-icon.vozen-module-icon[data-category="protection"]::before {
+  background-image: linear-gradient(90deg, currentColor 1px, transparent 1px), linear-gradient(currentColor 1px, transparent 1px);
+  background-size: 10px 10px;
+}
+
+.vozen-catalog-layout .feature-icon.vozen-module-icon[data-category="community"]::before {
+  background-image: radial-gradient(circle, currentColor 1.2px, transparent 1.8px), linear-gradient(35deg, transparent 46%, currentColor 47%, transparent 49%);
+  background-size: 12px 12px, 15px 15px;
+}
+
+.vozen-catalog-layout .feature-icon.vozen-module-icon[data-category="management"]::before {
+  background-image: linear-gradient(90deg, transparent 35%, currentColor 36%, transparent 39%);
+  background-size: 12px 8px;
+}
+
+.vozen-catalog-layout .feature-icon.vozen-module-icon[data-category="utility"]::before {
+  background-image: radial-gradient(circle at 2px 2px, currentColor 1.2px, transparent 1.8px), linear-gradient(90deg, transparent 48%, currentColor 49%, transparent 52%);
+  background-size: 12px 12px, 12px 12px;
+}
+
+.vozen-catalog-layout .feature-icon.vozen-module-icon[data-category="social"]::before {
+  background-image: radial-gradient(ellipse at 0 50%, transparent 0 35%, currentColor 36% 39%, transparent 40%);
+  background-size: 16px 12px;
+}
+
+.vozen-catalog-layout .feature-icon.vozen-module-icon[data-category="growth"]::before {
+  background-image: linear-gradient(135deg, transparent 43%, currentColor 44% 49%, transparent 50%);
+  background-size: 12px 12px;
+}
+
+.vozen-catalog-layout .feature-icon.vozen-module-icon[data-category="web3"]::before {
+  background-image: linear-gradient(30deg, transparent 44%, currentColor 45% 49%, transparent 50%), linear-gradient(150deg, transparent 44%, currentColor 45% 49%, transparent 50%);
+  background-size: 14px 14px;
+}
+
+.vozen-module-svg {
+  position: relative;
+  z-index: 1;
+}
+
+.vozen-module-row:hover .feature-icon.vozen-module-icon,
+.vozen-module-row:focus-within .feature-icon.vozen-module-icon {
+  border-color: color-mix(in srgb, var(--module-tone) 56%, var(--ui-border));
+  background: color-mix(in srgb, var(--module-tone) 18%, #142337);
+  transform: translateY(-1px);
+}
+
+.vozen-catalog-layout .vozen-module-category {
+  grid-area: category;
+  align-self: end;
+  color: var(--ui-subtle);
+  font: 650 10px/14px "Space Grotesk", sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.vozen-catalog-layout .feature h3 {
+  grid-area: title;
+  align-self: center;
+  margin: 0;
+  color: var(--ui-text);
+  font: 650 16px/22px "Space Grotesk", sans-serif;
+}
+
+.vozen-catalog-layout .feature p {
+  grid-area: description;
+  min-width: 0;
+  align-self: start;
+  overflow: hidden;
+  margin: 0;
+  color: var(--ui-muted);
+  font: 400 14px/20px "DM Sans", sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vozen-catalog-layout .vozen-module-context {
+  grid-area: context;
+  align-self: start;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--module-tone) 72%, var(--ui-muted));
+  font-size: 11px;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vozen-catalog-layout .vozen-module-status {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 6px;
+  grid-area: status;
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 1px solid color-mix(in srgb, var(--module-tone) 28%, var(--ui-border));
+  border-radius: 999px;
+  color: var(--ui-muted);
+  background: color-mix(in srgb, var(--module-tone) 7%, transparent);
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.vozen-module-status[data-status="active"] { --module-state: #72e2c2; }
+.vozen-module-status[data-status="available"] { --module-state: #8fc5ff; }
+.vozen-module-status[data-status="beta"] { --module-state: #f0c56a; }
+.vozen-module-status[data-status="planned"] { --module-state: #a9b7cc; }
+.vozen-module-status[data-status="blocked"] { --module-state: #f687a8; }
+.vozen-module-status { color: var(--module-state); border-color: color-mix(in srgb, var(--module-state) 34%, var(--ui-border)); }
+
+.vozen-module-status .vozen-status-svg {
+  color: var(--module-state);
+}
+
+.vozen-catalog-layout .feature .vozen-module-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  grid-area: action;
+  justify-self: stretch;
+  width: auto;
+  min-height: 44px;
+  padding: 8px 2px 8px 8px;
+  border: 0;
+  color: var(--ui-text);
+  background: transparent;
+  font: 650 13px/18px "DM Sans", sans-serif;
+  text-align: right;
+  transition: color var(--catalog-motion), gap var(--catalog-motion), opacity var(--catalog-motion);
+}
+
+.vozen-catalog-layout .feature .vozen-module-action:hover {
+  color: var(--module-tone);
+  background: transparent;
+}
+
+.vozen-catalog-layout .feature .vozen-module-action:disabled {
+  color: var(--ui-subtle);
+  cursor: not-allowed;
+  opacity: .75;
+}
+
+.vozen-action-arrow {
+  color: var(--module-tone);
+  font-size: 18px;
+  line-height: 18px;
+  transition: transform var(--catalog-motion);
+}
+
+.vozen-module-action:hover .vozen-action-arrow,
+.vozen-module-action:focus-visible .vozen-action-arrow {
+  transform: translateX(2px);
+}
+
+.vozen-module-row[data-ui-recommended="true"] {
+  border-color: #3b756f;
+  background: #10232b;
+}
+
+.vozen-module-row[data-ui-recommended="true"] .vozen-module-context {
+  color: var(--catalog-cyan);
+}
+
+.vozen-catalog-empty {
+  border-color: var(--ui-border);
+  background: var(--catalog-surface);
+}
+
+.vozen-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid #3b756f;
+  border-radius: 14px;
+  color: var(--catalog-cyan);
+  background: #12383a;
+}
+
+.vozen-empty-svg {
+  width: 24px;
+  height: 24px;
+}
+
+@media (max-width: 1100px) and (min-width: 901px) {
+  .vozen-catalog-layout {
+    grid-template-columns: 176px minmax(0, 1fr);
+  }
+
+  .vozen-catalog-layout > .feature-grid .feature.vozen-module-row {
+    grid-template-columns: 48px minmax(0, 1fr) 132px 88px;
+    column-gap: 12px;
+  }
+}
+
+@media (max-width: 900px) and (min-width: 721px) {
+  .vozen-catalog-layout {
+    display: block;
+  }
+
+  .vozen-catalog-controls-main,
+  .vozen-category-panel {
+    position: static;
+    margin-bottom: 10px;
+  }
+
+  .vozen-category-panel {
+    display: block;
+  }
+
+  .vozen-category-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .vozen-category-list button {
+    flex: 1 1 140px;
+  }
+
+  .vozen-category-list button:hover,
+  .vozen-category-list button.active {
+    transform: none;
+  }
+
+  .vozen-catalog-layout > .feature-grid .feature.vozen-module-row {
+    grid-template-columns: 48px minmax(0, 1fr) 116px 84px;
+    column-gap: 10px;
+  }
+}
+
+@media (max-width: 720px) {
+  .vozen-catalog-controls-main {
+    padding: 12px;
+  }
+
+  .vozen-status-filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .vozen-filter-button {
+    width: 100%;
+  }
+
+  .vozen-catalog-layout > .feature-grid .feature.vozen-module-row {
+    grid-template-columns: 44px minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "icon title"
+      "icon category"
+      "description description"
+      "context action";
+    gap: 4px 12px;
+    min-height: 136px;
+    padding: 14px;
+  }
+
+  .vozen-catalog-layout .feature-icon.vozen-module-icon {
+    width: 44px;
+    height: 44px;
+    align-self: start;
+  }
+
+  .vozen-catalog-layout .feature h3 {
+    align-self: end;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .vozen-catalog-layout .vozen-module-category {
+    align-self: start;
+  }
+
+  .vozen-catalog-layout .feature p {
+    display: -webkit-box;
+    align-self: start;
+    min-height: 40px;
+    margin-top: 5px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
+  }
+
+  .vozen-catalog-layout .vozen-module-context {
+    align-self: center;
+    min-width: 0;
+    white-space: normal;
+  }
+
+  .vozen-catalog-layout .feature .vozen-module-action {
+    align-self: center;
+    min-height: 44px;
+    padding-right: 0;
+  }
+
+  .vozen-recommendations-heading {
+    align-items: start;
+    flex-direction: column;
+    gap: 6px;
+    padding: 2px 2px 0;
+  }
+
+  .vozen-recommendations-heading h3 {
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  .vozen-recommendation-count {
+    display: none;
+  }
+}
+
+@media (max-width: 359px) {
+  .vozen-status-filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vozen-catalog-layout .feature.vozen-module-row,
+  .vozen-catalog-layout .feature-icon.vozen-module-icon,
+  .vozen-catalog-layout .feature .vozen-module-action,
+  .vozen-action-arrow,
+  .vozen-category-list button,
+  .vozen-filter-button {
+    transition: none !important;
+  }
+
+  .vozen-catalog-layout .feature.vozen-module-row:hover,
+  .vozen-catalog-layout .feature.vozen-module-row:focus-within,
+  .vozen-category-list button:hover,
+  .vozen-category-list button.active {
+    transform: none;
+  }
+}
