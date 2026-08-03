@@ -2137,6 +2137,129 @@ body.vozen-modal-open {
 
 /* Signal Deck catalog: a semantic list with category-led visual identity. */
 :root {
+  --preview-ink: #edf7ff;
+}
+
+/* Semantic preview deck. The shell is shared; these scene primitives make the
+   visual evidence change with the module instead of reusing one generic flow. */
+.vozen-simulation-content { grid-template-columns: minmax(220px, 280px) minmax(0, 1fr) !important; }
+.vozen-semantic-scene { min-height: 452px; position: relative; overflow: hidden; padding: 18px; }
+.vozen-semantic-item { position: absolute; right: 22px; left: 22px; display: grid; gap: 4px; padding: 13px 14px; border: 1px solid #35516d; border-radius: 12px; background: rgb(16 30 47 / 92%); box-shadow: 0 12px 28px rgb(0 0 0 / 18%); }
+.vozen-semantic-item.is-active { border-color: var(--preview-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--preview-accent) 10%, transparent); }
+.vozen-semantic-item strong, .vozen-semantic-item small { display: block; }
+.vozen-semantic-item strong { color: var(--preview-ink); font: 700 14px/19px "Space Grotesk", sans-serif; }
+.vozen-semantic-item small { color: #9bb1c7; font-size: 11px; line-height: 16px; }
+.vozen-semantic-kicker { color: var(--preview-accent); font: 700 9px/13px "Space Grotesk", sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+.vozen-semantic-icon { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid color-mix(in srgb, var(--preview-accent) 65%, #35516d); border-radius: 9px; color: var(--preview-accent); background: rgb(94 220 245 / 8%); font-weight: 800; }
+.vozen-semantic-result { position: absolute; right: 22px; bottom: 20px; left: 22px; display: grid; gap: 4px; padding: 14px; border: 1px solid color-mix(in srgb, var(--preview-secondary) 65%, #35516d); border-radius: 12px; background: rgb(142 229 210 / 10%); }
+.vozen-semantic-result strong { color: var(--preview-ink); font: 700 14px/19px "Space Grotesk", sans-serif; }
+.vozen-semantic-result small { color: #a9cfc9; font-size: 11px; line-height: 16px; }
+
+.vozen-scene-poll .vozen-poll-card { position: absolute; top: 24px; right: 22px; left: 22px; display: grid; gap: 10px; padding: 16px; border: 1px solid #3b6582; border-radius: 14px; background: linear-gradient(145deg, #142b42, #0c1726); }
+.vozen-poll-card > strong { color: var(--preview-ink); font: 700 18px/23px "Space Grotesk", sans-serif; }
+.vozen-poll-option { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px 10px; padding: 9px; overflow: hidden; border: 1px solid #2d4964; border-radius: 9px; color: #d5e5f1; font-size: 12px; }
+.vozen-poll-option b { grid-column: 1 / -1; display: block; width: var(--poll-width); height: 5px; border-radius: 999px; background: linear-gradient(90deg, var(--preview-accent), var(--preview-secondary)); }
+.vozen-poll-option small { color: #8faac2; font-size: 10px; }
+.vozen-scene-poll .vozen-semantic-card:nth-of-type(2) { top: 300px; }
+.vozen-scene-poll .vozen-semantic-card:nth-of-type(3) { top: 300px; }
+.vozen-scene-poll .vozen-semantic-card:nth-of-type(4) { top: 300px; }
+.vozen-scene-poll .vozen-semantic-result { bottom: 20px; }
+.vozen-scene-poll { min-height: 560px; }
+.vozen-scene-poll [data-beat="1"] { top: 286px; }
+.vozen-scene-poll [data-beat="2"] { top: 350px; }
+.vozen-scene-poll [data-beat="3"] { top: 414px; }
+.vozen-scene-poll [data-beat="4"] { bottom: 20px; }
+
+.vozen-scene-protection .vozen-chat-bubble { position: absolute; right: 28%; left: 22px; display: grid; gap: 4px; padding: 12px; border: 1px solid #304d67; border-radius: 12px; background: #122238; }
+.vozen-scene-protection .vozen-chat-bubble:nth-of-type(2) { top: 84px; }
+.vozen-scene-protection .vozen-chat-bubble:nth-of-type(3) { top: 26px; }
+.vozen-chat-bubble strong { color: var(--preview-ink); font-size: 12px; }
+.vozen-chat-bubble span { color: #9bb1c7; font-size: 11px; line-height: 16px; }
+.vozen-chat-warning { border-color: var(--preview-secondary) !important; background: rgb(240 197 106 / 9%) !important; }
+.vozen-rule-card, .vozen-action-card { display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: center; gap: 9px; }
+.vozen-scene-protection .vozen-rule-card { top: 158px; }
+.vozen-scene-protection .vozen-action-card { top: 242px; }
+.vozen-scene-protection .vozen-semantic-result { bottom: 20px; }
+.vozen-scene-protection [data-beat="0"] { top: 24px; }
+.vozen-scene-protection [data-beat="1"] { top: 94px; }
+.vozen-scene-protection [data-beat="2"] { top: 164px; position: absolute; right: 22px; left: 22px; }
+.vozen-scene-protection [data-beat="3"] { top: 246px; position: absolute; right: 22px; left: 22px; }
+.vozen-scene-protection [data-beat="4"] { bottom: 20px; }
+
+.vozen-scene-social .vozen-source-orbit { top: 30px; right: 22px; left: 22px; display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: center; gap: 9px; }
+.vozen-source-orbit strong, .vozen-source-orbit small { grid-column: 2; }
+.vozen-source-pulse { top: 112px; right: 22px; left: 22px; display: grid; place-items: center; min-height: 54px; border: 1px dashed color-mix(in srgb, var(--preview-accent) 58%, #35516d); border-radius: 12px; color: var(--preview-accent); }
+.vozen-source-pulse i { position: absolute; width: 46px; height: 46px; border: 1px solid var(--preview-accent); border-radius: 50%; opacity: .35; animation: vozen-signal-ring 1.8s ease-out infinite; }
+.vozen-source-pulse i + i { animation-delay: .7s; }
+.vozen-alert-card { top: 190px; right: 22px; left: 22px; display: grid; gap: 5px; }
+.vozen-destination-card { top: 270px; right: 22px; left: 22px; display: grid; gap: 5px; }
+.vozen-destination-card span { color: var(--preview-secondary); font: 700 11px/15px "Space Grotesk", sans-serif; }
+.vozen-scene-social .vozen-semantic-result { bottom: 20px; }
+.vozen-scene-social [data-beat="0"], .vozen-scene-social [data-beat="1"], .vozen-scene-social [data-beat="2"], .vozen-scene-social [data-beat="3"] { position: absolute; right: 22px; left: 22px; }
+.vozen-scene-social [data-beat="0"] { top: 30px; }
+.vozen-scene-social [data-beat="1"] { top: 112px; }
+.vozen-scene-social [data-beat="2"] { top: 190px; }
+.vozen-scene-social [data-beat="3"] { top: 270px; }
+.vozen-scene-social [data-beat="4"] { bottom: 20px; }
+
+.vozen-scene-community .vozen-community-card { top: 28px; right: 22px; left: 22px; display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: center; gap: 10px; }
+.vozen-scene-community .vozen-community-progress { top: 118px; right: 22px; left: 22px; display: grid; gap: 8px; }
+.vozen-progress-track { height: 8px; overflow: hidden; border-radius: 999px; background: #20354b; }
+.vozen-progress-track b { display: block; width: var(--progress-width); height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--preview-accent), var(--preview-secondary)); }
+.vozen-scene-community .vozen-community-card:nth-of-type(4) { top: 214px; }
+.vozen-scene-community .vozen-community-card:nth-of-type(5) { top: 292px; }
+.vozen-scene-community .vozen-semantic-result { bottom: 20px; }
+.vozen-scene-community [data-beat="0"], .vozen-scene-community [data-beat="1"], .vozen-scene-community [data-beat="2"], .vozen-scene-community [data-beat="3"] { position: absolute; right: 22px; left: 22px; }
+.vozen-scene-community [data-beat="0"] { top: 28px; }
+.vozen-scene-community [data-beat="1"] { top: 118px; }
+.vozen-scene-community [data-beat="2"] { top: 214px; }
+.vozen-scene-community [data-beat="3"] { top: 292px; }
+.vozen-scene-community [data-beat="4"] { bottom: 20px; }
+
+.vozen-scene-data .vozen-data-header { top: 28px; right: 22px; left: 22px; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; }
+.vozen-data-header strong, .vozen-data-header small { grid-column: 2; }
+.vozen-scene-data .vozen-data-chart { top: 126px; right: 22px; left: 22px; display: flex; align-items: end; gap: 12px; height: 105px; padding: 12px; border: 1px solid #2d4764; border-radius: 12px; background: #0d1b2b; }
+.vozen-data-chart i { width: 18%; height: var(--bar-height); border-radius: 5px 5px 2px 2px; background: linear-gradient(180deg, var(--preview-accent), var(--preview-secondary)); }
+.vozen-data-chart span { align-self: start; margin-left: auto; color: #a9b7cc; font-size: 11px; }
+.vozen-scene-data .vozen-data-card { right: 22px; left: 22px; display: grid; gap: 4px; }
+.vozen-scene-data .vozen-data-card:nth-of-type(4) { top: 252px; }
+.vozen-scene-data .vozen-data-card:nth-of-type(5) { top: 320px; }
+.vozen-scene-data .vozen-semantic-result { bottom: 20px; }
+.vozen-scene-data [data-beat="0"], .vozen-scene-data [data-beat="1"], .vozen-scene-data [data-beat="2"], .vozen-scene-data [data-beat="3"] { position: absolute; right: 22px; left: 22px; }
+.vozen-scene-data [data-beat="0"] { top: 28px; }
+.vozen-scene-data [data-beat="1"] { top: 126px; }
+.vozen-scene-data [data-beat="2"] { top: 252px; }
+.vozen-scene-data [data-beat="3"] { top: 320px; }
+.vozen-scene-data [data-beat="4"] { bottom: 20px; }
+
+.vozen-scene-service .vozen-service-node { top: 36px; right: 22px; left: 22px; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; align-items: center; }
+.vozen-service-node strong, .vozen-service-node small { grid-column: 2; }
+.vozen-service-flow { top: 132px; right: 22px; left: 22px; display: flex; justify-content: space-around; align-items: center; }
+.vozen-service-flow i { width: 28%; height: 4px; border-radius: 999px; background: linear-gradient(90deg, var(--preview-accent), var(--preview-secondary)); transform-origin: left; }
+.vozen-service-card { right: 22px; left: 22px; display: grid; gap: 4px; }
+.vozen-scene-service .vozen-service-card:nth-of-type(4) { top: 184px; }
+.vozen-scene-service .vozen-service-card:nth-of-type(5) { top: 270px; }
+.vozen-scene-service .vozen-semantic-result { bottom: 20px; }
+.vozen-scene-service [data-beat="0"], .vozen-scene-service [data-beat="1"], .vozen-scene-service [data-beat="2"], .vozen-scene-service [data-beat="3"] { position: absolute; right: 22px; left: 22px; }
+.vozen-scene-service [data-beat="0"] { top: 36px; }
+.vozen-scene-service [data-beat="1"] { top: 132px; }
+.vozen-scene-service [data-beat="2"] { top: 184px; }
+.vozen-scene-service [data-beat="3"] { top: 270px; }
+.vozen-scene-service [data-beat="4"] { bottom: 20px; }
+
+@keyframes vozen-signal-ring { from { opacity: .5; transform: scale(.6); } to { opacity: 0; transform: scale(1.8); } }
+
+@media (max-width: 900px) {
+  .vozen-simulation-content { grid-template-columns: minmax(0, 1fr) !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vozen-semantic-item, .vozen-source-pulse i, .vozen-progress-track b, .vozen-service-flow i { animation: none !important; transition: none !important; }
+  .vozen-semantic-item, .vozen-semantic-item.is-active, .vozen-semantic-item.is-complete { opacity: 1; transform: none; }
+}
+
+/* Signal Deck catalog: a semantic list with category-led visual identity. */
+:root {
   --catalog-surface: #0f1724;
   --catalog-surface-raised: #131f30;
   --catalog-surface-hover: #162438;

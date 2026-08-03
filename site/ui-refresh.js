@@ -1,11 +1,13 @@
+import { getPreviewDefinition } from "./module-previews.js";
+
 (() => {
   "use strict";
 
   const routes = [
-    ["/", "Dashboard", "⌂"],
-    ["/quick-setup", "Setup", "✦"],
-    ["/features", "Modules", "◇"],
-    ["/activity", "Activity", "◷"],
+    ["/", "Painel", "⌂"],
+    ["/quick-setup", "Configuração", "✦"],
+    ["/features", "Módulos", "◇"],
+    ["/activity", "Atividade", "◷"],
     ["/rank-card", "XP", "▣"],
   ];
   const state = { lastPath: "", scheduled: 0, applying: false };
@@ -16,12 +18,12 @@
   const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]));
 
   const CATEGORY_LABELS = {
-    protection: "Protection",
-    community: "Community",
-    management: "Management",
-    utility: "Utilities",
-    social: "Social alerts",
-    growth: "Growth",
+    protection: "Proteção",
+    community: "Comunidade",
+    management: "Gestão",
+    utility: "Utilidades",
+    social: "Alertas sociais",
+    growth: "Crescimento",
     web3: "Web3",
   };
 
@@ -692,267 +694,59 @@
     return invalid;
   }
 
-  function previewField(container, terms, fallback = "Not set") {
-    const needles = terms.map((term) => term.toLowerCase());
-    const field = all("input, select, textarea", container).find((candidate) => {
-      const label = cleanText(candidate.closest("label")?.textContent || "").toLowerCase();
-      const name = String(candidate.name || candidate.id || "").toLowerCase();
-      return needles.some((needle) => label.includes(needle) || name.includes(needle));
-    });
-    if (!field) return fallback;
-    if (field.type === "checkbox") return field.checked ? "Enabled" : "Disabled";
-    return String(field.value || fallback).trim() || fallback;
-  }
 
-  function simulationRows(page, route) {
-    const container = one(".detail-layout", page) || page;
-    if (/community\.levels/.test(route)) {
-      const minXp = previewField(container, ["minimum xp", "minxp"], "15");
-      const maxXp = previewField(container, ["maximum xp", "maxxp"], "30");
-      const cooldown = previewField(container, ["cooldown", "cooldownseconds"], "60");
-      const stackRoles = previewField(container, ["stack level roles", "stackroles"], "Disabled");
-      const channel = previewField(container, ["announcement channel", "announcementchannel"], "Not selected");
-      return [
-        { tone: "event", label: "EVENT", title: "A member sends a message", text: "The Helper checks the XP cooldown before continuing." },
-        { tone: "reward", label: "XP REWARD", title: `${minXp}–${maxXp} XP awarded`, text: "A random amount inside this range is added to the member's progression." },
-        { tone: "cooldown", label: "COOLDOWN", title: `${cooldown} seconds`, text: "Messages inside this cooldown window do not award additional XP." },
-        { tone: "roles", label: "LEVEL ROLES", title: stackRoles, text: channel === "Not selected" ? "No announcement channel is selected." : `Announcements use ${channel}.` },
-      ];
-    }
-    const values = all("input, select, textarea", container)
-      .map((field) => ({
-        label: cleanText(field.closest("label")?.querySelector("span")?.textContent || field.name || field.type || "Setting"),
-        value: field.type === "checkbox" ? (field.checked ? "Enabled" : "Disabled") : String(field.value || "Not set").trim(),
-      }))
-      .filter((item) => item.label && item.value)
-      .slice(0, 4);
-    return values.length
-      ? [{ tone: "config", label: "CONFIGURATION", title: "Current values loaded", text: values.map((item) => `${item.label}: ${item.value}`).join(" · ") }]
-      : [{ tone: "config", label: "CONFIGURATION", title: "Ready to preview", text: "The current module settings will be checked without publishing anything." }];
+  function readPreviewValues(container) {
+    return Object.fromEntries(all("input, select, textarea", container).map((field) => [
+      field.name || field.id || field.type,
+      field.type === "checkbox" ? field.checked : String(field.value || "").trim(),
+    ]));
   }
 
   function simulationVisual(page, route) {
-    const container = one(".detail-layout", page) || page;
-    if (/protection\.antispam/.test(route)) {
-      const windowCount = previewField(container, ["messages in time window"], "6");
-      const duplicate = previewField(container, ["duplicate messages"], "3");
-      const timeout = previewField(container, ["initial timeout"], "60");
-      return {
-        channel: "general",
-        eyebrow: "LIVE EXAMPLE",
-        title: "Protection in action",
-        messages: [
-          { kind: "normal", initials: "N", name: "Nova", meta: "Community message", text: "Can someone share the event details?" },
-          { kind: "warning", initials: "K", name: "Kairo", meta: `${duplicate} repeated messages`, text: "join join join join join join" },
-          { kind: "action", initials: "VH", name: "Vozen Helper", meta: "Protection rule triggered", text: "Message held for review" },
-        ],
-        action: `Would prepare a ${timeout}s timeout after ${windowCount} messages in the time window.`,
-      };
-    }
-    if (/community\.levels/.test(route)) {
-      const minXp = previewField(container, ["minimum xp", "minxp"], "15");
-      const maxXp = previewField(container, ["maximum xp", "maxxp"], "30");
-      return {
-        channel: "general",
-        eyebrow: "LIVE EXAMPLE",
-        title: "Progress in action",
-        messages: [
-          { kind: "normal", initials: "M", name: "Mira", meta: "Community message", text: "That strategy worked perfectly!" },
-          { kind: "helper", initials: "VH", name: "Vozen Helper", meta: "XP event", text: `+${minXp}-${maxXp} XP added to Mira` },
-          { kind: "success", initials: "UP", name: "Level progress", meta: "Preview state", text: "Member moves closer to the next level" },
-        ],
-        action: "The configured XP and cooldown rules are applied locally for this preview.",
-      };
-    }
-    const firstValue = all("input, select, textarea", container)
-      .map((field) => String(field.value || "").trim())
-      .find(Boolean) || "the current settings";
-    return {
-      channel: "general",
-      eyebrow: "LIVE EXAMPLE",
-      title: "Configuration in action",
-      messages: [
-        { kind: "normal", initials: "M", name: "Member", meta: "Community event", text: "A new event arrives in the server" },
-        { kind: "helper", initials: "VH", name: "Vozen Helper", meta: "Rule evaluated", text: `Uses ${firstValue}` },
-        { kind: "success", initials: "OK", name: "Preview complete", meta: "No external effects", text: "The configured response is ready" },
-      ],
-      action: "This sequence is simulated locally and will not publish anything.",
-    };
+    const moduleId = route.replace(/^\/config\//, "");
+    const values = readPreviewValues(one(".detail-layout", page) || page);
+    return getPreviewDefinition(moduleId, values) || getPreviewDefinition("management.workflows", { dryRun: true });
   }
 
-  function closeSimulationPreview(page) {
-    const modal = one("#vozen-simulation-modal");
-    if (!modal) return;
-    document.body.classList.remove("vozen-modal-open");
-    document.removeEventListener("keydown", modal._onKeyDown);
-    modal.remove();
-    page._simulationTrigger?.focus();
+  function sceneGroup(scene) {
+    if (scene === "poll" || scene === "suggestions" || scene === "starboard") return "poll";
+    if (["protection", "join-gate", "moderation"].includes(scene)) return "protection";
+    if (["social"].includes(scene)) return "social";
+    if (["levels", "rank-card", "leaderboard", "achievement", "birthday", "economy", "giveaway", "role-panel", "event"].includes(scene)) return "community";
+    if (["stats", "audit", "privacy", "template", "monetization", "web3"].includes(scene)) return "data";
+    return "service";
   }
 
-  function openSimulationPreview(page, route, trigger) {
-    closeSimulationPreview(page);
-    const title = cleanText(one("h2", page)?.textContent) || "Module";
-    const rows = simulationRows(page, route);
-    const visual = simulationVisual(page, route);
-    const modal = document.createElement("div");
-    modal.id = "vozen-simulation-modal";
-    modal.className = "vozen-simulation-modal";
-    modal.setAttribute("role", "dialog");
-    modal.setAttribute("aria-modal", "true");
-    modal.setAttribute("aria-labelledby", "vozen-simulation-title");
-    modal.innerHTML = `
-      <div class="vozen-simulation-backdrop" data-simulation-close="true"></div>
-      <section class="vozen-simulation-dialog" role="document">
-        <header class="vozen-simulation-header">
-          <div>
-            <span class="vozen-eyebrow">SAFE PREVIEW</span>
-            <h2 id="vozen-simulation-title">${escapeHtml(title)}</h2>
-            <p>See what this configuration would do before publishing.</p>
-          </div>
-          <button type="button" class="vozen-simulation-close" aria-label="Close simulation preview">×</button>
-        </header>
-        <div class="vozen-simulation-badge"><span aria-hidden="true">●</span> Preview only · No real action will be sent</div>
-        <div class="vozen-simulation-content">
-          <div class="vozen-simulation-timeline">
-            ${rows.map((row, index) => `<article class="vozen-simulation-step" data-tone="${escapeHtml(row.tone)}"><span class="vozen-simulation-step-number">${index + 1}</span><div><span class="vozen-eyebrow">${escapeHtml(row.label)}</span><h3>${escapeHtml(row.title)}</h3><p>${escapeHtml(row.text)}</p></div></article>`).join("")}
-          </div>
-          <aside class="vozen-live-preview" aria-label="Live simulation example">
-            <div class="vozen-live-preview-head">
-              <div>
-                <span class="vozen-eyebrow">${escapeHtml(visual.eyebrow)}</span>
-                <h3>${escapeHtml(visual.title)}</h3>
-              </div>
-              <button type="button" class="vozen-preview-replay" aria-label="Replay live example">Replay</button>
-            </div>
-            <div class="vozen-discord-preview" aria-live="polite">
-              <div class="vozen-discord-channel"><span aria-hidden="true">#</span> ${escapeHtml(visual.channel)} <small>SIMULATED</small></div>
-              <div class="vozen-discord-messages">
-                ${visual.messages.map((message, index) => `<div class="vozen-preview-message" data-kind="${escapeHtml(message.kind)}" data-preview-animate="true" style="--preview-delay:${index * 260}ms"><span class="vozen-preview-avatar" aria-hidden="true">${escapeHtml(message.initials)}</span><div class="vozen-preview-message-copy"><div><strong>${escapeHtml(message.name)}</strong><small>now</small></div><p>${escapeHtml(message.text)}</p><span>${escapeHtml(message.meta)}</span></div></div>`).join("")}
-              </div>
-              <div class="vozen-helper-action" data-preview-animate="true" style="--preview-delay:${visual.messages.length * 260}ms"><span class="vozen-helper-action-label">HELPER ACTION</span><strong>${escapeHtml(visual.action)}</strong></div>
-            </div>
-            <p class="vozen-live-preview-note">Visual example only. Nothing is sent to Discord.</p>
-          </aside>
-        </div>
-        <footer class="vozen-simulation-footer"><span>These are simulated results based on the values currently in the form.</span><button type="button" class="primary vozen-simulation-done">Close preview</button></footer>
-      </section>`;
-    document.body.append(modal);
-    document.body.classList.add("vozen-modal-open");
-    page._simulationTrigger = trigger;
-    const close = () => closeSimulationPreview(page);
-    const onKeyDown = (event) => {
-      if (event.key === "Escape") close();
-    };
-    modal._onKeyDown = onKeyDown;
-    document.addEventListener("keydown", onKeyDown);
-    one(".vozen-simulation-close", modal)?.addEventListener("click", close);
-    one(".vozen-simulation-done", modal)?.addEventListener("click", close);
-    one("[data-simulation-close]", modal)?.addEventListener("click", close);
-    const startVisualAnimation = () => all("[data-preview-animate]", modal).forEach((item) => item.classList.add("is-running"));
-    one(".vozen-preview-replay", modal)?.addEventListener("click", () => {
-      all("[data-preview-animate]", modal).forEach((item) => item.classList.remove("is-running"));
-      window.requestAnimationFrame(startVisualAnimation);
-    });
-    window.requestAnimationFrame(() => {
-      startVisualAnimation();
-      one(".vozen-simulation-close", modal)?.focus();
-    });
-  }
-
-  function simulationVisual(page, route) {
-    const container = one(".detail-layout", page) || page;
-    if (/protection\.antispam/.test(route)) {
-      const windowCount = previewField(container, ["messages in time window"], "6");
-      const duplicate = previewField(container, ["duplicate messages"], "3");
-      const timeout = previewField(container, ["initial timeout"], "60");
-      return {
-        scene: "antispam", icon: "shield-message", theme: "protection", eyebrow: "LIVE SCENARIO", title: "Protection in action",
-        accent: "#5EDCF5", secondary: "#F0C56A", duration: 6200, duplicate, windowCount, timeout,
-        finalSummary: "Spam stopped before it reached the channel.",
-        stages: [
-          { label: "NORMAL", title: "Channel healthy", text: "Conversation is flowing normally.", status: "Channel healthy", tone: "calm" },
-          { label: "SIGNAL", title: "Repeated messages arrive", text: `${duplicate} duplicate messages cross the configured threshold.`, status: "Signal detected", tone: "warning" },
-          { label: "DETECTION", title: "Pattern detected", text: "The Helper connects repeated content into one moderation signal.", status: "Pattern detected", tone: "signal" },
-          { label: "ACTION", title: "Messages held", text: `A ${timeout}s timeout is prepared for the simulated offender.`, status: "Helper action", tone: "action" },
-          { label: "RESOLUTION", title: "Channel protected", text: "Normal conversation can continue without the spam burst.", status: "Protected", tone: "success" },
-        ],
-      };
-    }
-    if (/support\.welcome/.test(route)) {
-      const channel = previewField(container, ["public channel"], "general");
-      const publicMessage = previewField(container, ["public message"], "Welcome, {member}! Read the rules and enjoy your stay.");
-      const sendDm = previewField(container, ["send private message"], "Disabled");
-      const role = previewField(container, ["role", "auto role"], "No role selected");
-      return {
-        scene: "welcome", icon: "welcome", theme: "support", eyebrow: "LIVE SCENARIO", title: "Welcome in action",
-        accent: "#76DFC1", secondary: "#F2B880", duration: 6400, channel, publicMessage, sendDm, role,
-        finalSummary: "The new member is ready to join the conversation.",
-        stages: [
-          { label: "NORMAL", title: "Waiting for new members", text: "The welcome flow is standing by.", status: "Waiting", tone: "calm" },
-          { label: "EVENT", title: "A new member joins", text: "A simulated member enters the server.", status: "Member joined", tone: "signal" },
-          { label: "PERSONALIZE", title: "Message prepared", text: `Variables resolve before posting to #${channel}.`, status: "Personalized", tone: "action" },
-          { label: "WELCOME", title: "Public welcome ready", text: publicMessage, status: "Welcome prepared", tone: "success" },
-          { label: "RESOLUTION", title: "Onboarding complete", text: sendDm === "Enabled" ? `Private message and ${role} are ready.` : "The public welcome is ready for the member.", status: "Ready to join", tone: "success" },
-        ],
-      };
-    }
-    if (/community\.levels/.test(route)) {
-      const min = Number.parseFloat(String(previewField(container, ["minimum xp", "minxp"], "15")).replace(",", ".")) || 15;
-      const max = Number.parseFloat(String(previewField(container, ["maximum xp", "maxxp"], "30")).replace(",", ".")) || 30;
-      const xpGain = Math.round((min + max) / 2);
-      return {
-        scene: "levels", icon: "levels", theme: "community", eyebrow: "LIVE SCENARIO", title: "Progress in action",
-        accent: "#F0C56A", secondary: "#8EE5D2", duration: 5800, xpGain,
-        finalSummary: `Level progress complete. ${xpGain} XP was added in this local preview.`,
-        stages: [
-          { label: "NORMAL", title: "A healthy message lands", text: "A member contributes to the conversation.", status: "Community active", tone: "calm" },
-          { label: "ELIGIBILITY", title: "Cooldown clear", text: "The message qualifies for an XP reward.", status: "Cooldown clear", tone: "signal" },
-          { label: "REWARD", title: `+${xpGain} XP awarded`, text: "The configured range produces a deterministic preview reward.", status: "XP reward", tone: "action" },
-          { label: "PROGRESS", title: "Progress reaches the next level", text: "The member's bar fills and the level marker updates.", status: "Progress updated", tone: "success" },
-          { label: "RESOLUTION", title: "Next level started", text: "The member continues from the new level.", status: "Level reached", tone: "success" },
-        ],
-      };
-    }
-    if (/social\.twitch/.test(route)) {
-      const channelName = previewField(container, ["twitch channel"], "rexy40407");
-      const destination = previewField(container, ["discord channel"], "streams");
-      const alertMessage = previewField(container, ["alert message"], "{broadcaster} is live now!");
-      return {
-        scene: "twitch", icon: "twitch", theme: "social", eyebrow: "LIVE SCENARIO", title: "Twitch alert in action",
-        accent: "#A8B0FF", secondary: "#FF7A84", duration: 6000, channelName, destination, alertMessage,
-        finalSummary: `Twitch alert ready for #${destination}.`,
-        stages: [
-          { label: "NORMAL", title: "Stream offline", text: `${channelName} is waiting for a live event.`, status: "Offline", tone: "calm" },
-          { label: "EVENT", title: "Channel goes live", text: "A simulated broadcast signal reaches the Helper.", status: "Live event", tone: "signal" },
-          { label: "MATCH", title: "Channel event matched", text: "The configured alert rule matches the simulated event.", status: "Rule matched", tone: "action" },
-          { label: "COMPOSE", title: "Alert assembled", text: alertMessage, status: "Alert prepared", tone: "success" },
-          { label: "RESOLUTION", title: "Twitch alert ready", text: `The alert would post to #${destination}.`, status: "Ready to post", tone: "success" },
-        ],
-      };
-    }
-    const firstValue = all("input, select, textarea", container).map((field) => String(field.value || "").trim()).find(Boolean) || "the current settings";
-    return {
-      scene: "generic", icon: "workflow", theme: "support", eyebrow: "LIVE SCENARIO", title: "Configuration in action",
-      accent: "#5EDCF5", secondary: "#8EE5D2", duration: 5200, firstValue,
-      finalSummary: "The configured response is ready in this local preview.",
-      stages: [
-        { label: "NORMAL", title: "Server is ready", text: "The module is waiting for a matching event.", status: "Ready", tone: "calm" },
-        { label: "EVENT", title: "A server event arrives", text: "The Helper receives a simulated trigger.", status: "Event received", tone: "signal" },
-        { label: "MATCH", title: "Rules evaluated", text: `The current setting is ${firstValue}.`, status: "Rules checked", tone: "action" },
-        { label: "ACTION", title: "Helper response prepared", text: "The configured response is staged locally.", status: "Action prepared", tone: "success" },
-        { label: "RESOLUTION", title: "Preview complete", text: "No external action was performed.", status: "Complete", tone: "success" },
-      ],
-    };
+  function sceneItem(beat, stage, className = "") {
+    return `<div class="vozen-semantic-item vozen-stage-item ${className}" data-beat="${beat}"><span class="vozen-semantic-kicker">${escapeHtml(stage.label)}</span><strong>${escapeHtml(stage.title)}</strong><small>${escapeHtml(stage.text)}</small></div>`;
   }
 
   function stageMarkup(visual) {
-    const common = `<div class="vozen-stage-topline"><span class="vozen-stage-status" data-stage-status>${escapeHtml(visual.stages[0].status)}</span><span class="vozen-stage-live-label">SIMULATED</span></div>`;
-    if (visual.scene === "antispam") return `${common}<div class="vozen-scene vozen-scene-antispam"><div class="vozen-scene-grid"></div><div class="vozen-chat-lane"><div class="vozen-stage-item vozen-chat-message is-complete" data-beat="0"><span class="vozen-scene-avatar">N</span><div><strong>Nova</strong><small>now</small><p>Can someone share the event details?</p></div></div><div class="vozen-stage-item vozen-chat-message vozen-spam-cluster" data-beat="1"><span class="vozen-scene-avatar vozen-avatar-warning">K</span><div><strong>Kairo</strong><small>now</small><p>join join join join join join</p><span class="vozen-scene-meta"><span data-spam-count>0/3</span> repeated messages</span></div></div><div class="vozen-stage-item vozen-detection-card" data-beat="2"><span>${svgIcon(ICONS["shield-message"], "vozen-scene-inline-icon")}</span><div><strong>Pattern detected</strong><small>Duplicate content linked</small></div></div></div><div class="vozen-stage-item vozen-scene-shield" data-beat="3">${svgIcon(ICONS["shield-message"], "vozen-scene-hero-icon")}<span>HELD</span></div><div class="vozen-stage-item vozen-scene-action" data-beat="3"><span class="vozen-scene-action-label">HELPER ACTION</span><strong>Message held for review</strong></div><div class="vozen-stage-item vozen-scene-result" data-beat="4"><span>${svgIcon(ICONS["shield-message"], "vozen-scene-result-icon")}</span><strong>Spam stopped before it reached the channel</strong></div></div>`;
-    if (visual.scene === "welcome") return `${common}<div class="vozen-scene vozen-scene-welcome"><div class="vozen-scene-grid"></div><div class="vozen-welcome-orbit"><span class="vozen-welcome-node">${svgIcon(ICONS.welcome, "vozen-scene-inline-icon")}</span><span class="vozen-welcome-avatar vozen-stage-item is-complete" data-beat="1">M</span><i></i><i></i></div><div class="vozen-welcome-count vozen-stage-item is-complete" data-beat="1"><strong>+1</strong><small>new member</small></div><div class="vozen-welcome-message vozen-stage-item" data-beat="3"><span class="vozen-welcome-message-label">WELCOME PREPARED</span><strong>Welcome, Mira!</strong><p>${escapeHtml(visual.publicMessage)}</p><small>#${escapeHtml(visual.channel)}</small></div><div class="vozen-welcome-actions vozen-stage-item" data-beat="4"><span>${visual.sendDm === "Enabled" ? "DM ready" : "DM skipped"}</span><span>${visual.role !== "No role selected" ? escapeHtml(visual.role) : "No role selected"}</span></div><div class="vozen-scene-result vozen-stage-item" data-beat="4"><span>${svgIcon(ICONS.welcome, "vozen-scene-result-icon")}</span><strong>Ready to join the conversation</strong></div></div>`;
-    if (visual.scene === "levels") return `${common}<div class="vozen-scene vozen-scene-levels"><div class="vozen-scene-grid"></div><div class="vozen-level-message vozen-stage-item is-complete" data-beat="0"><span class="vozen-scene-avatar">M</span><div><strong>Mira</strong><small>now</small><p>That strategy worked perfectly!</p></div></div><div class="vozen-cooldown-check vozen-stage-item" data-beat="1"><span>${svgIcon(ICONS["shield-message"], "vozen-scene-inline-icon")}</span><strong>Cooldown clear</strong></div><div class="vozen-xp-reward vozen-stage-item" data-beat="2"><span class="vozen-xp-orbit"><i></i><i></i><i></i></span><strong>+${escapeHtml(visual.xpGain)} XP</strong><small>community reward</small></div><div class="vozen-xp-progress vozen-stage-item" data-beat="3"><div class="vozen-xp-progress-head"><span>LEVEL 11</span><strong data-xp-value>72%</strong></div><div class="vozen-xp-track"><span data-xp-fill></span></div></div><div class="vozen-level-up vozen-stage-item" data-beat="4"><span>${svgIcon(ICONS.levels, "vozen-scene-result-icon")}</span><strong>Level 12 reached</strong><small>Next level started</small></div></div>`;
-    if (visual.scene === "twitch") return `${common}<div class="vozen-scene vozen-scene-twitch"><div class="vozen-scene-grid"></div><div class="vozen-twitch-status vozen-stage-item is-complete" data-beat="0"><span class="vozen-twitch-dot" data-live-dot></span><strong data-live-status>OFFLINE</strong><small>${escapeHtml(visual.channelName)}</small></div><div class="vozen-broadcast-rings vozen-stage-item" data-beat="1"><i></i><i></i><span>${svgIcon(ICONS.twitch, "vozen-scene-hero-icon")}</span></div><div class="vozen-twitch-match vozen-stage-item" data-beat="2"><span>${svgIcon(ICONS["shield-message"], "vozen-scene-inline-icon")}</span><strong>Channel event matched</strong></div><div class="vozen-alert-card vozen-stage-item" data-beat="3"><span class="vozen-alert-live">LIVE</span><strong>${escapeHtml(visual.channelName)}</strong><p>${escapeHtml(visual.alertMessage)}</p><small>Simulated Twitch alert</small></div><div class="vozen-twitch-destination vozen-stage-item" data-beat="4"><span>#${escapeHtml(visual.destination)}</span><strong>Twitch alert ready</strong><small>Would post here</small></div></div>`;
-    return `${common}<div class="vozen-scene vozen-scene-generic"><div class="vozen-scene-grid"></div><div class="vozen-generic-node vozen-stage-item is-complete" data-beat="0">${svgIcon(ICONS.workflow, "vozen-scene-hero-icon")}<strong>Ready</strong></div><div class="vozen-generic-flow vozen-stage-item" data-beat="1"><span></span><span></span><span></span></div><div class="vozen-generic-signal vozen-stage-item" data-beat="2"><span>${svgIcon(ICONS["clipboard-check"], "vozen-scene-inline-icon")}</span><div><strong>Rules evaluated</strong><small>The current setting is checked safely.</small></div></div><div class="vozen-generic-action vozen-stage-item" data-beat="3"><span>${svgIcon(ICONS.workflow, "vozen-scene-inline-icon")}</span><div><strong>Helper response prepared</strong><small>Local response staged without external effects.</small></div></div><div class="vozen-generic-result vozen-stage-item" data-beat="4"><strong>Preview complete</strong><small>No external effects</small></div></div>`;
+    const common = `<div class="vozen-stage-topline"><span class="vozen-stage-status" data-stage-status>${escapeHtml(visual.stages[0].status)}</span><span class="vozen-stage-live-label">SIMULADO</span></div>`;
+    const group = sceneGroup(visual.scene);
+    const items = visual.stages.map((stage, index) => sceneItem(index, stage, index === 0 ? "is-complete" : "")).join("");
+    if (group === "poll") {
+      return `${common}<div class="vozen-scene vozen-semantic-scene vozen-scene-poll"><div class="vozen-scene-grid"></div><div class="vozen-poll-card vozen-stage-item is-complete" data-beat="0"><span class="vozen-semantic-kicker">ENQUETE SIMULADA</span><strong>Qual é a próxima atividade?</strong><div class="vozen-poll-option"><span>Evento da comunidade</span><b style="--poll-width:72%"></b><small>8 votos</small></div><div class="vozen-poll-option"><span>Sessão de jogos</span><b style="--poll-width:48%"></b><small>5 votos</small></div><div class="vozen-poll-option"><span>Q&amp;A ao vivo</span><b style="--poll-width:28%"></b><small>3 votos</small></div><small class="vozen-scene-meta">${escapeHtml(visual.data.allowMultiple === "sim" ? "Várias escolhas permitidas" : "Uma escolha por membro")}</small></div>${sceneItem(1, visual.stages[1], "vozen-semantic-card")}${sceneItem(2, visual.stages[2], "vozen-semantic-card")}${sceneItem(3, visual.stages[3], "vozen-semantic-card")}${sceneItem(4, visual.stages[4], "vozen-semantic-result")}</div>`;
+    }
+    if (group === "protection") {
+      return `${common}<div class="vozen-scene vozen-semantic-scene vozen-scene-protection"><div class="vozen-scene-grid"></div><div class="vozen-chat-bubble vozen-stage-item is-complete" data-beat="0"><strong>Nova</strong><span>Mensagem normal no canal</span></div><div class="vozen-chat-bubble vozen-chat-warning vozen-stage-item" data-beat="1"><strong>Membro sinalizado</strong><span>${escapeHtml(visual.stages[1].text)}</span></div><div class="vozen-rule-card vozen-stage-item" data-beat="2"><span class="vozen-semantic-icon">✓</span><div><strong>${escapeHtml(visual.stages[2].title)}</strong><small>${escapeHtml(visual.stages[2].text)}</small></div></div><div class="vozen-action-card vozen-stage-item" data-beat="3"><span class="vozen-semantic-icon">!</span><div><strong>${escapeHtml(visual.stages[3].title)}</strong><small>${escapeHtml(visual.stages[3].text)}</small></div></div><div class="vozen-semantic-result vozen-stage-item" data-beat="4"><strong>${escapeHtml(visual.stages[4].title)}</strong><small>${escapeHtml(visual.stages[4].text)}</small></div></div>`;
+    }
+    if (group === "social") {
+      return `${common}<div class="vozen-scene vozen-semantic-scene vozen-scene-social"><div class="vozen-scene-grid"></div><div class="vozen-source-orbit vozen-stage-item is-complete" data-beat="0"><span class="vozen-semantic-icon">↗</span><strong>Fonte monitorizada</strong><small>A aguardar uma atualização</small></div><div class="vozen-source-pulse vozen-stage-item" data-beat="1"><i></i><i></i><strong>${escapeHtml(visual.stages[1].title)}</strong></div><div class="vozen-alert-card vozen-stage-item" data-beat="2"><span class="vozen-semantic-kicker">ALERTA PREPARADO</span><strong>${escapeHtml(visual.stages[2].title)}</strong><p>${escapeHtml(visual.stages[2].text)}</p></div><div class="vozen-destination-card vozen-stage-item" data-beat="3"><span># destino Discord</span><strong>${escapeHtml(visual.stages[3].title)}</strong><small>${escapeHtml(visual.stages[3].text)}</small></div><div class="vozen-semantic-result vozen-stage-item" data-beat="4"><strong>${escapeHtml(visual.stages[4].title)}</strong><small>${escapeHtml(visual.stages[4].text)}</small></div></div>`;
+    }
+    if (group === "community") {
+      return `${common}<div class="vozen-scene vozen-semantic-scene vozen-scene-community"><div class="vozen-scene-grid"></div><div class="vozen-community-card vozen-stage-item is-complete" data-beat="0"><span class="vozen-semantic-icon">✦</span><div><strong>${escapeHtml(visual.stages[0].title)}</strong><small>${escapeHtml(visual.stages[0].text)}</small></div></div><div class="vozen-community-progress vozen-stage-item" data-beat="1"><span class="vozen-semantic-kicker">PROGRESSO DA COMUNIDADE</span><div class="vozen-progress-track"><b style="--progress-width:64%"></b></div><strong>${escapeHtml(visual.stages[1].title)}</strong><small>${escapeHtml(visual.stages[1].text)}</small></div><div class="vozen-community-card vozen-stage-item" data-beat="2"><span class="vozen-semantic-icon">+</span><div><strong>${escapeHtml(visual.stages[2].title)}</strong><small>${escapeHtml(visual.stages[2].text)}</small></div></div><div class="vozen-community-card vozen-stage-item" data-beat="3"><span class="vozen-semantic-icon">✓</span><div><strong>${escapeHtml(visual.stages[3].title)}</strong><small>${escapeHtml(visual.stages[3].text)}</small></div></div><div class="vozen-semantic-result vozen-stage-item" data-beat="4"><strong>${escapeHtml(visual.stages[4].title)}</strong><small>${escapeHtml(visual.stages[4].text)}</small></div></div>`;
+    }
+    if (group === "data") {
+      return `${common}<div class="vozen-scene vozen-semantic-scene vozen-scene-data"><div class="vozen-scene-grid"></div><div class="vozen-data-header vozen-stage-item is-complete" data-beat="0"><span class="vozen-semantic-icon">▦</span><div><strong>${escapeHtml(visual.stages[0].title)}</strong><small>${escapeHtml(visual.stages[0].text)}</small></div></div><div class="vozen-data-chart vozen-stage-item" data-beat="1"><i style="--bar-height:42%"></i><i style="--bar-height:68%"></i><i style="--bar-height:54%"></i><i style="--bar-height:86%"></i><span>${escapeHtml(visual.stages[1].title)}</span></div><div class="vozen-data-card vozen-stage-item" data-beat="2"><strong>${escapeHtml(visual.stages[2].title)}</strong><small>${escapeHtml(visual.stages[2].text)}</small></div><div class="vozen-data-card vozen-stage-item" data-beat="3"><strong>${escapeHtml(visual.stages[3].title)}</strong><small>${escapeHtml(visual.stages[3].text)}</small></div><div class="vozen-semantic-result vozen-stage-item" data-beat="4"><strong>${escapeHtml(visual.stages[4].title)}</strong><small>${escapeHtml(visual.stages[4].text)}</small></div></div>`;
+    }
+    return `${common}<div class="vozen-scene vozen-semantic-scene vozen-scene-service"><div class="vozen-scene-grid"></div><div class="vozen-service-node vozen-stage-item is-complete" data-beat="0"><span class="vozen-semantic-icon">●</span><strong>${escapeHtml(visual.stages[0].title)}</strong><small>${escapeHtml(visual.stages[0].text)}</small></div><div class="vozen-service-flow vozen-stage-item" data-beat="1"><i></i><i></i><i></i></div><div class="vozen-service-card vozen-stage-item" data-beat="2"><strong>${escapeHtml(visual.stages[2].title)}</strong><small>${escapeHtml(visual.stages[2].text)}</small></div><div class="vozen-service-card vozen-stage-item" data-beat="3"><strong>${escapeHtml(visual.stages[3].title)}</strong><small>${escapeHtml(visual.stages[3].text)}</small></div><div class="vozen-semantic-result vozen-stage-item" data-beat="4"><strong>${escapeHtml(visual.stages[4].title)}</strong><small>${escapeHtml(visual.stages[4].text)}</small></div></div>`;
   }
+
+
+  // The base panel already ships PT-PT presets. Do not rewrite them to English
+  // after the module form is mounted.
+  function normalizeEnglishPresets() {}
 
   function closeSimulationPreview(page) {
     const modal = one("#vozen-simulation-modal");
@@ -965,8 +759,9 @@
 
   function openSimulationPreview(page, route, trigger) {
     closeSimulationPreview(page);
-    const title = cleanText(one("h2", page)?.textContent) || "Module";
     const visual = simulationVisual(page, route);
+    if (!visual) return;
+    const title = cleanText(one("h2", page)?.textContent) || "Módulo";
     const modal = document.createElement("div");
     modal.id = "vozen-simulation-modal";
     modal.className = "vozen-simulation-modal";
@@ -974,7 +769,7 @@
     modal.setAttribute("aria-modal", "true");
     modal.setAttribute("aria-labelledby", "vozen-simulation-title");
     modal.setAttribute("aria-describedby", "vozen-simulation-description");
-    modal.innerHTML = `<div class="vozen-simulation-backdrop" data-simulation-close="true"></div><section class="vozen-simulation-dialog" role="document" style="--preview-accent:${escapeHtml(visual.accent)};--preview-secondary:${escapeHtml(visual.secondary)}"><header class="vozen-simulation-header"><div><span class="vozen-eyebrow">SAFE PREVIEW</span><h2 id="vozen-simulation-title">${escapeHtml(title)}</h2><p id="vozen-simulation-description">See what this configuration would do before publishing.</p></div><button type="button" class="vozen-simulation-close" aria-label="Close simulation preview">×</button></header><div class="vozen-simulation-badge"><span aria-hidden="true">●</span> Preview only · No real action will be sent</div><div class="vozen-simulation-content"><ol class="vozen-scenario-rail" aria-label="Preview scenario steps">${visual.stages.map((stage, index) => `<li class="vozen-scenario-step ${index === 0 ? "is-active" : ""}" data-rail-beat="${index}"><span>${index + 1}</span><div><strong>${escapeHtml(stage.label)}</strong><small>${escapeHtml(stage.title)}</small></div></li>`).join("")}</ol><div class="vozen-signal-column"><div class="vozen-signal-stage" data-scene="${escapeHtml(visual.scene)}" aria-hidden="true">${stageMarkup(visual)}</div><p class="vozen-live-preview-note">Visual example only. Nothing is sent to Discord or external services.</p></div></div><p class="vozen-preview-sr-summary" aria-live="polite">Preview ready.</p><footer class="vozen-simulation-footer"><div class="vozen-preview-progress-wrap"><div class="vozen-preview-progress" role="progressbar" aria-label="Preview progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-preview-progress></span></div><span data-preview-state>Ready</span></div><div class="vozen-preview-controls"><button type="button" class="vozen-preview-replay" aria-label="Replay preview">Replay</button><button type="button" class="primary vozen-preview-playback" aria-label="Play preview">Play preview</button><button type="button" class="secondary vozen-simulation-done">Close preview</button></div></footer></section>`;
+    modal.innerHTML = `<div class="vozen-simulation-backdrop" data-simulation-close="true"></div><section class="vozen-simulation-dialog" role="document" style="--preview-accent:${escapeHtml(visual.accent)};--preview-secondary:${escapeHtml(visual.secondary)}"><header class="vozen-simulation-header"><div><span class="vozen-eyebrow">PRÉ-VISUALIZAÇÃO SEGURA</span><h2 id="vozen-simulation-title">${escapeHtml(title)}</h2><p id="vozen-simulation-description">Vê o que esta configuração faria antes de publicar.</p></div><button type="button" class="vozen-simulation-close" aria-label="Fechar pré-visualização da simulação">×</button></header><div class="vozen-simulation-badge"><span aria-hidden="true">●</span> Apenas pré-visualização · Nenhuma ação real será enviada</div><div class="vozen-simulation-content"><ol class="vozen-scenario-rail" aria-label="Etapas do cenário de pré-visualização">${visual.stages.map((stage, index) => `<li class="vozen-scenario-step ${index === 0 ? "is-active" : ""}" data-rail-beat="${index}"><span>${index + 1}</span><div><strong>${escapeHtml(stage.label)}</strong><small>${escapeHtml(stage.title)}</small></div></li>`).join("")}</ol><div class="vozen-signal-column"><div class="vozen-signal-stage" data-scene="${escapeHtml(visual.scene)}">${stageMarkup(visual)}</div><p class="vozen-live-preview-note">Exemplo visual. Nada é enviado para o Discord ou serviços externos.</p></div></div><p class="vozen-preview-sr-summary" aria-live="polite">Pré-visualização pronta.</p><footer class="vozen-simulation-footer"><div class="vozen-preview-progress-wrap"><div class="vozen-preview-progress" role="progressbar" aria-label="Progresso da pré-visualização" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-preview-progress></span></div><span data-preview-state>Pronta</span></div><div class="vozen-preview-controls"><button type="button" class="vozen-preview-replay" aria-label="Repetir pré-visualização">Repetir</button><button type="button" class="primary vozen-preview-playback" aria-label="Reproduzir pré-visualização">Reproduzir</button><button type="button" class="secondary vozen-simulation-done">Fechar pré-visualização</button></div></footer></section>`;
     document.body.append(modal);
     document.body.classList.add("vozen-modal-open");
     page._simulationTrigger = trigger;
@@ -985,110 +780,60 @@
     const playbackButton = one(".vozen-preview-playback", modal);
     const replayButton = one(".vozen-preview-replay", modal);
     const srSummary = one(".vozen-preview-sr-summary", modal);
+    const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     const beatForTime = (elapsed) => Math.min(visual.stages.length - 1, Math.floor((elapsed / visual.duration) * visual.stages.length));
-    const updateSceneProgress = (elapsed) => {
-      if (visual.scene === "levels") {
-        const fill = one("[data-xp-fill]", modal); const value = one("[data-xp-value]", modal);
-        const start = visual.duration * 0.45; const end = visual.duration * 0.69;
-        const ratio = elapsed <= start ? 0 : Math.min(1, (elapsed - start) / (end - start)); const percentage = Math.round(72 + ratio * 28);
-        fill?.style.setProperty("--xp-progress", `${percentage}%`); if (value) value.textContent = `${percentage}%`;
-      }
-      if (visual.scene === "antispam") {
-        const count = one("[data-spam-count]", modal); const start = visual.duration * 0.11; const end = visual.duration * 0.28;
-        const ratio = elapsed <= start ? 0 : Math.min(1, (elapsed - start) / (end - start)); if (count) count.textContent = `${Math.round(ratio * 3)}/3`;
-      }
-      if (visual.scene === "twitch") {
-        const live = playback.beat >= 1; const status = one("[data-live-status]", modal); const dot = one("[data-live-dot]", modal);
-        if (status) status.textContent = live ? "LIVE" : "OFFLINE"; dot?.classList.toggle("is-live", live);
-      }
-    };
     const renderBeat = (beat) => {
       playback.beat = beat;
       all("[data-rail-beat]", modal).forEach((item) => { const itemBeat = Number(item.dataset.railBeat); item.classList.toggle("is-active", itemBeat === beat); item.classList.toggle("is-complete", itemBeat < beat || playback.status === "completed"); });
       all("[data-beat]", modal).forEach((item) => { const itemBeat = Number(item.dataset.beat); item.classList.toggle("is-active", itemBeat === beat); item.classList.toggle("is-complete", itemBeat < beat || playback.status === "completed"); });
-      const status = one("[data-stage-status]", modal); if (status) status.textContent = visual.stages[beat]?.status || "Preview";
+      const status = one("[data-stage-status]", modal); if (status) status.textContent = visual.stages[beat]?.status || "Pré-visualização";
     };
     const setStatus = (status) => {
       playback.status = status; modal.dataset.playback = status;
-      const labels = { idle: ["Play preview", "Play preview", false, "Ready"], playing: ["Pause preview", "Pause preview", false, "Playing"], paused: ["Resume preview", "Resume preview", false, "Paused"], replaying: ["Preparing preview…", "Replay", true, "Replaying"], completed: ["Replay", "Replay", false, "Complete"], error: ["Try again", "Replay", false, "Unavailable"] };
+      const labels = { idle: ["Reproduzir", "Reproduzir pré-visualização", false, "Pronta"], playing: ["Pausar", "Pausar pré-visualização", false, "A reproduzir"], paused: ["Continuar", "Continuar pré-visualização", false, "Pausada"], replaying: ["A preparar…", "Repetir pré-visualização", true, "A repetir"], completed: ["Repetir", "Repetir pré-visualização", false, "Concluída"] };
       const [label, aria, disabled, state] = labels[status] || labels.idle;
       if (playbackButton) { playbackButton.textContent = label; playbackButton.setAttribute("aria-label", aria); playbackButton.disabled = disabled; }
       if (replayButton) replayButton.disabled = disabled;
       if (stateLabel) stateLabel.textContent = state;
-      if (status === "completed" && srSummary) srSummary.textContent = `Preview complete. ${visual.finalSummary}`;
-      if (status === "paused" && srSummary) srSummary.textContent = `Preview paused at ${visual.stages[playback.beat]?.label || "current step"}.`;
+      if (status === "completed" && srSummary) srSummary.textContent = `Pré-visualização concluída. ${visual.finalSummary}`;
+      if (status === "paused" && srSummary) srSummary.textContent = `Pré-visualização pausada em ${visual.stages[playback.beat]?.label || "etapa atual"}.`;
+    };
+    const updateProgress = () => {
+      const percentage = Math.round((playback.elapsed / visual.duration) * 100);
+      if (progress) progress.style.width = `${percentage}%`;
+      if (progressTrack) progressTrack.setAttribute("aria-valuenow", String(percentage));
     };
     const render = () => {
       if (playback.status !== "playing") return;
-      playback.elapsed = Math.min(visual.duration, performance.now() - playback.startedAt); renderBeat(beatForTime(playback.elapsed)); updateSceneProgress(playback.elapsed);
-      const percentage = Math.round((playback.elapsed / visual.duration) * 100); if (progress) progress.style.width = `${percentage}%`; if (progressTrack) progressTrack.setAttribute("aria-valuenow", String(percentage));
-      if (playback.elapsed >= visual.duration) { setStatus("completed"); renderBeat(visual.stages.length - 1); updateSceneProgress(visual.duration); return; }
+      playback.elapsed = Math.min(visual.duration, performance.now() - playback.startedAt);
+      renderBeat(beatForTime(playback.elapsed)); updateProgress();
+      if (playback.elapsed >= visual.duration) { setStatus("completed"); renderBeat(visual.stages.length - 1); updateProgress(); return; }
       playback.raf = window.requestAnimationFrame(render);
     };
     const start = () => { playback.startedAt = performance.now() - playback.elapsed; setStatus("playing"); playback.raf = window.requestAnimationFrame(render); };
-    const pause = () => { if (playback.status !== "playing") return; window.cancelAnimationFrame(playback.raf); playback.elapsed = Math.min(visual.duration, performance.now() - playback.startedAt); setStatus("paused"); renderBeat(beatForTime(playback.elapsed)); updateSceneProgress(playback.elapsed); };
-    const replay = () => { window.cancelAnimationFrame(playback.raf); window.clearTimeout(playback.timeout); playback.elapsed = 0; if (progress) progress.style.width = "0%"; setStatus("replaying"); renderBeat(0); updateSceneProgress(0); playback.timeout = window.setTimeout(() => start(), 180); };
+    const pause = () => { if (playback.status !== "playing") return; window.cancelAnimationFrame(playback.raf); playback.elapsed = Math.min(visual.duration, performance.now() - playback.startedAt); setStatus("paused"); renderBeat(beatForTime(playback.elapsed)); updateProgress(); };
+    const replay = () => { window.cancelAnimationFrame(playback.raf); window.clearTimeout(playback.timeout); playback.elapsed = 0; updateProgress(); setStatus("replaying"); renderBeat(0); playback.timeout = window.setTimeout(() => start(), reduceMotion ? 0 : 180); };
     const togglePlayback = () => { if (playback.status === "playing") pause(); else if (playback.status === "paused") start(); else replay(); };
     const close = () => closeSimulationPreview(page);
-    const onKeyDown = (event) => { if (event.key === "Escape") close(); };
+    const focusables = () => all("button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])", modal);
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") { event.preventDefault(); close(); return; }
+      if (event.key !== "Tab") return;
+      const items = focusables(); if (!items.length) return;
+      const first = items[0]; const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
     const onVisibility = () => { if (document.hidden) pause(); };
     modal._previewCleanup = () => { window.cancelAnimationFrame(playback.raf); window.clearTimeout(playback.timeout); document.removeEventListener("keydown", onKeyDown); document.removeEventListener("visibilitychange", onVisibility); playback.observer?.disconnect(); };
     document.addEventListener("keydown", onKeyDown); document.addEventListener("visibilitychange", onVisibility);
     one(".vozen-simulation-close", modal)?.addEventListener("click", close); one(".vozen-simulation-done", modal)?.addEventListener("click", close); one("[data-simulation-close]", modal)?.addEventListener("click", close);
     playbackButton?.addEventListener("click", togglePlayback); replayButton?.addEventListener("click", replay);
     playback.observer = typeof IntersectionObserver === "function" ? new IntersectionObserver((entries) => { if (!entries[0]?.isIntersecting) pause(); }) : null; playback.observer?.observe(modal);
-    renderBeat(0); setStatus("idle"); playback.timeout = window.setTimeout(() => start(), 300); window.requestAnimationFrame(() => one(".vozen-simulation-close", modal)?.focus());
-  }
-
-  function normalizeEnglishPresets(container, route) {
-    if (container.dataset.uiEnglishPresets === "true") return;
-    const presetGroups = [
-      {
-        route: /support\.welcome/,
-        presets: [
-          {
-            matches: [
-              "Bem-vindo(a), {member}! Lê as regras e diverte-te.",
-              "Bem-vindo(a), {member}! Le as regras e diverte-te.",
-            ],
-            value: "Welcome, {member}! Read the rules and enjoy your stay.",
-            terms: ["public message", "mensagem pública", "mensagem publica"],
-          },
-          {
-            matches: ["Olá {member}, bem-vindo(a) ao servidor!", "Ola {member}, bem-vindo(a) ao servidor!"],
-            value: "Hi {member}, welcome to the server!",
-            terms: ["private message", "mensagem privada"],
-          },
-        ],
-      },
-      {
-        route: /community\.levels/,
-        presets: [
-          { matches: ["{member} chegou ao nível {level}!", "{member} chegou ao nivel {level}!"], value: "{member} reached level {level}!" },
-        ],
-      },
-      {
-        route: /social\.twitch/,
-        presets: [
-          { matches: ["{broadcaster} está ao vivo!\nhttps://twitch.tv/{login}", "{broadcaster} esta ao vivo!\nhttps://twitch.tv/{login}"], value: "{broadcaster} is live now!\nhttps://twitch.tv/{login}" },
-        ],
-      },
-    ];
-    const group = presetGroups.find((candidate) => candidate.route.test(route));
-    if (!group) return;
-    const presets = group.presets;
-    presets.forEach((preset) => {
-      const field = all("textarea, input", container).find((candidate) => {
-        const label = cleanText(candidate.closest("label")?.textContent || "").toLowerCase(); const name = String(candidate.name || candidate.id || "").toLowerCase();
-        const currentValue = String(candidate.value || "").trim();
-        const labelledMatch = !preset.terms || preset.terms.some((term) => label.includes(term) || name.includes(term));
-        return labelledMatch && preset.matches.includes(currentValue);
-      });
-      if (!field) return;
-      const prototype = field instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
-      const setter = Object.getOwnPropertyDescriptor(prototype, "value")?.set; setter?.call(field, preset.value); field.dispatchEvent(new Event("input", { bubbles: true }));
-    });
-    container.dataset.uiEnglishPresets = "true";
+    renderBeat(0); setStatus("idle");
+    if (reduceMotion) { playback.elapsed = visual.duration; renderBeat(visual.stages.length - 1); updateProgress(); setStatus("completed"); }
+    else playback.timeout = window.setTimeout(() => start(), 300);
+    window.requestAnimationFrame(() => one(".vozen-simulation-close", modal)?.focus());
   }
 
   function enhanceModuleForm() {
