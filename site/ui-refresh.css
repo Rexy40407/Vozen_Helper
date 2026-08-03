@@ -618,6 +618,70 @@
 .vozen-generic-flow.is-active span { animation: vozen-flow-grow 420ms cubic-bezier(.2, 0, 0, 1) both; }
 .vozen-generic-flow.is-active span:nth-child(2) { animation-delay: 90ms; }
 .vozen-generic-flow.is-active span:nth-child(3) { animation-delay: 180ms; }
+.vozen-generic-signal,
+.vozen-generic-action {
+  position: absolute;
+  right: 22px;
+  left: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #2d536d;
+  border-radius: 11px;
+  background: rgb(94 220 245 / 7%);
+}
+.vozen-generic-signal { top: 202px; }
+.vozen-generic-action {
+  top: 286px;
+  right: 40px;
+  left: 40px;
+  border-color: color-mix(in srgb, var(--preview-secondary) 58%, #29435d);
+  background: rgb(142 229 210 / 8%);
+}
+.vozen-generic-signal > span,
+.vozen-generic-action > span {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid color-mix(in srgb, var(--preview-accent) 60%, #29435d);
+  border-radius: 9px;
+  color: var(--preview-accent);
+  background: rgb(94 220 245 / 8%);
+}
+.vozen-generic-action > span {
+  border-color: color-mix(in srgb, var(--preview-secondary) 60%, #29435d);
+  color: var(--preview-secondary);
+  background: rgb(142 229 210 / 8%);
+}
+.vozen-generic-signal strong,
+.vozen-generic-action strong {
+  display: block;
+  color: #edf7ff;
+  font: 700 12px/17px "Space Grotesk", sans-serif;
+}
+.vozen-generic-signal small,
+.vozen-generic-action small {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: #8faac2;
+  font-size: 10px;
+  line-height: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vozen-generic-signal.is-active,
+.vozen-generic-action.is-active {
+  border-color: var(--preview-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--preview-accent) 8%, transparent);
+}
+.vozen-generic-action.is-active {
+  border-color: var(--preview-secondary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--preview-secondary) 8%, transparent);
+}
 .vozen-generic-result { position: absolute; right: 22px; bottom: 82px; left: 22px; display: grid; gap: 4px; padding: 14px; border: 1px solid color-mix(in srgb, var(--preview-secondary) 58%, #29435d); border-radius: 11px; background: rgb(142 229 210 / 8%); }
 .vozen-generic-result strong { color: #edf7ff; font: 700 14px/19px "Space Grotesk", sans-serif; }
 .vozen-generic-result small { color: #8faac2; font-size: 11px; }
