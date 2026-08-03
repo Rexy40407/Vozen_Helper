@@ -306,6 +306,11 @@
     ["gest\u00e3o", "management"],
     ["ao vivo", "live"],
     ["defini\u00e7\u00f5es", "settings"],
+    ["Vari\u00e1veis:", "Variables:"],
+    ["Notas da equipa", "Team notes"],
+    ["Apenas alertar", "Alert only"],
+    ["Funcionalidade", "Module"],
+    ["Ajusta esta funcionalidade ao teu servidor.", "Adjust this module for your server."],
   ];
 
   const patterns = [
