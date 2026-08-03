@@ -731,6 +731,55 @@
       : [{ tone: "config", label: "CONFIGURATION", title: "Ready to preview", text: "The current module settings will be checked without publishing anything." }];
   }
 
+  function simulationVisual(page, route) {
+    const container = one(".detail-layout", page) || page;
+    if (/protection\.antispam/.test(route)) {
+      const windowCount = previewField(container, ["messages in time window"], "6");
+      const duplicate = previewField(container, ["duplicate messages"], "3");
+      const timeout = previewField(container, ["initial timeout"], "60");
+      return {
+        channel: "general",
+        eyebrow: "LIVE EXAMPLE",
+        title: "Protection in action",
+        messages: [
+          { kind: "normal", initials: "N", name: "Nova", meta: "Community message", text: "Can someone share the event details?" },
+          { kind: "warning", initials: "K", name: "Kairo", meta: `${duplicate} repeated messages`, text: "join join join join join join" },
+          { kind: "action", initials: "VH", name: "Vozen Helper", meta: "Protection rule triggered", text: "Message held for review" },
+        ],
+        action: `Would prepare a ${timeout}s timeout after ${windowCount} messages in the time window.`,
+      };
+    }
+    if (/community\.levels/.test(route)) {
+      const minXp = previewField(container, ["minimum xp", "minxp"], "15");
+      const maxXp = previewField(container, ["maximum xp", "maxxp"], "30");
+      return {
+        channel: "general",
+        eyebrow: "LIVE EXAMPLE",
+        title: "Progress in action",
+        messages: [
+          { kind: "normal", initials: "M", name: "Mira", meta: "Community message", text: "That strategy worked perfectly!" },
+          { kind: "helper", initials: "VH", name: "Vozen Helper", meta: "XP event", text: `+${minXp}-${maxXp} XP added to Mira` },
+          { kind: "success", initials: "UP", name: "Level progress", meta: "Preview state", text: "Member moves closer to the next level" },
+        ],
+        action: "The configured XP and cooldown rules are applied locally for this preview.",
+      };
+    }
+    const firstValue = all("input, select, textarea", container)
+      .map((field) => String(field.value || "").trim())
+      .find(Boolean) || "the current settings";
+    return {
+      channel: "general",
+      eyebrow: "LIVE EXAMPLE",
+      title: "Configuration in action",
+      messages: [
+        { kind: "normal", initials: "M", name: "Member", meta: "Community event", text: "A new event arrives in the server" },
+        { kind: "helper", initials: "VH", name: "Vozen Helper", meta: "Rule evaluated", text: `Uses ${firstValue}` },
+        { kind: "success", initials: "OK", name: "Preview complete", meta: "No external effects", text: "The configured response is ready" },
+      ],
+      action: "This sequence is simulated locally and will not publish anything.",
+    };
+  }
+
   function closeSimulationPreview(page) {
     const modal = one("#vozen-simulation-modal");
     if (!modal) return;
@@ -744,6 +793,7 @@
     closeSimulationPreview(page);
     const title = cleanText(one("h2", page)?.textContent) || "Module";
     const rows = simulationRows(page, route);
+    const visual = simulationVisual(page, route);
     const modal = document.createElement("div");
     modal.id = "vozen-simulation-modal";
     modal.className = "vozen-simulation-modal";
@@ -762,8 +812,27 @@
           <button type="button" class="vozen-simulation-close" aria-label="Close simulation preview">×</button>
         </header>
         <div class="vozen-simulation-badge"><span aria-hidden="true">●</span> Preview only · No real action will be sent</div>
-        <div class="vozen-simulation-timeline">
-          ${rows.map((row, index) => `<article class="vozen-simulation-step" data-tone="${escapeHtml(row.tone)}"><span class="vozen-simulation-step-number">${index + 1}</span><div><span class="vozen-eyebrow">${escapeHtml(row.label)}</span><h3>${escapeHtml(row.title)}</h3><p>${escapeHtml(row.text)}</p></div></article>`).join("")}
+        <div class="vozen-simulation-content">
+          <div class="vozen-simulation-timeline">
+            ${rows.map((row, index) => `<article class="vozen-simulation-step" data-tone="${escapeHtml(row.tone)}"><span class="vozen-simulation-step-number">${index + 1}</span><div><span class="vozen-eyebrow">${escapeHtml(row.label)}</span><h3>${escapeHtml(row.title)}</h3><p>${escapeHtml(row.text)}</p></div></article>`).join("")}
+          </div>
+          <aside class="vozen-live-preview" aria-label="Live simulation example">
+            <div class="vozen-live-preview-head">
+              <div>
+                <span class="vozen-eyebrow">${escapeHtml(visual.eyebrow)}</span>
+                <h3>${escapeHtml(visual.title)}</h3>
+              </div>
+              <button type="button" class="vozen-preview-replay" aria-label="Replay live example">Replay</button>
+            </div>
+            <div class="vozen-discord-preview" aria-live="polite">
+              <div class="vozen-discord-channel"><span aria-hidden="true">#</span> ${escapeHtml(visual.channel)} <small>SIMULATED</small></div>
+              <div class="vozen-discord-messages">
+                ${visual.messages.map((message, index) => `<div class="vozen-preview-message" data-kind="${escapeHtml(message.kind)}" data-preview-animate="true" style="--preview-delay:${index * 260}ms"><span class="vozen-preview-avatar" aria-hidden="true">${escapeHtml(message.initials)}</span><div class="vozen-preview-message-copy"><div><strong>${escapeHtml(message.name)}</strong><small>now</small></div><p>${escapeHtml(message.text)}</p><span>${escapeHtml(message.meta)}</span></div></div>`).join("")}
+              </div>
+              <div class="vozen-helper-action" data-preview-animate="true" style="--preview-delay:${visual.messages.length * 260}ms"><span class="vozen-helper-action-label">HELPER ACTION</span><strong>${escapeHtml(visual.action)}</strong></div>
+            </div>
+            <p class="vozen-live-preview-note">Visual example only. Nothing is sent to Discord.</p>
+          </aside>
         </div>
         <footer class="vozen-simulation-footer"><span>These are simulated results based on the values currently in the form.</span><button type="button" class="primary vozen-simulation-done">Close preview</button></footer>
       </section>`;
@@ -779,7 +848,15 @@
     one(".vozen-simulation-close", modal)?.addEventListener("click", close);
     one(".vozen-simulation-done", modal)?.addEventListener("click", close);
     one("[data-simulation-close]", modal)?.addEventListener("click", close);
-    window.requestAnimationFrame(() => one(".vozen-simulation-close", modal)?.focus());
+    const startVisualAnimation = () => all("[data-preview-animate]", modal).forEach((item) => item.classList.add("is-running"));
+    one(".vozen-preview-replay", modal)?.addEventListener("click", () => {
+      all("[data-preview-animate]", modal).forEach((item) => item.classList.remove("is-running"));
+      window.requestAnimationFrame(startVisualAnimation);
+    });
+    window.requestAnimationFrame(() => {
+      startVisualAnimation();
+      one(".vozen-simulation-close", modal)?.focus();
+    });
   }
 
   function enhanceModuleForm() {
