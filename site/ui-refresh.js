@@ -825,15 +825,15 @@
         });
         const discard = one("button.secondary", actions);
         if (discard) discard.addEventListener("click", () => window.setTimeout(schedule, 80));
-        const simulate = one("button.secondary", one(".detail-aside", page) || page);
-        if (simulate && /simulat|simular/i.test(simulate.textContent) && !simulate.dataset.uiPreviewBound) {
-          simulate.dataset.uiPreviewBound = "true";
-          simulate.addEventListener("click", (event) => {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            openSimulationPreview(page, route, simulate);
-          });
-        }
+      }
+      const simulate = one("button.secondary", one(".detail-aside", page) || page);
+      if (simulate && /simulat|simular/i.test(simulate.textContent) && !simulate.dataset.uiPreviewBound) {
+        simulate.dataset.uiPreviewBound = "true";
+        simulate.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          openSimulationPreview(page, route, simulate);
+        });
       }
     }
   }
