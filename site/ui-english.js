@@ -264,6 +264,7 @@
     "Mensagem": "Message",
     "Personaliza o aviso enviado quando a transmissão começa.": "Customize the alert sent when the stream starts.",
     "Mensagem do alerta": "Alert message",
+    "Variáveis:": "Variables:",
     "Opções avançadas": "Advanced options",
     "Resposta automática": "Automatic response",
     "Perfil de proteção": "Protection profile",
