@@ -7,6 +7,7 @@ const index = await readFile(new URL('../site/index.html', import.meta.url), 'ut
 const bundleName = index.match(/assets\/(index-[^"']+\.js)/)?.[1];
 assert.ok(bundleName, 'the published app bundle must be declared in site/index.html');
 const bundle = await readFile(new URL(`../site/assets/${bundleName}`, import.meta.url), 'utf8');
+const styles = await readFile(new URL('../site/ui-refresh.css', import.meta.url), 'utf8');
 
 const catalogIds = [...bundle.matchAll(/\{key:`([^`]+)`,label:`[^`]+`,description:`[^`]+`,category:/g)].map((match) => match[1]);
 const configurableIds = new Set([...bundle.matchAll(/"([a-z_]+\.[a-z_]+)":\[\{title:`/g)].map((match) => match[1]));
@@ -37,14 +38,14 @@ test('each preview has a complete, non-generic five-beat story', () => {
 test('polls describes a real poll flow and uses current settings', () => {
   const preview = getPreviewDefinition('management.polls', { allowMultiple: true, defaultDurationHours: 48 });
   assert.deepEqual(preview.stages.map((stage) => stage.title), [
-    'Pergunta preparada',
-    'Enquete publicada',
-    'Membros escolhem',
-    'Resultados contam',
-    'Enquete concluída',
+    'Question prepared',
+    'Poll published',
+    'Members choose',
+    'Results counted',
+    'Poll completed',
   ]);
-  assert.match(preview.stages[4].text, /privacidade/);
-  assert.equal(preview.data.allowMultiple, 'sim');
+  assert.match(preview.stages[4].text, /privacy/);
+  assert.equal(preview.data.allowMultiple, 'yes');
 });
 
 test('all previews expose a deterministic palette and duration', () => {
@@ -56,10 +57,15 @@ test('all previews expose a deterministic palette and duration', () => {
   }
 });
 
-test('English overlay is not loaded and the preview controller is module-based', async () => {
-  assert.doesNotMatch(index, /ui-english\.js/);
+test('English overlay and preview controller are wired together', async () => {
+  assert.match(index, /ui-english\.js/);
   const refresh = await readFile(new URL('../site/ui-refresh.js', import.meta.url), 'utf8');
   assert.match(refresh, /module-previews\.js/);
   assert.match(refresh, /prefers-reduced-motion/);
-  assert.match(refresh, /Fechar .*simula/);
+  assert.match(refresh, /Close simulation preview/);
+});
+
+test('poll scene uses content-driven flow instead of overlapping absolute cards', () => {
+  assert.match(styles, /\.vozen-scene-poll\s*\{[\s\S]*?display:\s*grid/);
+  assert.match(styles, /\.vozen-scene-poll \.vozen-poll-card,[\s\S]*?position:\s*relative !important/);
 });

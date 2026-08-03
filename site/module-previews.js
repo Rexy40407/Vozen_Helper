@@ -481,22 +481,38 @@ const CONFIGURABLE_PREVIEW_IDS = [
 
 const displayValue = (value, fallback = "não definido") => {
   if (value === undefined || value === null || String(value).trim() === "") return fallback;
-  if (value === true || value === "true" || value === "on") return "sim";
+  if (value === true || value === "true" || value === "on") return "yes";
   if (value === false || value === "false" || value === "off") return "não";
   return String(value).trim();
 };
 
 const interpolate = (value, context) => String(value).replace(/\{([a-zA-Z][\w]*)\}/g, (_, key) => displayValue(context[key], `{${key}}`));
 
+const ENGLISH_PREVIEW_OVERRIDES = {
+  "management.polls": {
+    title: "Polls",
+    stages: sequence(
+      ["CREATE", "Question prepared", "The team defines a question and its poll options.", "Poll started", "calm"],
+      ["PUBLISH", "Poll published", "The card appears in the configured channel for the selected duration.", "Poll published", "signal"],
+      ["VOTE", "Members choose", "Each participant can choose one or multiple options.", "Votes received", "action"],
+      ["UPDATE", "Results counted", "The bars and poll state reflect the simulated votes.", "Results updated", "success"],
+      ["RESULT", "Poll completed", "Reminders and privacy follow the configured settings.", "Poll completed", "success"],
+    ),
+    finalSummary: "The poll was published and its results were updated in this simulation only.",
+  },
+};
+
 export function getPreviewDefinition(id, values = {}) {
   const item = PREVIEWS[id];
   if (!item) return null;
-  const context = { ...item.sample, ...values };
+  const override = ENGLISH_PREVIEW_OVERRIDES[id] || {};
+  const resolved = { ...item, ...override };
+  const context = { ...resolved.sample, ...values };
   return {
-    ...item,
-    duration: item.duration,
-    stages: item.stages.map((stage) => Object.fromEntries(Object.entries(stage).map(([key, value]) => [key, interpolate(value, context)]))),
-    finalSummary: interpolate(item.finalSummary, context),
+    ...resolved,
+    duration: resolved.duration,
+    stages: resolved.stages.map((stage) => Object.fromEntries(Object.entries(stage).map(([key, value]) => [key, interpolate(value, context)]))),
+    finalSummary: interpolate(resolved.finalSummary, context),
     data: Object.fromEntries(Object.keys(context).map((key) => [key, displayValue(context[key])])),
   };
 }

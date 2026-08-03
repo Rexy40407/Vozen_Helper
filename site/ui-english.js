@@ -373,7 +373,7 @@
         window.clearTimeout(scheduled);
         scheduled = window.setTimeout(applyTranslations, 40);
       });
-      observer.observe(root, { childList: true, subtree: true, characterData: true });
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
     }
   }
 

@@ -758,6 +758,46 @@
   }
 }
 
+/* Poll scenes use content-driven flow so the question card never collides
+   with the story cards when copy or settings change their height. */
+.vozen-scene-poll {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 0 !important;
+  padding: 18px 22px 22px;
+}
+
+.vozen-scene-poll .vozen-poll-card,
+.vozen-scene-poll .vozen-semantic-card,
+.vozen-scene-poll .vozen-semantic-result {
+  position: relative !important;
+  inset: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  top: auto !important;
+  width: auto;
+  margin: 0;
+}
+
+.vozen-scene-poll .vozen-poll-card {
+  display: grid;
+  gap: 10px;
+}
+
+.vozen-scene-poll .vozen-semantic-card,
+.vozen-scene-poll .vozen-semantic-result {
+  display: grid;
+  gap: 4px;
+}
+
+@media (max-width: 600px) {
+  .vozen-scene-poll {
+    padding: 14px;
+  }
+}
+
 html {
   min-width: 320px;
   background: var(--ui-bg);
