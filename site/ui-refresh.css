@@ -1604,6 +1604,28 @@ body.vozen-modal-open {
   background: #101b2b;
   box-shadow: 0 24px 70px rgb(0 0 0 / 44%);
   animation: vozen-modal-in 180ms cubic-bezier(.2, .8, .2, 1);
+  scrollbar-color: #5edcf5 #091321;
+  scrollbar-width: thin;
+}
+
+.vozen-simulation-dialog::-webkit-scrollbar {
+  width: 10px;
+}
+
+.vozen-simulation-dialog::-webkit-scrollbar-track {
+  border-left: 1px solid #213751;
+  background: #091321;
+}
+
+.vozen-simulation-dialog::-webkit-scrollbar-thumb {
+  min-height: 48px;
+  border: 2px solid #091321;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #76dfc1 0%, #5edcf5 100%);
+}
+
+.vozen-simulation-dialog::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #9aefdc 0%, #8ae8fa 100%);
 }
 
 .vozen-simulation-header {
