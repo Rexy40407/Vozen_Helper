@@ -708,7 +708,7 @@ import { openModulePreview } from "./module-preview-player.js";
     const values = readPreviewValues(one(".detail-layout", page) || page);
     const definition = getPreviewDefinition(moduleId, values);
     if (!definition) {
-      console.error(`[Vozen preview] Definição desconhecida: ${moduleId}`);
+      console.error(`[Vozen preview] Unknown definition: ${moduleId}`);
       return;
     }
     openModulePreview({ definition, title: cleanText(one("h2", page)?.textContent) || definition.title, trigger });

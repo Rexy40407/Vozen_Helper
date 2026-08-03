@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-PT">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,7 +21,7 @@
     <main>
       <div class="harness-toolbar">
         <div><h1 data-preview-module></h1><p data-preview-availability></p></div>
-        <button id="open-preview" type="button">Abrir pré-visualização</button>
+      <button id="open-preview" type="button">Open preview</button>
       </div>
       <div class="vozen-signal-stage" data-harness-stage></div>
     </main>
@@ -33,7 +33,7 @@
       const moduleId = params.get("module") || "management.polls";
       const beat = Math.max(0, Number(params.get("beat") || 0));
       const definition = getPreviewDefinition(moduleId);
-      if (!definition) throw new Error(`Definição desconhecida: ${moduleId}`);
+      if (!definition) throw new Error(`Unknown definition: ${moduleId}`);
       document.title = `${definition.title} · Harness`;
       document.querySelector("[data-preview-module]").textContent = definition.title;
       document.querySelector("[data-preview-availability]").textContent = `${definition.id} · ${definition.availability} · ${definition.renderer}`;

@@ -61,6 +61,17 @@ test("Polls percorre os cinco beats sem perder a narrativa", async ({ page }, te
   }
 });
 
+test("Tickets renders a real support conversation in English", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(harnessUrl("support.tickets"), { waitUntil: "domcontentloaded" });
+  await expect(page.locator(".vozen-chat-thread")).toBeVisible();
+  await expect(page.locator(".vozen-chat-message")).toHaveCount(3);
+  await expect(page.locator(".vozen-chat-system")).toHaveCount(2);
+  await expect(page.locator(".vozen-chat-thread")).toContainText("Support team assigned");
+  await expect(page.locator(".vozen-chat-thread")).toContainText("Transcript saved");
+  await expect(page.locator(".vozen-chat-thread")).not.toContainText(/Atendimento|Suporte|Transcrição|Ticket resolvido/);
+});
+
 test("o modal suporta reprodução, pausa, repetição, fecho e foco", async ({ page }) => {
   await page.goto(harnessUrl("management.polls"), { waitUntil: "domcontentloaded" });
   await expect(page.locator("[data-harness-stage]")).toHaveAttribute("data-module", "management.polls");

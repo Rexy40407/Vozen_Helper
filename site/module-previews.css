@@ -116,6 +116,29 @@
 .vozen-flow-connector { display: flex; justify-content: space-around; padding: 0 28px; }
 .vozen-flow-connector i { display: block; width: 28%; height: 2px; background: var(--preview-accent); opacity: .7; }
 .vozen-flow-node { min-width: 0; }
+.vozen-scene-conversation { display: flex; flex-direction: column; align-content: stretch; gap: 10px; }
+.vozen-conversation-header { position: relative; z-index: 1; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 11px 12px; border: 1px solid rgba(119, 174, 219, .32); border-radius: 12px; background: rgba(13, 28, 45, .94); }
+.vozen-channel-icon { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 9px; background: rgba(114, 220, 209, .17); color: var(--preview-accent); font-size: 18px; font-weight: 800; }
+.vozen-conversation-header strong, .vozen-conversation-header small { display: block; }
+.vozen-conversation-header strong { color: #e6f2ff; font-size: 14px; }
+.vozen-conversation-header small { margin-top: 3px; color: #8da6bf; font-size: 10px; }
+.vozen-ticket-state { padding: 4px 7px; border: 1px solid rgba(121, 225, 189, .45); border-radius: 999px; color: #79e1bd; font-size: 9px; font-weight: 800; letter-spacing: .1em; }
+.vozen-chat-thread { position: relative; z-index: 1; display: grid; gap: 7px; min-width: 0; }
+.vozen-chat-message { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: start; gap: 8px; max-width: 88%; }
+.vozen-chat-message.is-helper { grid-template-columns: minmax(0, 1fr) 28px; margin-left: auto; }
+.vozen-chat-avatar { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid rgba(119, 174, 219, .4); border-radius: 9px; background: #193149; color: #a8e8dc; font-size: 10px; font-weight: 800; }
+.vozen-chat-message.is-helper .vozen-chat-avatar { grid-column: 2; }
+.vozen-chat-bubble { min-width: 0; padding: 8px 10px; border: 1px solid rgba(119, 174, 219, .3); border-radius: 4px 12px 12px 12px; background: rgba(16, 35, 55, .88); }
+.vozen-chat-message.is-helper .vozen-chat-bubble { grid-column: 1; grid-row: 1; border-color: rgba(114, 220, 209, .35); border-radius: 12px 4px 12px 12px; background: rgba(33, 67, 78, .58); }
+.vozen-chat-meta { display: flex; align-items: baseline; gap: 8px; }
+.vozen-chat-meta strong { color: #e6f2ff; font-size: 10px; }
+.vozen-chat-meta time { color: #718ba7; font-size: 9px; }
+.vozen-chat-bubble p { margin: 4px 0 0; color: #c9d9e9; font-size: 11px; line-height: 1.35; }
+.vozen-chat-system { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 8px; max-width: 82%; margin: 1px auto; padding: 7px 10px; border: 1px dashed rgba(126, 173, 220, .35); border-radius: 9px; background: rgba(13, 28, 45, .72); }
+.vozen-chat-system > span { display: grid; width: 22px; height: 22px; place-items: center; border: 1px solid var(--preview-accent); border-radius: 50%; color: var(--preview-accent); font-size: 11px; }
+.vozen-chat-system strong, .vozen-chat-system small { display: block; }
+.vozen-chat-system strong { color: #dceafb; font-size: 10px; }
+.vozen-chat-system small { margin-top: 2px; color: #8098b4; font-size: 9px; }
 .vozen-scene-custom-command, .vozen-scene-workflow, .vozen-scene-help, .vozen-scene-reminder, .vozen-scene-nickname, .vozen-scene-ticket, .vozen-scene-welcome, .vozen-scene-welcome-channel, .vozen-scene-temporary-channel, .vozen-scene-embed, .vozen-scene-emoji, .vozen-scene-search { grid-template-columns: 1fr 1fr; }
 .vozen-scene-custom-command .vozen-flow-source, .vozen-scene-workflow .vozen-flow-source, .vozen-scene-help .vozen-flow-source, .vozen-scene-reminder .vozen-flow-source, .vozen-scene-nickname .vozen-flow-source, .vozen-scene-ticket .vozen-flow-source, .vozen-scene-welcome .vozen-flow-source, .vozen-scene-welcome-channel .vozen-flow-source, .vozen-scene-temporary-channel .vozen-flow-source, .vozen-scene-embed .vozen-flow-source, .vozen-scene-emoji .vozen-flow-source, .vozen-scene-search .vozen-flow-source { grid-column: 1 / -1; }
 .vozen-scene-custom-command .vozen-flow-connector, .vozen-scene-workflow .vozen-flow-connector, .vozen-scene-help .vozen-flow-connector, .vozen-scene-reminder .vozen-flow-connector, .vozen-scene-nickname .vozen-flow-connector, .vozen-scene-ticket .vozen-flow-connector, .vozen-scene-welcome .vozen-flow-connector, .vozen-scene-welcome-channel .vozen-flow-connector, .vozen-scene-temporary-channel .vozen-flow-connector, .vozen-scene-embed .vozen-flow-connector, .vozen-scene-emoji .vozen-flow-connector, .vozen-scene-search .vozen-flow-connector { grid-column: 1 / -1; }
@@ -160,6 +183,7 @@
   .vozen-scene-poll, .vozen-scene-protection, .vozen-scene-leaderboard, .vozen-scene-rank-card, .vozen-scene-levels, .vozen-scene-role-panel, .vozen-scene-event, .vozen-scene-giveaway, .vozen-scene-achievement, .vozen-scene-birthday, .vozen-scene-economy, .vozen-scene-audit, .vozen-scene-privacy, .vozen-scene-template, .vozen-scene-stats, .vozen-scene-invite-tracker, .vozen-scene-monetization, .vozen-scene-crypto-stats, .vozen-scene-nft-stats, .vozen-scene-custom-command, .vozen-scene-workflow, .vozen-scene-help, .vozen-scene-reminder, .vozen-scene-nickname, .vozen-scene-ticket, .vozen-scene-welcome, .vozen-scene-welcome-channel, .vozen-scene-temporary-channel, .vozen-scene-embed, .vozen-scene-emoji, .vozen-scene-search, .vozen-scene-crypto-query, .vozen-scene-gas-tracker, .vozen-scene-token-gate, .vozen-scene-nft-query, .vozen-scene-nft-sale { grid-template-columns: 1fr; }
   .vozen-scene-poll .vozen-poll-card, .vozen-community-hero, .vozen-community-progress, .vozen-data-summary, .vozen-chain-card, .vozen-chain-metrics, .vozen-chain-proof, .vozen-flow-source, .vozen-flow-connector { grid-column: auto; }
   .vozen-social-card .vozen-thumbnail { width: 64px; }
+  .vozen-chat-message, .vozen-chat-system { max-width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -55,14 +55,14 @@ test('each preview has a complete, non-generic five-beat story', () => {
 test('polls describes a real poll flow and uses current settings', () => {
   const preview = getPreviewDefinition('management.polls', { allowMultiple: true, defaultDurationHours: 48 });
   assert.deepEqual(preview.stages.map((stage) => stage.title), [
-    'Pergunta preparada',
-    'Enquete publicada',
-    'Membros escolhem',
-    'Resultados contam',
-    'Enquete concluída',
+    'Question prepared',
+    'Poll published',
+    'Members choose options',
+    'Results update',
+    'Poll completed',
   ]);
-  assert.match(preview.stages[4].text, /privacidade/);
-  assert.equal(preview.data.allowMultiple, 'sim');
+  assert.match(preview.stages[4].text, /final summary/i);
+  assert.equal(preview.data.allowMultiple, 'yes');
 });
 
 test('all previews expose a deterministic palette and duration', () => {
@@ -74,16 +74,20 @@ test('all previews expose a deterministic palette and duration', () => {
   }
 });
 
-test('PT-PT and safe preview controller are wired together', async () => {
-  assert.match(index, /<html lang="pt-PT">/);
+test('English UI and safe preview controller are wired together', async () => {
+  assert.match(index, /<html lang="en">/);
   assert.doesNotMatch(index, /ui-english\.js/);
+  assert.match(index, /ui-localization\.js/);
   const refresh = await readFile(new URL('../site/ui-refresh.js', import.meta.url), 'utf8');
   const player = await readFile(new URL('../site/module-preview-player.js', import.meta.url), 'utf8');
   assert.match(refresh, /module-previews\.js/);
   assert.match(refresh, /module-preview-player\.js/);
-  assert.match(refresh, /Definição desconhecida/);
+  assert.match(refresh, /Unknown definition/);
   assert.doesNotMatch(refresh, /management\.workflows.*dryRun/);
   assert.match(player, /prefers-reduced-motion/);
+  assert.match(player, /SAFE PREVIEW/);
+  assert.match(player, /vozen-chat-thread/);
+  assert.doesNotMatch(player, /PRÉ-VISUALIZAÇÃO|Reproduzir|Fechar pré-visualização/);
   assert.doesNotMatch(refresh, /SAFE PREVIEW|Preview only|Play preview/);
 });
 
@@ -104,4 +108,14 @@ test('values are escaped before entering preview text', () => {
   const rendered = renderPreviewScene({ ...preview, stages: preview.stages.map((stage, index) => index === 1 ? { ...stage, title: unsafe } : stage) });
   assert.match(rendered, /&lt;img src=x onerror=alert\(1\)&gt;/);
   assert.doesNotMatch(rendered, /<img src=x/);
+});
+
+test('tickets renders a conversation instead of a generic flow', () => {
+  const preview = getPreviewDefinition('support.tickets');
+  const rendered = renderPreviewScene(preview);
+  assert.match(rendered, /vozen-chat-thread/);
+  assert.match(rendered, /#ticket-104/);
+  assert.match(rendered, /Support team assigned/);
+  assert.match(rendered, /Transcript saved/);
+  assert.doesNotMatch(rendered, /Atendimento|Suporte|Transcrição|Ticket resolvido/);
 });
