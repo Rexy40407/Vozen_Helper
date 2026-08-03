@@ -239,6 +239,74 @@
     "Simulação concluída — nenhuma ação real foi aplicada.": "Simulation complete — no real action was applied.",
   };
 
+  Object.assign(translations, {
+    "O essencial para deixares o servidor pronto.": "Get your server essentials ready.",
+    "Níveis, XP e recompensas": "Levels, XP & rewards",
+    "PLANO ATUAL": "CURRENT PLAN",
+    "Ativa uma resposta rápida a entradas anormais.": "Triggers a quick response to unusual joins.",
+    "Pede verificação antes de dar acesso completo.": "Requests verification before granting full access.",
+    "Destaca mensagens que a comunidade mais gosta.": "Highlights messages the community likes most.",
+    "Notifica o servidor quando sai um novo vídeo.": "Notifies the server when a new video is published.",
+    "Cria respostas reutilizáveis para perguntas frequentes.": "Creates reusable responses for frequently asked questions.",
+    "Consulta, exporta e elimina dados do servidor com segurança.": "Safely views, exports and deletes server data.",
+    "Consulta informação de criptomoedas no servidor.": "Looks up cryptocurrency information in the server.",
+    "Vê o que aconteceu e mantém o controlo.": "See what happened and stay in control.",
+    "Cria uma carta de nível com a identidade do teu servidor.": "Create a level card with your server identity.",
+    "Configuração": "Configuration",
+    "Configuração por servidor, com opções simples e avançadas.": "Server-specific configuration with simple and advanced options.",
+    "← Voltar às funcionalidades": "← Back to modules",
+    "Canal acompanhado": "Tracked channel",
+    "Indica o nome do canal Twitch e valida-o pela API oficial antes de publicar.": "Enter the Twitch channel name and validate it through the official API before publishing.",
+    "Nome do canal Twitch": "Twitch channel name",
+    "Exemplo: rexy40407 (sem twitch.tv/).": "Example: rexy40407 (without twitch.tv/).",
+    "ID do canal Discord": "Discord channel ID",
+    "O canal onde o alerta será publicado.": "The channel where the alert will be published.",
+    "Mensagem": "Message",
+    "Personaliza o aviso enviado quando a transmissão começa.": "Customize the alert sent when the stream starts.",
+    "Mensagem do alerta": "Alert message",
+    "Opções avançadas": "Advanced options",
+    "Resposta automática": "Automatic response",
+    "Perfil de proteção": "Protection profile",
+    "Equilibrado é recomendado para começar.": "Balanced is recommended to start.",
+    "Mensagens no intervalo": "Messages in time window",
+    "Repetições iguais": "Duplicate messages",
+    "Timeout inicial (segundos)": "Initial timeout (seconds)",
+    "Exceções e alertas": "Exceptions and alerts",
+    "Evita falsos positivos e escolhe onde a equipa recebe contexto.": "Prevents false positives and chooses where the team receives context.",
+    "Progressão": "Progression",
+    "Cria um ritmo justo para membros ativos.": "Creates a fair pace for active members.",
+    "XP mínimo por mensagem": "Minimum XP per message",
+    "XP máximo por mensagem": "Maximum XP per message",
+    "Cooldown entre mensagens (segundos)": "Cooldown between messages (seconds)",
+    "Acumular cargos de nível": "Stack level roles",
+    "Mensagens e recompensas": "Messages and rewards",
+    "Personaliza o anúncio e os cargos sem editar comandos.": "Customize announcements and roles without editing commands.",
+    "Canal de anúncio": "Announcement channel",
+    "Mensagem de entrada": "Welcome message",
+    "Dá boas-vindas sem obrigar a editar código.": "Welcomes members without requiring code changes.",
+    "Canal público": "Public channel",
+    "Mensagem pública": "Public message",
+    "Mensagem privada e cargo": "Private message and role",
+    "Enviar mensagem privada": "Send private message",
+  });
+
+  const fragmentTranslations = [
+    ["CONFIGURA\u00c7\u00c3O", "CONFIGURATION"],
+    ["Configura\u00e7\u00e3o", "Configuration"],
+    ["configura\u00e7\u00e3o", "configuration"],
+    ["PROTE\u00c7\u00c3O", "PROTECTION"],
+    ["Prote\u00e7\u00e3o", "Protection"],
+    ["prote\u00e7\u00e3o", "protection"],
+    ["COMUNIDADE", "COMMUNITY"],
+    ["Comunidade", "Community"],
+    ["comunidade", "community"],
+    ["GEST\u00c3O", "MANAGEMENT"],
+    ["Gest\u00e3o", "Management"],
+    ["gest\u00e3o", "management"],
+    ["ao vivo", "live"],
+    ["defini\u00e7\u00f5es", "settings"],
+  ];
+
   const patterns = [
     [/^Servidor:\s*/, "Server: "],
     [/^ETAPA\s+/, "STEP "],
@@ -259,7 +327,11 @@
     for (const [pattern, replacement] of patterns) {
       if (pattern.test(value)) return `${leading}${value.replace(pattern, replacement)}${trailing}`;
     }
-    return raw;
+    const translatedFragments = fragmentTranslations.reduce(
+      (result, [source, replacement]) => result.split(source).join(replacement),
+      value,
+    );
+    return translatedFragments === value ? raw : `${leading}${translatedFragments}${trailing}`;
   };
 
   function applyTranslations() {
