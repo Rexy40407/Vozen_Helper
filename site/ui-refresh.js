@@ -13,6 +13,7 @@
   const one = (selector, root = document) => root.querySelector(selector);
   const all = (selector, root = document) => [...root.querySelectorAll(selector)];
   const cleanText = (value) => String(value || "").replace(/\s+/g, " ").trim();
+  const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]));
 
   const CATEGORY_LABELS = {
     protection: "Protection",
@@ -691,6 +692,96 @@
     return invalid;
   }
 
+  function previewField(container, terms, fallback = "Not set") {
+    const needles = terms.map((term) => term.toLowerCase());
+    const field = all("input, select, textarea", container).find((candidate) => {
+      const label = cleanText(candidate.closest("label")?.textContent || "").toLowerCase();
+      const name = String(candidate.name || candidate.id || "").toLowerCase();
+      return needles.some((needle) => label.includes(needle) || name.includes(needle));
+    });
+    if (!field) return fallback;
+    if (field.type === "checkbox") return field.checked ? "Enabled" : "Disabled";
+    return String(field.value || fallback).trim() || fallback;
+  }
+
+  function simulationRows(page, route) {
+    const container = one(".detail-layout", page) || page;
+    if (/community\.levels/.test(route)) {
+      const minXp = previewField(container, ["minimum xp", "minxp"], "15");
+      const maxXp = previewField(container, ["maximum xp", "maxxp"], "30");
+      const cooldown = previewField(container, ["cooldown", "cooldownseconds"], "60");
+      const stackRoles = previewField(container, ["stack level roles", "stackroles"], "Disabled");
+      const channel = previewField(container, ["announcement channel", "announcementchannel"], "Not selected");
+      return [
+        { tone: "event", label: "EVENT", title: "A member sends a message", text: "The Helper checks the XP cooldown before continuing." },
+        { tone: "reward", label: "XP REWARD", title: `${minXp}–${maxXp} XP awarded`, text: "A random amount inside this range is added to the member's progression." },
+        { tone: "cooldown", label: "COOLDOWN", title: `${cooldown} seconds`, text: "Messages inside this cooldown window do not award additional XP." },
+        { tone: "roles", label: "LEVEL ROLES", title: stackRoles, text: channel === "Not selected" ? "No announcement channel is selected." : `Announcements use ${channel}.` },
+      ];
+    }
+    const values = all("input, select, textarea", container)
+      .map((field) => ({
+        label: cleanText(field.closest("label")?.querySelector("span")?.textContent || field.name || field.type || "Setting"),
+        value: field.type === "checkbox" ? (field.checked ? "Enabled" : "Disabled") : String(field.value || "Not set").trim(),
+      }))
+      .filter((item) => item.label && item.value)
+      .slice(0, 4);
+    return values.length
+      ? [{ tone: "config", label: "CONFIGURATION", title: "Current values loaded", text: values.map((item) => `${item.label}: ${item.value}`).join(" · ") }]
+      : [{ tone: "config", label: "CONFIGURATION", title: "Ready to preview", text: "The current module settings will be checked without publishing anything." }];
+  }
+
+  function closeSimulationPreview(page) {
+    const modal = one("#vozen-simulation-modal");
+    if (!modal) return;
+    document.body.classList.remove("vozen-modal-open");
+    document.removeEventListener("keydown", modal._onKeyDown);
+    modal.remove();
+    page._simulationTrigger?.focus();
+  }
+
+  function openSimulationPreview(page, route, trigger) {
+    closeSimulationPreview(page);
+    const title = cleanText(one("h2", page)?.textContent) || "Module";
+    const rows = simulationRows(page, route);
+    const modal = document.createElement("div");
+    modal.id = "vozen-simulation-modal";
+    modal.className = "vozen-simulation-modal";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-labelledby", "vozen-simulation-title");
+    modal.innerHTML = `
+      <div class="vozen-simulation-backdrop" data-simulation-close="true"></div>
+      <section class="vozen-simulation-dialog" role="document">
+        <header class="vozen-simulation-header">
+          <div>
+            <span class="vozen-eyebrow">SAFE PREVIEW</span>
+            <h2 id="vozen-simulation-title">${escapeHtml(title)}</h2>
+            <p>See what this configuration would do before publishing.</p>
+          </div>
+          <button type="button" class="vozen-simulation-close" aria-label="Close simulation preview">×</button>
+        </header>
+        <div class="vozen-simulation-badge"><span aria-hidden="true">●</span> Preview only · No real action will be sent</div>
+        <div class="vozen-simulation-timeline">
+          ${rows.map((row, index) => `<article class="vozen-simulation-step" data-tone="${escapeHtml(row.tone)}"><span class="vozen-simulation-step-number">${index + 1}</span><div><span class="vozen-eyebrow">${escapeHtml(row.label)}</span><h3>${escapeHtml(row.title)}</h3><p>${escapeHtml(row.text)}</p></div></article>`).join("")}
+        </div>
+        <footer class="vozen-simulation-footer"><span>These are simulated results based on the values currently in the form.</span><button type="button" class="primary vozen-simulation-done">Close preview</button></footer>
+      </section>`;
+    document.body.append(modal);
+    document.body.classList.add("vozen-modal-open");
+    page._simulationTrigger = trigger;
+    const close = () => closeSimulationPreview(page);
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") close();
+    };
+    modal._onKeyDown = onKeyDown;
+    document.addEventListener("keydown", onKeyDown);
+    one(".vozen-simulation-close", modal)?.addEventListener("click", close);
+    one(".vozen-simulation-done", modal)?.addEventListener("click", close);
+    one("[data-simulation-close]", modal)?.addEventListener("click", close);
+    window.requestAnimationFrame(() => one(".vozen-simulation-close", modal)?.focus());
+  }
+
   function enhanceModuleForm() {
     const page = one(".detail-page");
     if (!page || !one(".detail-intro", page)) return;
@@ -735,18 +826,12 @@
         const discard = one("button.secondary", actions);
         if (discard) discard.addEventListener("click", () => window.setTimeout(schedule, 80));
         const simulate = one("button.secondary", one(".detail-aside", page) || page);
-        if (simulate && /simular/i.test(simulate.textContent) && !simulate.dataset.uiBound) {
-          simulate.dataset.uiBound = "true";
-          simulate.addEventListener("click", () => {
-            let result = one(".vozen-simulation-output", page);
-            if (!result) {
-              result = document.createElement("div");
-              result.className = "vozen-simulation-output";
-              result.setAttribute("role", "status");
-              result.setAttribute("aria-live", "polite");
-              simulate.after(result);
-            }
-            result.textContent = "Simulation complete — no action was sent.";
+        if (simulate && /simulat|simular/i.test(simulate.textContent) && !simulate.dataset.uiPreviewBound) {
+          simulate.dataset.uiPreviewBound = "true";
+          simulate.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            openSimulationPreview(page, route, simulate);
           });
         }
       }

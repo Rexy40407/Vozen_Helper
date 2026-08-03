@@ -900,6 +900,227 @@ header h1 {
   }
 }
 
+/* Safe simulation preview modal. */
+body.vozen-modal-open {
+  overflow: hidden;
+}
+
+.vozen-simulation-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.vozen-simulation-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(4 8 15 / 78%);
+  backdrop-filter: blur(6px);
+}
+
+.vozen-simulation-dialog {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(680px, 100%);
+  max-height: min(760px, calc(100vh - 48px));
+  overflow: auto;
+  border: 1px solid #46617f;
+  border-radius: 18px;
+  background: #101b2b;
+  box-shadow: 0 24px 70px rgb(0 0 0 / 44%);
+  animation: vozen-modal-in 180ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.vozen-simulation-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 24px 18px;
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.vozen-simulation-header h2 {
+  margin: 4px 0 5px;
+  color: var(--ui-text);
+  font: 650 28px/34px "Space Grotesk", sans-serif;
+}
+
+.vozen-simulation-header p {
+  margin: 0;
+  color: var(--ui-muted);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.vozen-simulation-close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  color: var(--ui-muted);
+  background: #0d1624;
+  font-size: 24px;
+  line-height: 1;
+  transition: border-color var(--catalog-motion), background-color var(--catalog-motion), color var(--catalog-motion);
+}
+
+.vozen-simulation-close:hover {
+  border-color: var(--ui-accent);
+  color: var(--ui-text);
+  background: #142337;
+}
+
+.vozen-simulation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  max-width: calc(100% - 48px);
+  margin: 18px 24px 4px;
+  padding: 7px 10px;
+  border: 1px solid #3b756f;
+  border-radius: 999px;
+  color: var(--ui-accent);
+  background: #12383a;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.vozen-simulation-timeline {
+  display: grid;
+  gap: 10px;
+  padding: 14px 24px 22px;
+}
+
+.vozen-simulation-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 12px;
+  min-height: 76px;
+  padding: 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  background: #0d1624;
+}
+
+.vozen-simulation-step:not(:last-child)::after {
+  position: absolute;
+  bottom: -11px;
+  left: 27px;
+  width: 1px;
+  height: 10px;
+  background: #46617f;
+  content: "";
+}
+
+.vozen-simulation-step-number {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid color-mix(in srgb, var(--step-tone, #8ee5d2) 48%, var(--ui-border));
+  border-radius: 9px;
+  color: var(--step-tone, #8ee5d2);
+  background: color-mix(in srgb, var(--step-tone, #8ee5d2) 10%, #112033);
+  font: 650 12px/16px "Space Grotesk", sans-serif;
+}
+
+.vozen-simulation-step[data-tone="event"] { --step-tone: #66c8ff; }
+.vozen-simulation-step[data-tone="reward"] { --step-tone: #72e2c2; }
+.vozen-simulation-step[data-tone="cooldown"] { --step-tone: #f0c56a; }
+.vozen-simulation-step[data-tone="roles"] { --step-tone: #a8b0ff; }
+.vozen-simulation-step[data-tone="config"] { --step-tone: #8ee5d2; }
+
+.vozen-simulation-step h3 {
+  margin: 2px 0 3px;
+  color: var(--ui-text);
+  font: 650 16px/22px "Space Grotesk", sans-serif;
+}
+
+.vozen-simulation-step p {
+  margin: 0;
+  color: var(--ui-muted);
+  font-size: 13px;
+  line-height: 19px;
+}
+
+.vozen-simulation-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--ui-border);
+  color: var(--ui-subtle);
+  font-size: 12px;
+  line-height: 17px;
+}
+
+.vozen-simulation-done {
+  flex: none;
+  min-height: 44px;
+}
+
+@keyframes vozen-modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 600px) {
+  .vozen-simulation-modal {
+    align-items: end;
+    padding: 0;
+  }
+
+  .vozen-simulation-dialog {
+    width: 100%;
+    max-height: 88vh;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 18px 18px 0 0;
+  }
+
+  .vozen-simulation-header,
+  .vozen-simulation-timeline,
+  .vozen-simulation-footer {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .vozen-simulation-badge {
+    max-width: calc(100% - 32px);
+    margin-right: 16px;
+    margin-left: 16px;
+  }
+
+  .vozen-simulation-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .vozen-simulation-done {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vozen-simulation-dialog,
+  .vozen-simulation-close {
+    animation: none;
+    transition: none;
+  }
+}
+
 /* Signal Deck catalog: a semantic list with category-led visual identity. */
 :root {
   --catalog-surface: #0f1724;
