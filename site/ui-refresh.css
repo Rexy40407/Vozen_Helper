@@ -55,6 +55,17 @@ input[type="radio"] {
   min-height: 44px;
 }
 
+/* Keep the switch visual compact while its label remains a comfortable hit target. */
+.switch-row,
+.toggle-field {
+  min-height: 44px;
+}
+
+.switch-row input[type="checkbox"],
+.toggle-field input[type="checkbox"] {
+  min-height: 24px;
+}
+
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
