@@ -1041,27 +1041,48 @@
   }
 
   function normalizeEnglishPresets(container, route) {
-    if (!/support\.welcome/.test(route) || container.dataset.uiEnglishPresets === "true") return;
-    const presets = [
+    if (container.dataset.uiEnglishPresets === "true") return;
+    const presetGroups = [
       {
-        matches: [
-          "Bem-vindo(a), {member}! Lê as regras e diverte-te.",
-          "Bem-vindo(a), {member}! Le as regras e diverte-te.",
+        route: /support\.welcome/,
+        presets: [
+          {
+            matches: [
+              "Bem-vindo(a), {member}! Lê as regras e diverte-te.",
+              "Bem-vindo(a), {member}! Le as regras e diverte-te.",
+            ],
+            value: "Welcome, {member}! Read the rules and enjoy your stay.",
+            terms: ["public message", "mensagem pública", "mensagem publica"],
+          },
+          {
+            matches: ["Olá {member}, bem-vindo(a) ao servidor!", "Ola {member}, bem-vindo(a) ao servidor!"],
+            value: "Hi {member}, welcome to the server!",
+            terms: ["private message", "mensagem privada"],
+          },
         ],
-        value: "Welcome, {member}! Read the rules and enjoy your stay.",
-        terms: ["public message", "mensagem pública", "mensagem publica"],
       },
       {
-        matches: ["Olá {member}, bem-vindo(a) ao servidor!", "Ola {member}, bem-vindo(a) ao servidor!"],
-        value: "Hi {member}, welcome to the server!",
-        terms: ["private message", "mensagem privada"],
+        route: /community\.levels/,
+        presets: [
+          { matches: ["{member} chegou ao nível {level}!", "{member} chegou ao nivel {level}!"], value: "{member} reached level {level}!" },
+        ],
+      },
+      {
+        route: /social\.twitch/,
+        presets: [
+          { matches: ["{broadcaster} está ao vivo!\nhttps://twitch.tv/{login}", "{broadcaster} esta ao vivo!\nhttps://twitch.tv/{login}"], value: "{broadcaster} is live now!\nhttps://twitch.tv/{login}" },
+        ],
       },
     ];
+    const group = presetGroups.find((candidate) => candidate.route.test(route));
+    if (!group) return;
+    const presets = group.presets;
     presets.forEach((preset) => {
       const field = all("textarea, input", container).find((candidate) => {
         const label = cleanText(candidate.closest("label")?.textContent || "").toLowerCase(); const name = String(candidate.name || candidate.id || "").toLowerCase();
         const currentValue = String(candidate.value || "").trim();
-        return preset.terms.some((term) => label.includes(term) || name.includes(term)) && preset.matches.includes(currentValue);
+        const labelledMatch = !preset.terms || preset.terms.some((term) => label.includes(term) || name.includes(term));
+        return labelledMatch && preset.matches.includes(currentValue);
       });
       if (!field) return;
       const prototype = field instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
