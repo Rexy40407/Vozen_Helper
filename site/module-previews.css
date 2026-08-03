@@ -1,0 +1,167 @@
+/* Preview scenes are content-led: decoration may be absolute, content never is. */
+.vozen-modal-open { overflow: hidden; }
+.vozen-simulation-modal { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 24px; color: #e7f1ff; }
+.vozen-simulation-backdrop { position: absolute; inset: 0; background: rgba(2, 7, 16, .82); backdrop-filter: blur(10px); }
+.vozen-simulation-dialog { position: relative; display: flex; flex-direction: column; width: min(1100px, 100%); max-height: min(860px, calc(100vh - 48px)); overflow: hidden; border: 1px solid rgba(126, 173, 220, .34); border-radius: 18px; background: #0d1928; box-shadow: 0 28px 90px rgba(0, 0, 0, .45); }
+.vozen-simulation-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding: 28px 32px 20px; border-bottom: 1px solid rgba(126, 173, 220, .22); }
+.vozen-eyebrow, .vozen-semantic-kicker { display: block; color: var(--preview-accent, #72dfd0); font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.vozen-simulation-header h2 { margin: 6px 0 8px; color: #f6fbff; font: 700 clamp(24px, 4vw, 34px)/1.05 Georgia, serif; }
+.vozen-simulation-header p { margin: 0; color: #a7b9d0; font-size: 14px; }
+.vozen-simulation-close { display: grid; flex: 0 0 44px; width: 44px; height: 44px; place-items: center; border: 2px solid #88dfd1; border-radius: 15px; background: #152337; color: #b7c8db; font-size: 24px; cursor: pointer; }
+.vozen-simulation-close:focus-visible, .vozen-preview-controls button:focus-visible { outline: 3px solid #f0c56a; outline-offset: 3px; }
+.vozen-simulation-badge { align-self: flex-start; margin: 10px 32px 14px; padding: 8px 12px; border: 1px solid rgba(104, 223, 203, .5); border-radius: 999px; background: rgba(78, 196, 178, .1); color: #8de1d1; font-size: 12px; }
+.vozen-simulation-badge span { margin-right: 7px; }
+.vozen-simulation-content { display: grid; grid-template-columns: minmax(250px, .8fr) minmax(0, 1.2fr); gap: 14px; min-height: 0; padding: 0 24px 20px; overflow: auto; }
+.vozen-scenario-rail { display: grid; align-content: start; gap: 6px; margin: 0; padding: 12px 0 0; list-style: none; }
+.vozen-scenario-step { display: grid; grid-template-columns: 32px 1fr; align-items: center; gap: 10px; min-height: 56px; padding: 8px 12px; border: 1px solid transparent; border-radius: 12px; color: #89a1ba; }
+.vozen-scenario-step > span { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 9px; background: #1b3245; color: #aec3d5; font-weight: 800; }
+.vozen-scenario-step strong, .vozen-scenario-step small { display: block; }
+.vozen-scenario-step strong { font-size: 10px; letter-spacing: .12em; }
+.vozen-scenario-step small { margin-top: 4px; color: #d3e0ee; font-size: 13px; }
+.vozen-scenario-step.is-active { border-color: var(--preview-accent, #72dfd0); background: rgba(78, 196, 178, .08); color: var(--preview-accent, #72dfd0); }
+.vozen-scenario-step.is-complete > span { background: #82dfcf; color: #112133; }
+.vozen-signal-column { min-width: 0; padding-top: 12px; }
+.vozen-signal-stage { min-height: 430px; overflow: hidden; border: 1px solid rgba(102, 170, 222, .4); border-radius: 16px; background: #091321; }
+.vozen-live-preview-note { margin: 10px 2px 0; color: #8098b4; font-size: 11px; }
+.vozen-preview-sr-summary { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.vozen-simulation-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 24px; border-top: 1px solid rgba(126, 173, 220, .22); background: rgba(13, 25, 40, .96); }
+.vozen-preview-progress-wrap { display: flex; align-items: center; gap: 10px; min-width: 180px; color: #83a0bc; font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.vozen-preview-progress { width: 120px; height: 5px; overflow: hidden; border-radius: 99px; background: #1d3449; }
+.vozen-preview-progress span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--preview-accent, #72dfd0); transition: width .12s linear; }
+.vozen-preview-controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.vozen-preview-controls button { min-height: 42px; padding: 0 14px; border: 1px solid #31516f; border-radius: 9px; background: #102238; color: #a9c2da; font-weight: 700; cursor: pointer; }
+.vozen-preview-controls button.primary { border-color: transparent; background: #72dcd1; color: #102133; }
+.vozen-preview-controls button:disabled { cursor: wait; opacity: .6; }
+
+.vozen-signal-stage, .vozen-signal-stage * { box-sizing: border-box; }
+.vozen-stage-topline { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 11px; border-bottom: 1px solid rgba(118, 181, 225, .2); }
+.vozen-stage-status { color: var(--preview-accent, #72dfd0); font-size: 12px; font-weight: 800; }
+.vozen-stage-live-label { color: #718ba7; font-size: 9px; font-weight: 800; letter-spacing: .13em; }
+.vozen-module-scene { position: relative; display: grid; align-content: start; gap: 10px; min-height: 375px; padding: 22px; overflow: hidden; }
+.vozen-scene-grid { position: absolute; inset: 0; pointer-events: none; opacity: .45; background-image: linear-gradient(rgba(115, 171, 219, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(115, 171, 219, .06) 1px, transparent 1px); background-size: 34px 34px; mask-image: linear-gradient(to bottom, #000, transparent 82%); }
+.vozen-preview-card, .vozen-message-card, .vozen-social-card, .vozen-suggestion-card, .vozen-protection-event, .vozen-protection-signal, .vozen-protection-check, .vozen-protection-action, .vozen-flow-node, .vozen-flow-source, .vozen-community-hero, .vozen-community-progress, .vozen-data-summary, .vozen-chain-card, .vozen-chain-metrics, .vozen-chain-proof, .vozen-review-card, .vozen-threshold-card, .vozen-starboard-card, .vozen-social-source, .vozen-social-event, .vozen-social-validate { position: relative; z-index: 1; display: grid; gap: 5px; padding: 14px; border: 1px solid rgba(119, 174, 219, .32); border-radius: 12px; background: rgba(13, 28, 45, .9); color: #d8e7f5; }
+.vozen-stage-item { opacity: .25; transform: translateY(8px) scale(.985); transition: opacity .28s ease, transform .28s ease, border-color .28s ease, background .28s ease; }
+.vozen-stage-item.is-active, .vozen-stage-item.is-complete { opacity: 1; transform: none; }
+.vozen-stage-item.is-active { border-color: var(--preview-accent, #72dfd0); box-shadow: 0 0 0 1px rgba(114, 220, 209, .12); }
+.vozen-preview-card strong, .vozen-preview-card small, .vozen-message-card strong, .vozen-message-card small, .vozen-social-card strong, .vozen-social-card small, .vozen-suggestion-card strong, .vozen-suggestion-card small, .vozen-protection-event strong, .vozen-protection-event small, .vozen-protection-signal strong, .vozen-protection-signal small, .vozen-protection-check strong, .vozen-protection-check small, .vozen-protection-action strong, .vozen-protection-action small, .vozen-flow-node strong, .vozen-flow-node small, .vozen-community-hero strong, .vozen-community-hero small, .vozen-community-progress strong, .vozen-community-progress small, .vozen-chain-proof strong, .vozen-chain-proof small { display: block; }
+.vozen-preview-card strong, .vozen-message-card strong, .vozen-social-card strong, .vozen-suggestion-card strong, .vozen-protection-event strong, .vozen-protection-signal strong, .vozen-protection-check strong, .vozen-protection-action strong, .vozen-flow-node strong, .vozen-community-hero strong, .vozen-community-progress strong, .vozen-chain-proof strong { color: #e6f2ff; font-size: 13px; }
+.vozen-preview-card small, .vozen-message-card small, .vozen-social-card small, .vozen-suggestion-card small, .vozen-protection-event small, .vozen-protection-signal small, .vozen-protection-check small, .vozen-protection-action small, .vozen-flow-node small, .vozen-community-hero small, .vozen-community-progress small, .vozen-chain-proof small { color: #8da6bf; font-size: 11px; line-height: 1.4; }
+.vozen-semantic-result { border-color: rgba(114, 220, 209, .55); background: rgba(75, 166, 166, .13); }
+
+.vozen-scene-poll { grid-template-columns: 1fr 1fr; align-items: start; }
+.vozen-scene-poll .vozen-poll-card { grid-column: 1 / -1; }
+.vozen-poll-card { display: grid; gap: 9px; }
+.vozen-poll-card > strong { color: #f0f7ff; font-size: 18px; }
+.vozen-poll-option { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; padding-top: 4px; color: #b9cde1; font-size: 11px; }
+.vozen-poll-option b { grid-column: 1 / -1; display: block; width: var(--poll-width); height: 6px; border-radius: 99px; background: linear-gradient(90deg, var(--preview-accent), var(--preview-secondary)); transform-origin: left center; }
+.vozen-poll-option small { color: #7793ae; }
+.vozen-scene-meta { color: #8da6bf; }
+.vozen-result-bars { display: grid; gap: 8px; padding: 14px; border: 1px solid rgba(119, 174, 219, .32); border-radius: 12px; background: rgba(13, 28, 45, .9); }
+.vozen-result-bars i { display: block; width: var(--poll-width); height: 7px; border-radius: 99px; background: var(--preview-accent); transform-origin: left center; }
+.vozen-result-bars i:nth-of-type(2) { background: var(--preview-secondary); }
+.vozen-result-bars i:nth-of-type(3) { background: #8295e9; }
+.vozen-message-card, .vozen-social-source, .vozen-social-card { grid-template-columns: auto 1fr; align-items: center; }
+.vozen-message-card p { margin: 2px 0; color: #c9d9e9; font-size: 12px; }
+.vozen-avatar, .vozen-shield-mark, .vozen-platform-mark, .vozen-flow-icon, .vozen-chain-orbit { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 11px; background: rgba(114, 220, 209, .18); color: var(--preview-accent); font-weight: 800; }
+.vozen-reaction-strip, .vozen-vote-board { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 11px 13px; border: 1px solid rgba(119, 174, 219, .28); border-radius: 10px; background: rgba(16, 35, 55, .8); color: #9db9d3; font-size: 12px; }
+.vozen-reaction-strip strong, .vozen-vote-board strong { margin-left: auto; color: var(--preview-accent); }
+.vozen-threshold-card { grid-template-columns: auto 1fr auto; align-items: center; }
+.vozen-threshold-card b { color: #f0c56a; font-size: 12px; }
+.vozen-starboard-card { grid-template-columns: 1fr auto; }
+.vozen-starboard-card .vozen-semantic-kicker, .vozen-starboard-card strong, .vozen-starboard-card small { grid-column: 1; }
+.vozen-star-fixed { grid-column: 2; grid-row: 1 / span 3; align-self: center; color: #f0c56a; font-size: 28px; }
+.vozen-suggestion-card { gap: 8px; }
+.vozen-vote-row { display: flex; gap: 8px; color: #85dacc; font-size: 11px; }
+.vozen-status-badge, .vozen-action-chip { justify-self: start; padding: 4px 7px; border-radius: 6px; background: rgba(240, 197, 106, .15); color: #f0c56a; font-size: 9px; font-weight: 800; letter-spacing: .1em; }
+
+.vozen-scene-protection { grid-template-columns: 1fr 1fr; }
+.vozen-scene-protection > .vozen-protection-event { grid-column: 1 / -1; }
+.vozen-protection-event { grid-template-columns: auto 1fr; align-items: center; }
+.vozen-protection-event p { margin: 2px 0; color: #c3d4e5; font-size: 12px; }
+.vozen-protection-signal, .vozen-protection-check { grid-template-columns: auto 1fr; align-items: center; }
+.vozen-signal-pulse, .vozen-protection-check > span, .vozen-protection-action > span:first-child { display: grid; width: 25px; height: 25px; place-items: center; border-radius: 50%; background: rgba(240, 197, 106, .17); color: #f0c56a; }
+.vozen-protection-action { background: rgba(178, 108, 111, .13); }
+.vozen-scene-anti-raid .vozen-protection-event { background: linear-gradient(90deg, rgba(75, 166, 166, .15), rgba(178, 108, 111, .13)); }
+.vozen-scene-join-gate .vozen-protection-event { background: rgba(114, 220, 209, .11); }
+
+.vozen-social-source { grid-template-columns: auto 1fr auto; }
+.vozen-platform-mark { background: color-mix(in srgb, var(--preview-accent) 25%, transparent); }
+.vozen-pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #79e1bd; box-shadow: 0 0 0 6px rgba(121, 225, 189, .1); }
+.vozen-social-event { border-left: 3px solid var(--preview-accent); }
+.vozen-social-validate { grid-template-columns: auto 1fr; align-items: center; }
+.vozen-social-validate > span { display: grid; width: 27px; height: 27px; place-items: center; border: 1px solid var(--preview-accent); border-radius: 50%; color: var(--preview-accent); }
+.vozen-thumbnail { display: grid; width: 86px; height: 54px; place-items: center; border-radius: 7px; background: linear-gradient(135deg, #203a57, #76527f); color: #fff; }
+.vozen-social-card .vozen-semantic-kicker, .vozen-social-card strong, .vozen-social-card small { grid-column: 2; }
+.vozen-social-card .vozen-thumbnail { grid-column: 1; grid-row: 1 / span 3; }
+
+.vozen-scene-leaderboard, .vozen-scene-rank-card, .vozen-scene-levels, .vozen-scene-role-panel, .vozen-scene-event, .vozen-scene-giveaway, .vozen-scene-achievement, .vozen-scene-birthday, .vozen-scene-economy { grid-template-columns: 1fr 1fr; }
+.vozen-community-hero { grid-column: 1 / -1; gap: 7px; background: linear-gradient(120deg, rgba(114, 220, 209, .14), rgba(13, 28, 45, .9)); }
+.vozen-community-hero > strong { font-size: 18px; }
+.vozen-community-hero > b { display: block; }
+.vozen-progress-track { display: block; height: 7px; overflow: hidden; border-radius: 99px; background: #203c55; }
+.vozen-progress-track i { display: block; width: var(--progress-width); height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--preview-accent), var(--preview-secondary)); transform-origin: left center; }
+.vozen-community-progress { grid-column: 1 / -1; }
+
+.vozen-scene-audit, .vozen-scene-privacy, .vozen-scene-template, .vozen-scene-stats, .vozen-scene-invite-tracker, .vozen-scene-monetization, .vozen-scene-crypto-stats, .vozen-scene-nft-stats { grid-template-columns: 1fr 1fr; }
+.vozen-data-summary { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; }
+.vozen-data-summary span { display: grid; gap: 4px; }
+.vozen-data-summary small, .vozen-chain-metrics small { color: #7997b4; font-size: 9px; font-weight: 800; letter-spacing: .1em; }
+.vozen-data-summary strong, .vozen-chain-metrics strong { color: #e4f1ff; font-size: 13px; }
+.vozen-data-visual { display: flex; align-items: end; gap: 8px; min-height: 130px; padding: 16px; border: 1px solid rgba(119, 174, 219, .32); border-radius: 12px; background: rgba(13, 28, 45, .9); }
+.vozen-data-visual i { width: 14%; height: var(--bar-height); min-height: 15px; border-radius: 5px 5px 2px 2px; background: var(--preview-accent); transform-origin: bottom center; }
+.vozen-data-visual i:nth-of-type(even) { background: var(--preview-secondary); }
+.vozen-data-visual strong { align-self: start; margin-left: auto; max-width: 46%; color: #dceafb; font-size: 11px; }
+
+.vozen-flow-source { grid-template-columns: auto 1fr; align-items: center; }
+.vozen-flow-connector { display: flex; justify-content: space-around; padding: 0 28px; }
+.vozen-flow-connector i { display: block; width: 28%; height: 2px; background: var(--preview-accent); opacity: .7; }
+.vozen-flow-node { min-width: 0; }
+.vozen-scene-custom-command, .vozen-scene-workflow, .vozen-scene-help, .vozen-scene-reminder, .vozen-scene-nickname, .vozen-scene-ticket, .vozen-scene-welcome, .vozen-scene-welcome-channel, .vozen-scene-temporary-channel, .vozen-scene-embed, .vozen-scene-emoji, .vozen-scene-search { grid-template-columns: 1fr 1fr; }
+.vozen-scene-custom-command .vozen-flow-source, .vozen-scene-workflow .vozen-flow-source, .vozen-scene-help .vozen-flow-source, .vozen-scene-reminder .vozen-flow-source, .vozen-scene-nickname .vozen-flow-source, .vozen-scene-ticket .vozen-flow-source, .vozen-scene-welcome .vozen-flow-source, .vozen-scene-welcome-channel .vozen-flow-source, .vozen-scene-temporary-channel .vozen-flow-source, .vozen-scene-embed .vozen-flow-source, .vozen-scene-emoji .vozen-flow-source, .vozen-scene-search .vozen-flow-source { grid-column: 1 / -1; }
+.vozen-scene-custom-command .vozen-flow-connector, .vozen-scene-workflow .vozen-flow-connector, .vozen-scene-help .vozen-flow-connector, .vozen-scene-reminder .vozen-flow-connector, .vozen-scene-nickname .vozen-flow-connector, .vozen-scene-ticket .vozen-flow-connector, .vozen-scene-welcome .vozen-flow-connector, .vozen-scene-welcome-channel .vozen-flow-connector, .vozen-scene-temporary-channel .vozen-flow-connector, .vozen-scene-embed .vozen-flow-connector, .vozen-scene-emoji .vozen-flow-connector, .vozen-scene-search .vozen-flow-connector { grid-column: 1 / -1; }
+
+.vozen-scene-crypto-query, .vozen-scene-gas-tracker, .vozen-scene-token-gate, .vozen-scene-nft-query, .vozen-scene-nft-sale { grid-template-columns: 1fr 1fr; }
+.vozen-chain-card, .vozen-chain-metrics { grid-column: 1 / -1; grid-template-columns: auto 1fr auto; align-items: center; }
+.vozen-chain-metrics { grid-template-columns: 1fr 1fr; }
+.vozen-chain-metrics span { display: grid; gap: 4px; }
+.vozen-chain-proof { grid-column: 1 / -1; grid-template-columns: auto 1fr; align-items: center; }
+.vozen-chain-proof > span { display: grid; width: 27px; height: 27px; place-items: center; border: 1px solid var(--preview-accent); border-radius: 50%; color: var(--preview-accent); }
+.vozen-chain-proof small { grid-column: 2; }
+.vozen-chain-state { color: #79e1bd; }
+
+@media (max-width: 720px) {
+  .vozen-simulation-modal { padding: 8px; }
+  .vozen-simulation-dialog { max-height: calc(100vh - 16px); border-radius: 14px; }
+  .vozen-simulation-header { padding: 20px 18px 16px; }
+  .vozen-simulation-badge { margin: 10px 18px; font-size: 11px; }
+  .vozen-simulation-content { grid-template-columns: 1fr; padding: 0 12px 14px; }
+  .vozen-scenario-rail { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; padding-top: 4px; }
+  .vozen-scenario-step { display: block; min-height: 0; padding: 6px 2px; text-align: center; }
+  .vozen-scenario-step > span { width: 25px; height: 25px; margin: 0 auto 4px; font-size: 11px; }
+  .vozen-scenario-step strong { font-size: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .vozen-scenario-step small { display: none; }
+  .vozen-signal-column { padding-top: 2px; }
+  .vozen-signal-stage { min-height: 420px; }
+  .vozen-module-scene { min-height: 365px; padding: 14px; }
+  .vozen-simulation-footer { align-items: stretch; flex-direction: column; gap: 12px; padding: 12px 14px; }
+  .vozen-preview-progress-wrap { justify-content: space-between; }
+  .vozen-preview-progress { flex: 1; }
+  .vozen-preview-controls { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .vozen-preview-controls button { padding: 0 7px; font-size: 11px; }
+}
+
+@media (max-width: 430px) {
+  .vozen-simulation-header { gap: 10px; }
+  .vozen-simulation-header h2 { font-size: 25px; }
+  .vozen-simulation-header p { font-size: 12px; }
+  .vozen-simulation-close { flex-basis: 38px; width: 38px; height: 38px; border-radius: 12px; }
+  .vozen-signal-stage { min-height: 450px; }
+  .vozen-module-scene { grid-template-columns: 1fr; }
+  .vozen-scene-poll, .vozen-scene-protection, .vozen-scene-leaderboard, .vozen-scene-rank-card, .vozen-scene-levels, .vozen-scene-role-panel, .vozen-scene-event, .vozen-scene-giveaway, .vozen-scene-achievement, .vozen-scene-birthday, .vozen-scene-economy, .vozen-scene-audit, .vozen-scene-privacy, .vozen-scene-template, .vozen-scene-stats, .vozen-scene-invite-tracker, .vozen-scene-monetization, .vozen-scene-crypto-stats, .vozen-scene-nft-stats, .vozen-scene-custom-command, .vozen-scene-workflow, .vozen-scene-help, .vozen-scene-reminder, .vozen-scene-nickname, .vozen-scene-ticket, .vozen-scene-welcome, .vozen-scene-welcome-channel, .vozen-scene-temporary-channel, .vozen-scene-embed, .vozen-scene-emoji, .vozen-scene-search, .vozen-scene-crypto-query, .vozen-scene-gas-tracker, .vozen-scene-token-gate, .vozen-scene-nft-query, .vozen-scene-nft-sale { grid-template-columns: 1fr; }
+  .vozen-scene-poll .vozen-poll-card, .vozen-community-hero, .vozen-community-progress, .vozen-data-summary, .vozen-chain-card, .vozen-chain-metrics, .vozen-chain-proof, .vozen-flow-source, .vozen-flow-connector { grid-column: auto; }
+  .vozen-social-card .vozen-thumbnail { width: 64px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vozen-stage-item, .vozen-preview-progress span { transition: none; }
+}

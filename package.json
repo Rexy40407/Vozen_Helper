@@ -8,9 +8,13 @@
     "node": ">=20"
   },
   "scripts": {
-    "build:site": "node tools/minify-site.mjs"
+    "build:site": "node tools/minify-site.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:ui": "node tests/run-playwright.mjs",
+    "test:all": "npm run test && npm run test:ui"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "clean-css": "^5.3.3",
     "html-minifier-terser": "^7.2.0",
     "terser": "^5.48.0"

@@ -10,16 +10,20 @@ const PALETTES = {
 
 const sequence = (...rows) => rows.map(([label, title, text, status = title, tone = "signal"]) => ({ label, title, text, status, tone }));
 
-const definition = ({ id, category, title, scene, fields = [], sample = {}, stages, finalSummary, unavailable = false }) => ({
+const definition = ({ id, category, title, scene, fields = [], sample = {}, stages, finalSummary, unavailable = false, availability, renderer = null, visual = {}, themeTerms = [] }) => ({
   id,
   category,
   title,
   scene,
+  availability: availability || (unavailable ? "roadmap" : "available"),
   fields,
   sample,
   stages,
   finalSummary,
   unavailable,
+  renderer,
+  visual,
+  themeTerms,
   accent: PALETTES[category]?.[0] || "#8ee5d2",
   secondary: PALETTES[category]?.[1] || "#5edcf5",
   duration: 6200,
@@ -383,7 +387,7 @@ add(definition({
 
 add(definition({
   id: "social.youtube", category: "social", title: "Alertas do YouTube", scene: "social",
-  fields: ["sourceChannelId", "targetChannelId", "intervalSeconds", "messageTemplate", "mention", "notes", "alertOnly"], sample: { sourceChannelId: "canal-youtube", targetChannelId: "vídeos", intervalSeconds: 300, messageTemplate: "Novo vídeo de {channel}: {title}", mention: "@here", alertOnly: false },
+  fields: ["sourceChannelId", "targetChannelId", "intervalSeconds", "messageTemplate", "mention"], sample: { sourceChannelId: "canal-youtube", targetChannelId: "vídeos", intervalSeconds: 300, messageTemplate: "Novo vídeo de {channel}: {title}", mention: "@here" },
   stages: sequence(
     ["ESPERA", "Canal a aguardar", "O Helper acompanha o canal YouTube escolhido.", "A aguardar", "calm"],
     ["EVENTO", "Novo vídeo encontrado", "A verificação deteta uma publicação nova.", "Vídeo encontrado", "signal"],
@@ -479,40 +483,103 @@ const CONFIGURABLE_PREVIEW_IDS = [
   "community.leaderboard", "support.welcome_channel", "management.moderation", "management.custom_commands", "management.audit", "management.privacy", "management.templates", "community.role_panels", "community.events", "utility.help", "utility.reminders", "social.twitch", "protection.antispam", "protection.antiscam", "protection.anti_raid", "protection.join_gate", "community.levels", "community.starboard", "community.suggestions", "community.giveaways", "support.tickets", "support.welcome", "management.nickname", "management.workflows", "management.polls", "insights.stats", "social.rss", "social.youtube",
 ];
 
+const RENDERERS = {
+  "community.leaderboard": "leaderboard",
+  "support.welcome_channel": "welcome-channel",
+  "management.moderation": "moderation",
+  "management.custom_commands": "custom-command",
+  "management.audit": "audit",
+  "management.privacy": "privacy",
+  "management.templates": "template",
+  "community.role_panels": "role-panel",
+  "community.events": "event",
+  "utility.help": "help",
+  "utility.reminders": "reminder",
+  "social.twitch": "social-twitch",
+  "protection.antispam": "antispam",
+  "protection.antiscam": "antiscam",
+  "protection.anti_raid": "anti-raid",
+  "protection.join_gate": "join-gate",
+  "community.levels": "levels",
+  "community.starboard": "starboard",
+  "community.suggestions": "suggestion",
+  "community.giveaways": "giveaway",
+  "support.tickets": "ticket",
+  "support.welcome": "welcome",
+  "management.nickname": "nickname",
+  "management.workflows": "workflow",
+  "management.polls": "poll",
+  "insights.stats": "stats",
+  "social.rss": "social-rss",
+  "social.youtube": "social-youtube",
+  "community.achievements": "achievement",
+  "community.birthdays": "birthday",
+  "community.economy": "economy",
+  "growth.monetization": "monetization",
+  "management.invite_tracker": "invite-tracker",
+  "social.bluesky": "social-bluesky",
+  "social.instagram": "social-instagram",
+  "social.kick": "social-kick",
+  "social.podcasts": "social-podcast",
+  "social.reddit": "social-reddit",
+  "social.tiktok": "social-tiktok",
+  "social.x": "social-x",
+  "studio.rank_card": "rank-card",
+  "utility.embeds": "embed",
+  "utility.emojis": "emoji",
+  "utility.search": "search",
+  "utility.temp_channels": "temporary-channel",
+  "web3.crypto_queries": "crypto-query",
+  "web3.crypto_stats": "crypto-stats",
+  "web3.gas_tracker": "gas-tracker",
+  "web3.gating": "token-gate",
+  "web3.nft_queries": "nft-query",
+  "web3.nft_sales": "nft-sale",
+  "web3.nft_stats": "nft-stats",
+};
+
+const THEME_TERMS = {
+  "management.polls": ["enquete", "pergunta", "opções", "votos", "resultados"],
+  "community.starboard": ["mensagem", "reações", "limiar", "destaque", "starboard"],
+  "community.suggestions": ["sugestão", "votos", "revisão", "decisão"],
+  "management.audit": ["autor", "alteração", "histórico", "auditoria"],
+  "management.privacy": ["pedido", "retenção", "exportação", "eliminação"],
+  "management.templates": ["recursos", "pacote", "comparação", "importação"],
+  "support.tickets": ["ticket", "equipa", "transcript", "arquivo"],
+  "support.welcome": ["membro", "boas-vindas", "DM", "cargo"],
+  "utility.help": ["ajuda", "categorias", "comandos", "exemplos"],
+  "management.nickname": ["membro", "nome", "nickname", "sincronização"],
+  "protection.antispam": ["mensagens", "repetições", "contador", "spam"],
+  "protection.antiscam": ["ligação", "domínio", "risco", "fraude"],
+  "protection.anti_raid": ["entradas", "janela", "incidente", "raid"],
+  "protection.join_gate": ["conta", "avatar", "admissão", "portão"],
+};
+
+for (const item of Object.values(PREVIEWS)) {
+  item.renderer ||= RENDERERS[item.id] || item.scene || "module";
+  item.themeTerms = THEME_TERMS[item.id] || [item.title, item.category, item.renderer];
+  item.visual = { ...(item.visual || {}), theme: item.renderer };
+}
+
 const displayValue = (value, fallback = "não definido") => {
   if (value === undefined || value === null || String(value).trim() === "") return fallback;
-  if (value === true || value === "true" || value === "on") return "yes";
+  if (value === true || value === "true" || value === "on") return "sim";
   if (value === false || value === "false" || value === "off") return "não";
   return String(value).trim();
 };
 
 const interpolate = (value, context) => String(value).replace(/\{([a-zA-Z][\w]*)\}/g, (_, key) => displayValue(context[key], `{${key}}`));
 
-const ENGLISH_PREVIEW_OVERRIDES = {
-  "management.polls": {
-    title: "Polls",
-    stages: sequence(
-      ["CREATE", "Question prepared", "The team defines a question and its poll options.", "Poll started", "calm"],
-      ["PUBLISH", "Poll published", "The card appears in the configured channel for the selected duration.", "Poll published", "signal"],
-      ["VOTE", "Members choose", "Each participant can choose one or multiple options.", "Votes received", "action"],
-      ["UPDATE", "Results counted", "The bars and poll state reflect the simulated votes.", "Results updated", "success"],
-      ["RESULT", "Poll completed", "Reminders and privacy follow the configured settings.", "Poll completed", "success"],
-    ),
-    finalSummary: "The poll was published and its results were updated in this simulation only.",
-  },
-};
-
 export function getPreviewDefinition(id, values = {}) {
   const item = PREVIEWS[id];
   if (!item) return null;
-  const override = ENGLISH_PREVIEW_OVERRIDES[id] || {};
-  const resolved = { ...item, ...override };
-  const context = { ...resolved.sample, ...values };
+  const context = { ...item.sample, ...values };
   return {
-    ...resolved,
-    duration: resolved.duration,
-    stages: resolved.stages.map((stage) => Object.fromEntries(Object.entries(stage).map(([key, value]) => [key, interpolate(value, context)]))),
-    finalSummary: interpolate(resolved.finalSummary, context),
+    ...item,
+    duration: item.duration,
+    stages: item.stages.map((stage) => Object.fromEntries(Object.entries(stage).map(([key, value]) => [key, interpolate(value, context)]))),
+    finalSummary: interpolate(item.finalSummary, context),
+    visual: { ...item.visual, context: Object.fromEntries(Object.keys(context).map((key) => [key, displayValue(context[key])])) },
     data: Object.fromEntries(Object.keys(context).map((key) => [key, displayValue(context[key])])),
   };
 }

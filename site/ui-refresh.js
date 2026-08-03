@@ -1,4 +1,5 @@
 import { getPreviewDefinition } from "./module-previews.js";
+import { openModulePreview } from "./module-preview-player.js";
 
 (() => {
   "use strict";
@@ -702,138 +703,15 @@ import { getPreviewDefinition } from "./module-previews.js";
     ]));
   }
 
-  function simulationVisual(page, route) {
+  function openSimulationPreview(page, route, trigger) {
     const moduleId = route.replace(/^\/config\//, "");
     const values = readPreviewValues(one(".detail-layout", page) || page);
-    return getPreviewDefinition(moduleId, values) || getPreviewDefinition("management.workflows", { dryRun: true });
-  }
-
-  function sceneGroup(scene) {
-    if (scene === "poll" || scene === "suggestions" || scene === "starboard") return "poll";
-    if (["protection", "join-gate", "moderation"].includes(scene)) return "protection";
-    if (["social"].includes(scene)) return "social";
-    if (["levels", "rank-card", "leaderboard", "achievement", "birthday", "economy", "giveaway", "role-panel", "event"].includes(scene)) return "community";
-    if (["stats", "audit", "privacy", "template", "monetization", "web3"].includes(scene)) return "data";
-    return "service";
-  }
-
-  function sceneItem(beat, stage, className = "") {
-    return `<div class="vozen-semantic-item vozen-stage-item ${className}" data-beat="${beat}"><span class="vozen-semantic-kicker">${escapeHtml(stage.label)}</span><strong>${escapeHtml(stage.title)}</strong><small>${escapeHtml(stage.text)}</small></div>`;
-  }
-
-  function stageMarkup(visual) {
-    const common = `<div class="vozen-stage-topline"><span class="vozen-stage-status" data-stage-status>${escapeHtml(visual.stages[0].status)}</span><span class="vozen-stage-live-label">SIMULATED</span></div>`;
-    const group = sceneGroup(visual.scene);
-    const items = visual.stages.map((stage, index) => sceneItem(index, stage, index === 0 ? "is-complete" : "")).join("");
-    if (group === "poll") {
-      return `${common}<div class="vozen-scene vozen-semantic-scene vozen-scene-poll"><div class="vozen-scene-grid"></div><div class="vozen-poll-card vozen-stage-item is-complete" data-beat="0"><span class="vozen-semantic-kicker">SIMULATED POLL</span><strong>What should we do next?</strong><div class="vozen-poll-option"><span>Community event</span><b style="--poll-width:72%"></b><small>8 votes</small></div><div class="vozen-poll-option"><span>Game night</span><b style="--poll-width:48%"></b><small>5 votes</small></div><div class="vozen-poll-option"><span>Live Q&amp;A</span><b style="--poll-width:28%"></b><small>3 votes</small></div><small class="vozen-scene-meta">${escapeHtml(visual.data.allowMultiple === "yes" ? "Multiple choices allowed" : "One choice per member")}</small></div>${sceneItem(1, visual.stages[1], "vozen-semantic-card")}${sceneItem(2, visual.stages[2], "vozen-semantic-card")}${sceneItem(3, visual.stages[3], "vozen-semantic-card")}${sceneItem(4, visual.stages[4], "vozen-semantic-result")}</div>`;
+    const definition = getPreviewDefinition(moduleId, values);
+    if (!definition) {
+      console.error(`[Vozen preview] Definição desconhecida: ${moduleId}`);
+      return;
     }
-    if (group === "protection") {
-      return `${common}<div class="vozen-scene vozen-semantic-scene vozen-scene-protection"><div class="vozen-scene-grid"></div><div class="vozen-chat-bubble vozen-stage-item is-complete" data-beat="0"><strong>Nova</strong><span>Normal message in the channel</span></div><div class="vozen-chat-bubble vozen-chat-warning vozen-stage-item" data-beat="1"><strong>Flagged member</strong><span>${escapeHtml(visual.stages[1].text)}</span></div><div class="vozen-rule-card vozen-stage-item" data-beat="2"><span class="vozen-semantic-icon">✓</span><div><strong>${escapeHtml(visual.stages[2].title)}</strong><small>${escapeHtml(visual.stages[2].text)}</small></div></div><div class="vozen-action-card vozen-stage-item" data-beat="3"><span class="vozen-semantic-icon">!</span><div><strong>${escapeHtml(visual.stages[3].title)}</strong><small>${escapeHtml(visual.stages[3].text)}</small></div></div><div class="vozen-semantic-result vozen-stage-item" data-beat="4"><strong>${escapeHtml(visual.stages[4].title)}</strong><small>${escapeHtml(visual.stages[4].text)}</small></div></div>`;
-    }
-    if (group === "social") {
-      return `${common}<div class="vozen-scene vozen-semantic-scene vozen-scene-social"><div class="vozen-scene-grid"></div><div class="vozen-source-orbit vozen-stage-item is-complete" data-beat="0"><span class="vozen-semantic-icon">↗</span><strong>Monitored source</strong><small>Waiting for an update</small></div><div class="vozen-source-pulse vozen-stage-item" data-beat="1"><i></i><i></i><strong>${escapeHtml(visual.stages[1].title)}</strong></div><div class="vozen-alert-card vozen-stage-item" data-beat="2"><span class="vozen-semantic-kicker">ALERT PREPARED</span><strong>${escapeHtml(visual.stages[2].title)}</strong><p>${escapeHtml(visual.stages[2].text)}</p></div><div class="vozen-destination-card vozen-stage-item" data-beat="3"><span># Discord destination</span><strong>${escapeHtml(visual.stages[3].title)}</strong><small>${escapeHtml(visual.stages[3].text)}</small></div><div class="vozen-semantic-result vozen-stage-item" data-beat="4"><strong>${escapeHtml(visual.stages[4].title)}</strong><small>${escapeHtml(visual.stages[4].text)}</small></div></div>`;
-    }
-    if (group === "community") {
-      return `${common}<div class="vozen-scene vozen-semantic-scene vozen-scene-community"><div class="vozen-scene-grid"></div><div class="vozen-community-card vozen-stage-item is-complete" data-beat="0"><span class="vozen-semantic-icon">✦</span><div><strong>${escapeHtml(visual.stages[0].title)}</strong><small>${escapeHtml(visual.stages[0].text)}</small></div></div><div class="vozen-community-progress vozen-stage-item" data-beat="1"><span class="vozen-semantic-kicker">COMMUNITY PROGRESS</span><div class="vozen-progress-track"><b style="--progress-width:64%"></b></div><strong>${escapeHtml(visual.stages[1].title)}</strong><small>${escapeHtml(visual.stages[1].text)}</small></div><div class="vozen-community-card vozen-stage-item" data-beat="2"><span class="vozen-semantic-icon">+</span><div><strong>${escapeHtml(visual.stages[2].title)}</strong><small>${escapeHtml(visual.stages[2].text)}</small></div></div><div class="vozen-community-card vozen-stage-item" data-beat="3"><span class="vozen-semantic-icon">✓</span><div><strong>${escapeHtml(visual.stages[3].title)}</strong><small>${escapeHtml(visual.stages[3].text)}</small></div></div><div class="vozen-semantic-result vozen-stage-item" data-beat="4"><strong>${escapeHtml(visual.stages[4].title)}</strong><small>${escapeHtml(visual.stages[4].text)}</small></div></div>`;
-    }
-    if (group === "data") {
-      return `${common}<div class="vozen-scene vozen-semantic-scene vozen-scene-data"><div class="vozen-scene-grid"></div><div class="vozen-data-header vozen-stage-item is-complete" data-beat="0"><span class="vozen-semantic-icon">▦</span><div><strong>${escapeHtml(visual.stages[0].title)}</strong><small>${escapeHtml(visual.stages[0].text)}</small></div></div><div class="vozen-data-chart vozen-stage-item" data-beat="1"><i style="--bar-height:42%"></i><i style="--bar-height:68%"></i><i style="--bar-height:54%"></i><i style="--bar-height:86%"></i><span>${escapeHtml(visual.stages[1].title)}</span></div><div class="vozen-data-card vozen-stage-item" data-beat="2"><strong>${escapeHtml(visual.stages[2].title)}</strong><small>${escapeHtml(visual.stages[2].text)}</small></div><div class="vozen-data-card vozen-stage-item" data-beat="3"><strong>${escapeHtml(visual.stages[3].title)}</strong><small>${escapeHtml(visual.stages[3].text)}</small></div><div class="vozen-semantic-result vozen-stage-item" data-beat="4"><strong>${escapeHtml(visual.stages[4].title)}</strong><small>${escapeHtml(visual.stages[4].text)}</small></div></div>`;
-    }
-    return `${common}<div class="vozen-scene vozen-semantic-scene vozen-scene-service"><div class="vozen-scene-grid"></div><div class="vozen-service-node vozen-stage-item is-complete" data-beat="0"><span class="vozen-semantic-icon">●</span><strong>${escapeHtml(visual.stages[0].title)}</strong><small>${escapeHtml(visual.stages[0].text)}</small></div><div class="vozen-service-flow vozen-stage-item" data-beat="1"><i></i><i></i><i></i></div><div class="vozen-service-card vozen-stage-item" data-beat="2"><strong>${escapeHtml(visual.stages[2].title)}</strong><small>${escapeHtml(visual.stages[2].text)}</small></div><div class="vozen-service-card vozen-stage-item" data-beat="3"><strong>${escapeHtml(visual.stages[3].title)}</strong><small>${escapeHtml(visual.stages[3].text)}</small></div><div class="vozen-semantic-result vozen-stage-item" data-beat="4"><strong>${escapeHtml(visual.stages[4].title)}</strong><small>${escapeHtml(visual.stages[4].text)}</small></div></div>`;
-  }
-
-
-  // The base panel already ships PT-PT presets. Do not rewrite them to English
-  // after the module form is mounted.
-  function normalizeEnglishPresets() {}
-
-  function closeSimulationPreview(page) {
-    const modal = one("#vozen-simulation-modal");
-    if (!modal) return;
-    modal._previewCleanup?.();
-    document.body.classList.remove("vozen-modal-open");
-    modal.remove();
-    page._simulationTrigger?.focus();
-  }
-
-  function openSimulationPreview(page, route, trigger) {
-    closeSimulationPreview(page);
-    const visual = simulationVisual(page, route);
-    if (!visual) return;
-    const title = cleanText(one("h2", page)?.textContent) || "Módulo";
-    const modal = document.createElement("div");
-    modal.id = "vozen-simulation-modal";
-    modal.className = "vozen-simulation-modal";
-    modal.setAttribute("role", "dialog");
-    modal.setAttribute("aria-modal", "true");
-    modal.setAttribute("aria-labelledby", "vozen-simulation-title");
-    modal.setAttribute("aria-describedby", "vozen-simulation-description");
-    modal.innerHTML = `<div class="vozen-simulation-backdrop" data-simulation-close="true"></div><section class="vozen-simulation-dialog" role="document" style="--preview-accent:${escapeHtml(visual.accent)};--preview-secondary:${escapeHtml(visual.secondary)}"><header class="vozen-simulation-header"><div><span class="vozen-eyebrow">SAFE PREVIEW</span><h2 id="vozen-simulation-title">${escapeHtml(title)}</h2><p id="vozen-simulation-description">See what this configuration would do before publishing.</p></div><button type="button" class="vozen-simulation-close" aria-label="Close simulation preview">×</button></header><div class="vozen-simulation-badge"><span aria-hidden="true">●</span> Preview only · No real action will be sent</div><div class="vozen-simulation-content"><ol class="vozen-scenario-rail" aria-label="Preview scenario steps">${visual.stages.map((stage, index) => `<li class="vozen-scenario-step ${index === 0 ? "is-active" : ""}" data-rail-beat="${index}"><span>${index + 1}</span><div><strong>${escapeHtml(stage.label)}</strong><small>${escapeHtml(stage.title)}</small></div></li>`).join("")}</ol><div class="vozen-signal-column"><div class="vozen-signal-stage" data-scene="${escapeHtml(visual.scene)}">${stageMarkup(visual)}</div><p class="vozen-live-preview-note">Visual example only. Nothing is sent to Discord or external services.</p></div></div><p class="vozen-preview-sr-summary" aria-live="polite">Preview ready.</p><footer class="vozen-simulation-footer"><div class="vozen-preview-progress-wrap"><div class="vozen-preview-progress" role="progressbar" aria-label="Preview progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span data-preview-progress></span></div><span data-preview-state>Ready</span></div><div class="vozen-preview-controls"><button type="button" class="vozen-preview-replay" aria-label="Replay preview">Replay</button><button type="button" class="primary vozen-preview-playback" aria-label="Play preview">Play preview</button><button type="button" class="secondary vozen-simulation-done">Close preview</button></div></footer></section>`;
-    document.body.append(modal);
-    document.body.classList.add("vozen-modal-open");
-    page._simulationTrigger = trigger;
-    const playback = { status: "idle", elapsed: 0, startedAt: 0, raf: 0, timeout: 0, beat: 0, observer: null };
-    const progress = one("[data-preview-progress]", modal);
-    const progressTrack = one(".vozen-preview-progress", modal);
-    const stateLabel = one("[data-preview-state]", modal);
-    const playbackButton = one(".vozen-preview-playback", modal);
-    const replayButton = one(".vozen-preview-replay", modal);
-    const srSummary = one(".vozen-preview-sr-summary", modal);
-    const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    const beatForTime = (elapsed) => Math.min(visual.stages.length - 1, Math.floor((elapsed / visual.duration) * visual.stages.length));
-    const renderBeat = (beat) => {
-      playback.beat = beat;
-      all("[data-rail-beat]", modal).forEach((item) => { const itemBeat = Number(item.dataset.railBeat); item.classList.toggle("is-active", itemBeat === beat); item.classList.toggle("is-complete", itemBeat < beat || playback.status === "completed"); });
-      all("[data-beat]", modal).forEach((item) => { const itemBeat = Number(item.dataset.beat); item.classList.toggle("is-active", itemBeat === beat); item.classList.toggle("is-complete", itemBeat < beat || playback.status === "completed"); });
-      const status = one("[data-stage-status]", modal); if (status) status.textContent = visual.stages[beat]?.status || "Preview";
-    };
-    const setStatus = (status) => {
-      playback.status = status; modal.dataset.playback = status;
-      const labels = { idle: ["Play preview", "Play preview", false, "Ready"], playing: ["Pause preview", "Pause preview", false, "Playing"], paused: ["Resume preview", "Resume preview", false, "Paused"], replaying: ["Preparing…", "Replay preview", true, "Replaying"], completed: ["Replay", "Replay preview", false, "Complete"] };
-      const [label, aria, disabled, state] = labels[status] || labels.idle;
-      if (playbackButton) { playbackButton.textContent = label; playbackButton.setAttribute("aria-label", aria); playbackButton.disabled = disabled; }
-      if (replayButton) replayButton.disabled = disabled;
-      if (stateLabel) stateLabel.textContent = state;
-      if (status === "completed" && srSummary) srSummary.textContent = `Preview complete. ${visual.finalSummary}`;
-      if (status === "paused" && srSummary) srSummary.textContent = `Preview paused at ${visual.stages[playback.beat]?.label || "current step"}.`;
-    };
-    const updateProgress = () => {
-      const percentage = Math.round((playback.elapsed / visual.duration) * 100);
-      if (progress) progress.style.width = `${percentage}%`;
-      if (progressTrack) progressTrack.setAttribute("aria-valuenow", String(percentage));
-    };
-    const render = () => {
-      if (playback.status !== "playing") return;
-      playback.elapsed = Math.min(visual.duration, performance.now() - playback.startedAt);
-      renderBeat(beatForTime(playback.elapsed)); updateProgress();
-      if (playback.elapsed >= visual.duration) { setStatus("completed"); renderBeat(visual.stages.length - 1); updateProgress(); return; }
-      playback.raf = window.requestAnimationFrame(render);
-    };
-    const start = () => { playback.startedAt = performance.now() - playback.elapsed; setStatus("playing"); playback.raf = window.requestAnimationFrame(render); };
-    const pause = () => { if (playback.status !== "playing") return; window.cancelAnimationFrame(playback.raf); playback.elapsed = Math.min(visual.duration, performance.now() - playback.startedAt); setStatus("paused"); renderBeat(beatForTime(playback.elapsed)); updateProgress(); };
-    const replay = () => { window.cancelAnimationFrame(playback.raf); window.clearTimeout(playback.timeout); playback.elapsed = 0; updateProgress(); setStatus("replaying"); renderBeat(0); playback.timeout = window.setTimeout(() => start(), reduceMotion ? 0 : 180); };
-    const togglePlayback = () => { if (playback.status === "playing") pause(); else if (playback.status === "paused") start(); else replay(); };
-    const close = () => closeSimulationPreview(page);
-    const focusables = () => all("button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])", modal);
-    const onKeyDown = (event) => {
-      if (event.key === "Escape") { event.preventDefault(); close(); return; }
-      if (event.key !== "Tab") return;
-      const items = focusables(); if (!items.length) return;
-      const first = items[0]; const last = items[items.length - 1];
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-    };
-    const onVisibility = () => { if (document.hidden) pause(); };
-    modal._previewCleanup = () => { window.cancelAnimationFrame(playback.raf); window.clearTimeout(playback.timeout); document.removeEventListener("keydown", onKeyDown); document.removeEventListener("visibilitychange", onVisibility); playback.observer?.disconnect(); };
-    document.addEventListener("keydown", onKeyDown); document.addEventListener("visibilitychange", onVisibility);
-    one(".vozen-simulation-close", modal)?.addEventListener("click", close); one(".vozen-simulation-done", modal)?.addEventListener("click", close); one("[data-simulation-close]", modal)?.addEventListener("click", close);
-    playbackButton?.addEventListener("click", togglePlayback); replayButton?.addEventListener("click", replay);
-    playback.observer = typeof IntersectionObserver === "function" ? new IntersectionObserver((entries) => { if (!entries[0]?.isIntersecting) pause(); }) : null; playback.observer?.observe(modal);
-    renderBeat(0); setStatus("idle");
-    if (reduceMotion) { playback.elapsed = visual.duration; renderBeat(visual.stages.length - 1); updateProgress(); setStatus("completed"); }
-    else playback.timeout = window.setTimeout(() => start(), 300);
-    window.requestAnimationFrame(() => one(".vozen-simulation-close", modal)?.focus());
+    openModulePreview({ definition, title: cleanText(one("h2", page)?.textContent) || definition.title, trigger });
   }
 
   function enhanceModuleForm() {
@@ -842,7 +720,6 @@ import { getPreviewDefinition } from "./module-previews.js";
     const route = routeInfo().path;
     page.classList.add("ui-module-form");
     const container = one(".detail-layout", page) || page;
-    normalizeEnglishPresets(container, route);
     const key = `${route}:${one("h2", page)?.textContent || ""}`;
     if (container.dataset.uiFormKey !== key) {
       container.dataset.uiFormKey = key;
