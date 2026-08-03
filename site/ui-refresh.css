@@ -1611,6 +1611,7 @@ body.vozen-modal-open {
   align-items: start;
   justify-content: space-between;
   gap: 20px;
+  margin: 0;
   padding: 24px 24px 18px;
   border-bottom: 1px solid var(--ui-border);
 }
@@ -1655,7 +1656,7 @@ body.vozen-modal-open {
   gap: 8px;
   width: max-content;
   max-width: calc(100% - 48px);
-  margin: 18px 24px 4px;
+  margin: 8px 24px 0;
   padding: 7px 10px;
   border: 1px solid #3b756f;
   border-radius: 999px;
