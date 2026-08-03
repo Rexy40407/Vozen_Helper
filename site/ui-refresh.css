@@ -243,6 +243,12 @@
   gap: 9px;
 }
 
+/* Antispam keeps conversation, detection and enforcement in separate lanes. */
+.vozen-scene-antispam .vozen-chat-lane {
+  right: 124px;
+  bottom: 172px;
+}
+
 .vozen-chat-message {
   display: grid;
   grid-template-columns: 34px minmax(0, 1fr);
@@ -324,7 +330,7 @@
 
 .vozen-scene-shield {
   position: absolute;
-  top: 78px;
+  top: 182px;
   right: 28px;
   display: grid;
   place-items: center;
@@ -653,7 +659,8 @@
   .vozen-preview-controls { justify-content: stretch; }
   .vozen-preview-controls button { flex: 1 1 110px; }
   .vozen-chat-lane { right: 12px; left: 12px; }
-  .vozen-scene-shield { top: 90px; right: 20px; width: 64px; height: 64px; }
+  .vozen-scene-antispam .vozen-chat-lane { right: 96px; bottom: 190px; }
+  .vozen-scene-shield { top: 200px; right: 16px; width: 64px; height: 64px; }
   .vozen-scene-action { top: 322px; right: 12px; bottom: auto; left: 12px; }
   .vozen-scene-result { right: 12px; bottom: 18px; left: 12px; }
   .vozen-welcome-message, .vozen-level-message, .vozen-twitch-status, .vozen-alert-card, .vozen-twitch-match, .vozen-twitch-destination { right: 12px; left: 12px; }
