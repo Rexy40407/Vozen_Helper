@@ -210,6 +210,20 @@
   opacity: 1;
 }
 
+/* Only the current beat owns the stage. Completed beats leave the visual
+   layout immediately so sequential scenes cannot stack cards on top of one
+   another during the crossfade. */
+.vozen-stage-item.is-complete:not(.is-active) {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-4px) scale(.98);
+}
+
+.vozen-stage-item.is-active {
+  visibility: visible;
+}
+
 .vozen-scene-avatar,
 .vozen-welcome-avatar {
   display: grid;
@@ -494,7 +508,7 @@
 .vozen-welcome-actions {
   position: absolute;
   right: 22px;
-  bottom: 35px;
+  bottom: 76px;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
