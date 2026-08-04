@@ -10,6 +10,10 @@ on:
     branches: [main]
     paths:
       - 'site/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'playwright.config.mjs'
       - 'tools/minify-site.mjs'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
@@ -25,7 +29,22 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium for Playwright
+        run: npx playwright install chromium
+      - name: Run Node and browser preview tests
+        run: npm run test:all
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -35,7 +54,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
+      - run: npm ci
       - name: Build minified site (site/ -> site-dist/)
         run: npm run build:site
       - uses: actions/configure-pages@v5
