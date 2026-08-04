@@ -579,7 +579,9 @@
       // fallback for older VPS proxies so a migration never strands an existing panel session.
       const API_BASES = ['https://api.vozen.org', 'https://api.vozen.org/rust'];
       let API_BASE = API_BASES[0];
-      const CLIENT_ID = '1526211106081734666';
+      // Dedicated OAuth application for the owner-only administration panel.
+      // Keep the TTS/Helper bot application IDs out of this login flow.
+      const CLIENT_ID = '1534014665187655760';
       const REDIRECT_URI = 'https://rexy40407.github.io/Vozen_Helper/vozen.html';
       const SCOPE = 'identify';
 
