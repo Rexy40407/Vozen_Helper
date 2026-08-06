@@ -1,4 +1,5 @@
 name: Deploy site to GitHub Pages
+# Force a Pages run when GitHub's deployment queue drops a push event.
 
 # Publica o site em GitHub Pages, MINIFICADO. O passo build:site gera site-dist/ a
 # partir de site/ (index.html + css minificados; privacy/terms ficam legíveis) e é
