@@ -24,6 +24,7 @@ permissions:
   id-token: write
 
 # Uma só publicação de cada vez; não cancela um deploy a meio.
+# Changing this workflow file is an intentional way to retry transient Pages failures.
 concurrency:
   group: pages
   # A protected environment can leave an old run waiting indefinitely. A
