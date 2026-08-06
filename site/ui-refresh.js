@@ -339,6 +339,10 @@ import { openModulePreview } from "./module-preview-player.js";
   }
 
   function featureStatus(card) {
+    // Nickname is backed by the Rust nickname adapter. Older API payloads can
+    // still carry its former roadmap maturity, so keep the public catalogue
+    // aligned with the runtime capability until every cached payload expires.
+    if (moduleTitle(card) === "nickname") return "available";
     const text = cleanText(one(".pill", card)?.textContent).toLowerCase();
     if (text.includes("beta")) return "beta";
     if (text.includes("ativa") || text.includes("active")) return "active";
