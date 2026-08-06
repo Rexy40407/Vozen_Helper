@@ -26,7 +26,9 @@ permissions:
 # Uma só publicação de cada vez; não cancela um deploy a meio.
 concurrency:
   group: pages
-  cancel-in-progress: false
+  # A protected environment can leave an old run waiting indefinitely. A
+  # newer verified commit must be able to replace that stale deployment.
+  cancel-in-progress: true
 
 jobs:
   test:
