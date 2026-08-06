@@ -32,6 +32,6 @@ para esta página; não há segredos Discord no bundle público.
 
 Cada `push` a `main` que altere `site/**` corre o workflow `pages.yml`, que gera
 `site-dist/` e publica-o no GitHub Pages em
-`https://rexy40407.github.io/Vozen_Helper/`.
+`https://rexy40407.github.io/painel/`.
 
 Sem afiliação com a Discord Inc.
