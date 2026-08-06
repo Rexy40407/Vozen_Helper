@@ -70,3 +70,6 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+          # GitHub Pages can leave a deployment queued during provider load.
+          # Allow the service 30 minutes before cancelling the poll.
+          timeout: 1800000
