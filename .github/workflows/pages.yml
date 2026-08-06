@@ -8,14 +8,6 @@ name: Deploy site to GitHub Pages
 on:
   push:
     branches: [main]
-    paths:
-      - 'site/**'
-      - 'tests/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'playwright.config.mjs'
-      - 'tools/minify-site.mjs'
-      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:
